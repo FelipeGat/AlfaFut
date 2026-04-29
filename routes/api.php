@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\DespesaController;
 use App\Http\Controllers\Api\MensagemController;
 use App\Http\Controllers\Api\PartidaController;
 use App\Http\Controllers\Api\PatotaController;
+use App\Http\Controllers\Api\PlacarController;
 use App\Http\Controllers\Api\UsuarioController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +34,13 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::post('partidas/{partida}/confirmar', [ConfirmacaoController::class, 'confirmar']);
         Route::post('partidas/{partida}/recusar', [ConfirmacaoController::class, 'recusar']);
         Route::delete('partidas/{partida}/confirmacao', [ConfirmacaoController::class, 'cancelar']);
+
+        // Placar ao vivo
+        Route::get('partidas/{partida}/placar', [PlacarController::class, 'dados']);
+        Route::post('partidas/{partida}/iniciar', [PlacarController::class, 'iniciar']);
+        Route::post('partidas/{partida}/pausar', [PlacarController::class, 'pausar']);
+        Route::post('partidas/{partida}/finalizar', [PlacarController::class, 'finalizar']);
+        Route::post('partidas/{partida}/gol', [PlacarController::class, 'gol']);
 
         Route::get('patotas/{patota}/despesas', [DespesaController::class, 'index']);
         Route::post('patotas/{patota}/despesas', [DespesaController::class, 'store']);
