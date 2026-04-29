@@ -7,7 +7,11 @@
     <meta name="theme-color" content="#1b5e20">
 
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/logo/icon.svg') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/pwa/icon-192.png') }}">
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="AlfaFut">
+    <meta name="mobile-web-app-capable" content="yes">
 
     <title>{{ $title ?? '' }}{{ isset($title) ? ' | ' : '' }}{{ config('app.name', 'AlfaFut') }}</title>
 
@@ -42,5 +46,7 @@
             AlfaFut &middot; Atividade de Extensao Uniasselvi
         </div>
     </footer>
+
+    @include('partials.pwa-script')
 </body>
 </html>

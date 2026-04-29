@@ -8,6 +8,11 @@
     <meta name="theme-color" content="#1b5e20">
 
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/pwa/icon-192.png') }}">
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="AlfaFut">
+    <meta name="mobile-web-app-capable" content="yes">
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=playfair-display:700,900|roboto:400,500,700&display=swap" rel="stylesheet">
@@ -568,5 +573,7 @@
             };
         }
     </script>
+
+    @include('partials.pwa-script')
 </body>
 </html>

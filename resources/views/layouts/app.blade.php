@@ -11,7 +11,14 @@
     <meta name="theme-color" content="#1b5e20">
 
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/logo/icon.svg') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/pwa/icon-192.png') }}">
+
+    {{-- PWA --}}
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AlfaFut">
+    <meta name="mobile-web-app-capable" content="yes">
 
     <title>{{ $title ?? '' }}{{ isset($title) ? ' | ' : '' }}{{ config('app.name', 'AlfaFut') }}</title>
 
@@ -56,5 +63,25 @@
             </div>
         </footer>
     </div>
+
+    {{-- Banner "Instalar app" (aparece quando o navegador suporta) --}}
+    <div id="banner-instalar"
+         x-data="{ aberto: false }"
+         x-show="aberto"
+         x-cloak
+         x-transition
+         role="region"
+         aria-label="Instalar AlfaFut"
+         class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-primary text-on-primary rounded-2xl shadow-2xl p-4 flex items-center gap-3 max-w-md w-[calc(100%-2rem)]">
+        <img src="{{ asset('images/logo/icon.svg') }}" alt="" class="h-12 w-12 rounded-full bg-white p-1 shrink-0">
+        <div class="flex-1 min-w-0">
+            <p class="font-semibold text-sm">Instalar AlfaFut</p>
+            <p class="text-xs opacity-90">Adicione na tela inicial pra usar offline.</p>
+        </div>
+        <button id="btn-instalar" class="btn btn-secondary text-sm" @click="aberto = false">Instalar</button>
+        <button class="text-on-primary opacity-70 hover:opacity-100" aria-label="Fechar" @click="aberto = false">✕</button>
+    </div>
+
+    @include('partials.pwa-script')
 </body>
 </html>

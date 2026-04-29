@@ -17,6 +17,7 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/como-usar', ComoUsarController::class)->name('como-usar');
+Route::view('/offline', 'offline')->name('offline');
 
 // Rota temporaria para capturas de tela em ambiente local
 if (app()->environment('local')) {
