@@ -2,10 +2,10 @@
     <x-slot name="title">{{ $partida->titulo }}</x-slot>
     <x-slot name="header">
         <p class="opacity-90 text-sm">{{ $partida->patota->nome }}</p>
-        <h1 class="font-bold text-2xl mt-1">{{ $partida->titulo }}</h1>
-        <p class="opacity-95 mt-1">
+        <h1 class="font-bold text-xl sm:text-2xl mt-1">{{ $partida->titulo }}</h1>
+        <p class="opacity-95 mt-1 text-sm sm:text-base">
             <time datetime="{{ $partida->data_hora->toIso8601String() }}">
-                {{ $partida->data_hora->translatedFormat('l, d \d\e F \d\e Y \a\s H:i') }}
+                {{ $partida->data_hora->translatedFormat('l, d \d\e F \a\s H:i') }}
             </time>
         </p>
     </x-slot>
@@ -88,6 +88,39 @@
                         🎲 {{ $partida->times->count() ? 'Re-sortear times' : 'Sortear times' }}
                     </button>
                 </form>
+            @endif
+
+            @php
+                $eResponsavel = $partida->patota->responsavel_id === auth()->id() || $eAdmin;
+            @endphp
+            @if ($eResponsavel && $partida->times->count() >= 2)
+                <div class="mt-3 flex flex-wrap gap-2">
+                    @if (! $partida->finalizada())
+                        <a href="{{ route('partidas.controle', $partida) }}" class="btn btn-primary">
+                            🎮 Controle ao vivo
+                        </a>
+                    @endif
+                    <a href="{{ route('partidas.tv', $partida) }}" target="_blank" class="btn btn-outline">
+                        📺 Placar TV
+                    </a>
+                    @if ($partida->finalizada())
+                        <a href="{{ route('partidas.resultado', $partida) }}" class="btn btn-secondary">
+                            🏆 Resultado
+                        </a>
+                    @endif
+                </div>
+            @elseif ($partida->times->count() >= 2)
+                {{-- membros normais ainda podem ver TV e resultado --}}
+                <div class="mt-3 flex flex-wrap gap-2">
+                    <a href="{{ route('partidas.tv', $partida) }}" target="_blank" class="btn btn-outline">
+                        📺 Placar TV
+                    </a>
+                    @if ($partida->finalizada())
+                        <a href="{{ route('partidas.resultado', $partida) }}" class="btn btn-secondary">
+                            🏆 Resultado
+                        </a>
+                    @endif
+                </div>
             @endif
 
             @if ($minhaConfirmacao)

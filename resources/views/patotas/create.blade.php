@@ -1,7 +1,7 @@
 <x-app-layout>
-    <x-slot name="title">Nova patota</x-slot>
+    <x-slot name="title">Nova turma</x-slot>
     <x-slot name="header">
-        <h1 class="font-bold text-2xl">Criar nova patota</h1>
+        <h1 class="font-bold text-2xl">Criar nova turma</h1>
         <p class="text-sm opacity-90">Passo 1: voce sera o administrador, depois compartilhe o codigo de convite.</p>
     </x-slot>
 
@@ -11,12 +11,34 @@
             <p id="form-help" class="text-sm text-gray-700">Os campos marcados com asterisco (*) sao obrigatorios.</p>
 
             <div>
-                <label for="nome">Nome da patota *</label>
+                <label for="nome">Nome da turma *</label>
                 <input id="nome" name="nome" type="text" class="input" required maxlength="120"
                        value="{{ old('nome') }}" aria-required="true"
                        @error('nome') aria-invalid="true" aria-describedby="nome-erro" @enderror>
                 @error('nome')<p id="nome-erro" class="text-red-700 text-sm mt-1" role="alert">{{ $message }}</p>@enderror
             </div>
+
+            <fieldset x-data="{ sel: '{{ old('brasao') }}' }">
+                <legend class="font-medium block mb-2">Escolha o brasao da turma</legend>
+                <p class="text-sm text-gray-700 mb-3">20 clubes ficticios disponiveis. O brasao sera usado em jogos, placar e mural.</p>
+                <input type="hidden" name="brasao" :value="sel">
+                <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                    @foreach ($clubes as $clube)
+                        <button type="button"
+                                @click="sel = '{{ $clube['brasao'] }}'"
+                                :class="sel === '{{ $clube['brasao'] }}' ? 'ring-4 ring-offset-2 scale-105' : ''"
+                                style="--tw-ring-color: var(--md-sys-color-primary);"
+                                class="bg-white border rounded-lg p-2 transition-all hover:shadow-lg focus:outline-none"
+                                :aria-pressed="sel === '{{ $clube['brasao'] }}' ? 'true' : 'false'"
+                                aria-label="Escolher brasao {{ $clube['nome'] }}">
+                            <img src="{{ asset($clube['brasao']) }}" alt="{{ $clube['nome'] }}" class="w-full h-auto" loading="lazy">
+                            <span class="block text-xs mt-1 text-center text-gray-700 truncate">{{ $clube['nome'] }}</span>
+                        </button>
+                    @endforeach
+                </div>
+                <p class="text-xs text-gray-600 mt-2" x-show="!sel">Nenhum brasao selecionado (opcional).</p>
+                <p class="text-xs text-green-700 mt-2" x-show="sel" x-cloak>✓ Brasao selecionado.</p>
+            </fieldset>
 
             <div>
                 <label for="descricao">Descricao</label>
@@ -51,14 +73,14 @@
                     </div>
                     <div class="flex items-center mt-7">
                         <input id="publica" name="publica" type="checkbox" value="1" class="h-5 w-5" {{ old('publica') ? 'checked' : '' }}>
-                        <label for="publica" class="ms-2 mb-0">Patota publica (aparece em busca)</label>
+                        <label for="publica" class="ms-2 mb-0">Turma publica (aparece em busca)</label>
                     </div>
                 </div>
             </fieldset>
 
             <div class="flex items-center justify-end gap-2">
                 <a href="{{ route('patotas.index') }}" class="btn btn-outline">Cancelar</a>
-                <button type="submit" class="btn btn-primary">Criar patota</button>
+                <button type="submit" class="btn btn-primary">Criar turma</button>
             </div>
         </form>
     </div>

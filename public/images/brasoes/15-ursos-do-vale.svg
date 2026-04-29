@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" role="img" aria-label="Ursos do Vale">
+  <defs>
+    <linearGradient id="b15" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6d4c41"/><stop offset="100%" stop-color="#3e2723"/>
+    </linearGradient>
+  </defs>
+  <path d="M 12 8 L 88 8 L 88 70 Q 88 100, 50 116 Q 12 100, 12 70 Z" fill="url(#b15)" stroke="#ffe082" stroke-width="2.5"/>
+  <circle cx="50" cy="50" r="20" fill="#ffe082"/>
+  <circle cx="36" cy="36" r="6" fill="#ffe082"/><circle cx="64" cy="36" r="6" fill="#ffe082"/>
+  <circle cx="36" cy="36" r="2" fill="#3e2723"/><circle cx="64" cy="36" r="2" fill="#3e2723"/>
+  <circle cx="44" cy="48" r="2" fill="#3e2723"/><circle cx="56" cy="48" r="2" fill="#3e2723"/>
+  <ellipse cx="50" cy="56" rx="3" ry="2" fill="#3e2723"/>
+  <text x="50" y="98" font-family="Georgia,serif" font-size="9" font-weight="700" text-anchor="middle" fill="#ffe082" letter-spacing="1">URSOS</text>
+</svg>

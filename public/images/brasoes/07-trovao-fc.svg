@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" role="img" aria-label="Trovao FC">
+  <defs>
+    <linearGradient id="b7" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#546e7a"/><stop offset="100%" stop-color="#263238"/>
+    </linearGradient>
+  </defs>
+  <path d="M 8 8 L 92 8 L 92 75 Q 50 110, 8 75 Z" fill="url(#b7)" stroke="#cfd8dc" stroke-width="2.5"/>
+  <path d="M 20 30 Q 35 25, 50 30 Q 65 25, 80 30 L 75 38 Q 60 33, 50 38 Q 40 33, 25 38 Z" fill="#90a4ae" opacity="0.8"/>
+  <path d="M 56 35 L 38 65 L 50 65 L 44 90 L 64 60 L 52 60 Z" fill="#fdd835" stroke="#fff" stroke-width="1"/>
+  <text x="50" y="106" font-family="Arial,sans-serif" font-size="7" font-weight="900" text-anchor="middle" fill="#fdd835" letter-spacing="2">TROVAO FC</text>
+</svg>

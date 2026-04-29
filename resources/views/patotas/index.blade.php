@@ -1,17 +1,17 @@
 <x-app-layout>
-    <x-slot name="title">Patotas</x-slot>
+    <x-slot name="title">Turmas</x-slot>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h1 class="font-bold text-2xl">Minhas patotas</h1>
-            <a href="{{ route('patotas.create') }}" class="btn btn-secondary" aria-label="Criar nova patota">+ Nova</a>
+        <div class="flex flex-wrap items-center justify-between gap-2">
+            <h1 class="font-bold text-xl sm:text-2xl">Minhas turmas</h1>
+            <a href="{{ route('patotas.create') }}" class="btn btn-secondary" aria-label="Criar nova turma">+ Nova</a>
         </div>
     </x-slot>
 
     <div class="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         @if ($patotas->isEmpty())
             <div class="card text-center">
-                <p class="text-lg text-gray-700">Voce ainda nao participa de nenhuma patota.</p>
-                <a href="{{ route('patotas.create') }}" class="btn btn-primary mt-4">Criar minha primeira patota</a>
+                <p class="text-lg text-gray-700">Voce ainda nao participa de nenhuma turma.</p>
+                <a href="{{ route('patotas.create') }}" class="btn btn-primary mt-4">Criar minha primeira turma</a>
             </div>
         @else
             <ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" role="list">

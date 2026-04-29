@@ -7,8 +7,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="description" content="AlfaFut - Solucao colaborativa para gestao de patota de futebol com suporte de acessibilidade.">
+    <meta name="description" content="AlfaFut - Solucao colaborativa para gestao de turmas de futebol com suporte de acessibilidade.">
     <meta name="theme-color" content="#1b5e20">
+
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo/icon.svg') }}">
 
     <title>{{ $title ?? '' }}{{ isset($title) ? ' | ' : '' }}{{ config('app.name', 'AlfaFut') }}</title>
 
@@ -47,9 +50,9 @@
         </main>
 
         <footer class="bg-gray-900 text-gray-100 mt-12" role="contentinfo">
-            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-sm">
-                <p>AlfaFut &middot; Atividade de Extensao Uniasselvi &middot; ADS / Gestao de Tecnologia</p>
-                <p class="mt-1 opacity-80">Desenvolvido seguindo Modelo 3C (Comunicacao, Coordenacao, Cooperacao), Material Design e WCAG 2.1.</p>
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-xs sm:text-sm">
+                <p>AlfaFut &middot; Atividade de Extensao Uniasselvi</p>
+                <p class="mt-1 opacity-80">Modelo 3C, Material Design e WCAG 2.1.</p>
             </div>
         </footer>
     </div>

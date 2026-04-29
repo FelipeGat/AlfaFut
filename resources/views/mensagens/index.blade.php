@@ -2,7 +2,7 @@
     <x-slot name="title">Mural - {{ $patota->nome }}</x-slot>
     <x-slot name="header">
         <p class="opacity-90 text-sm">{{ $patota->nome }}</p>
-        <h1 class="font-bold text-2xl">Mural da patota</h1>
+        <h1 class="font-bold text-xl sm:text-2xl">Mural da turma</h1>
     </x-slot>
 
     <div class="py-8 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">

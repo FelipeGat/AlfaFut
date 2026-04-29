@@ -21,7 +21,7 @@
         </div>
 
         @if ($partidas->isEmpty())
-            <div class="card text-center text-gray-700">Nenhuma partida {{ $filtro }}.</div>
+            <div class="card text-center text-gray-700">Nenhuma partida {{ $filtro === 'proximas' ? 'proxima' : 'passada' }}.</div>
         @else
             <ul class="space-y-3" role="list">
                 @foreach ($partidas as $partida)

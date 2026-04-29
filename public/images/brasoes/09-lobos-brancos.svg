@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" role="img" aria-label="Lobos Brancos">
+  <defs>
+    <linearGradient id="b9" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#eceff1"/><stop offset="100%" stop-color="#90a4ae"/>
+    </linearGradient>
+  </defs>
+  <path d="M 14 10 L 86 10 L 86 70 Q 86 95, 50 115 Q 14 95, 14 70 Z" fill="url(#b9)" stroke="#37474f" stroke-width="3"/>
+  <path d="M 30 28 L 35 38 L 38 30 L 42 42 L 50 32 L 58 42 L 62 30 L 65 38 L 70 28 L 70 55 Q 70 75, 50 80 Q 30 75, 30 55 Z" fill="#37474f"/>
+  <circle cx="44" cy="50" r="2.5" fill="#fff"/><circle cx="56" cy="50" r="2.5" fill="#fff"/>
+  <path d="M 47 60 L 50 67 L 53 60 Z" fill="#fff"/>
+  <text x="50" y="100" font-family="Georgia,serif" font-size="9" font-weight="700" text-anchor="middle" fill="#37474f" letter-spacing="1">LOBOS</text>
+</svg>

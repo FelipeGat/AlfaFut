@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" role="img" aria-label="Raios do Norte">
+  <defs>
+    <linearGradient id="b3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1976d2"/><stop offset="100%" stop-color="#0d47a1"/>
+    </linearGradient>
+  </defs>
+  <path d="M 10 5 L 90 5 L 95 60 Q 95 95, 50 115 Q 5 95, 5 60 Z" fill="url(#b3)" stroke="#ffeb3b" stroke-width="3"/>
+  <path d="M 56 25 L 38 60 L 48 60 L 42 90 L 64 50 L 54 50 Z" fill="#ffeb3b" stroke="#fff" stroke-width="0.5"/>
+  <text x="50" y="106" font-family="Arial,sans-serif" font-size="7" font-weight="900" text-anchor="middle" fill="#fff" letter-spacing="1.5">RAIOS</text>
+</svg>

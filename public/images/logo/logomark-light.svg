@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 64" role="img" aria-label="AlfaFut">
+  <defs>
+    <radialGradient id="ballLight" cx="40%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="55%" stop-color="#f1f8f3"/>
+      <stop offset="100%" stop-color="#c8e6c9"/>
+    </radialGradient>
+  </defs>
+
+  <g>
+    <circle cx="32" cy="32" r="30" fill="url(#ballLight)"/>
+    <g fill="#1b5e20" opacity="0.85">
+      <polygon points="32,4 38,9 35.7,16 28.3,16 26,9"/>
+      <polygon points="56,38 60,46 53.5,52 47,48.5 48,41"/>
+      <polygon points="8,38 4,46 10.5,52 17,48.5 16,41"/>
+    </g>
+    <g stroke="#1b5e20" stroke-width="0.7" fill="none" opacity="0.5">
+      <line x1="32" y1="16" x2="20" y2="22"/>
+      <line x1="32" y1="16" x2="44" y2="22"/>
+      <line x1="20" y1="22" x2="16" y2="41"/>
+      <line x1="44" y1="22" x2="48" y2="41"/>
+    </g>
+    <path d="M32 16 L18.5 47 L24.4 47 L26.9 41 L37.1 41 L39.6 47 L45.5 47 L32 16 Z M28.7 36 L32 28 L35.3 36 Z" fill="#1b5e20"/>
+    <rect x="20" y="50.5" width="24" height="2.2" rx="1.1" fill="#f57c00"/>
+  </g>
+
+  <text x="76" y="44"
+        font-family="Roboto, system-ui, sans-serif"
+        font-weight="700"
+        font-size="32"
+        letter-spacing="-0.5"
+        fill="#ffffff">Alfa<tspan fill="#ffb74d">Fut</tspan></text>
+
+  <text x="76" y="58"
+        font-family="Roboto, system-ui, sans-serif"
+        font-size="9"
+        font-weight="500"
+        letter-spacing="2"
+        fill="#c8e6c9">SUA TURMA ORGANIZADA</text>
+</svg>

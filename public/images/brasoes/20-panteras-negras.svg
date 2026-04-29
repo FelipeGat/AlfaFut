@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" role="img" aria-label="Panteras Negras">
+  <defs>
+    <linearGradient id="b20" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1a1a"/><stop offset="100%" stop-color="#000"/>
+    </linearGradient>
+  </defs>
+  <path d="M 12 8 L 88 8 L 88 70 Q 88 100, 50 116 Q 12 100, 12 70 Z" fill="url(#b20)" stroke="#e91e63" stroke-width="3"/>
+  <path d="M 30 35 L 50 28 L 70 35 L 65 50 Q 65 65, 50 70 Q 35 65, 35 50 Z" fill="#1a1a1a" stroke="#e91e63" stroke-width="1"/>
+  <ellipse cx="44" cy="48" rx="2" ry="3" fill="#fdd835"/>
+  <ellipse cx="56" cy="48" rx="2" ry="3" fill="#fdd835"/>
+  <path d="M 35 35 L 32 28 L 38 32 Z M 65 35 L 68 28 L 62 32 Z" fill="#e91e63"/>
+  <path d="M 46 58 L 50 65 L 54 58 Z" fill="#e91e63"/>
+  <text x="50" y="100" font-family="Georgia,serif" font-size="8" font-weight="700" text-anchor="middle" fill="#e91e63" letter-spacing="1">PANTERAS</text>
+</svg>

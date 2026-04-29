@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" role="img" aria-label="Tubaroes da Praia">
+  <defs>
+    <linearGradient id="b14" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#03a9f4"/><stop offset="100%" stop-color="#01579b"/>
+    </linearGradient>
+  </defs>
+  <path d="M 10 10 L 90 10 L 90 65 Q 90 95, 50 115 Q 10 95, 10 65 Z" fill="url(#b14)" stroke="#fff" stroke-width="2.5"/>
+  <path d="M 18 60 Q 35 35, 60 45 L 70 38 L 70 50 L 80 55 L 70 60 L 70 70 L 60 64 Q 35 75, 18 60 Z" fill="#eceff1" stroke="#0d47a1" stroke-width="0.8"/>
+  <circle cx="55" cy="51" r="2" fill="#000"/>
+  <path d="M 35 56 L 38 60 L 45 58 L 42 56 Z M 50 58 L 53 62 L 58 60" fill="none" stroke="#0d47a1" stroke-width="0.8"/>
+  <text x="50" y="100" font-family="Georgia,serif" font-size="8" font-weight="700" text-anchor="middle" fill="#fff" letter-spacing="1">TUBAROES</text>
+</svg>

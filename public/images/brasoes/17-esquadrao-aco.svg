@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" role="img" aria-label="Esquadrao de Aco">
+  <defs>
+    <linearGradient id="b17" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#cfd8dc"/><stop offset="50%" stop-color="#78909c"/><stop offset="100%" stop-color="#37474f"/>
+    </linearGradient>
+  </defs>
+  <path d="M 12 8 L 88 8 L 88 70 Q 88 95, 50 115 Q 12 95, 12 70 Z" fill="url(#b17)" stroke="#0d47a1" stroke-width="3"/>
+  <g transform="translate(50,52)">
+    <circle r="20" fill="#0d47a1"/>
+    <g fill="#cfd8dc">
+      <rect x="-3" y="-22" width="6" height="8"/>
+      <rect x="-3" y="14" width="6" height="8"/>
+      <rect x="-22" y="-3" width="8" height="6"/>
+      <rect x="14" y="-3" width="8" height="6"/>
+      <rect x="-17" y="-17" width="6" height="6" transform="rotate(45)"/>
+      <rect x="11" y="-17" width="6" height="6" transform="rotate(45)"/>
+    </g>
+    <circle r="10" fill="#cfd8dc"/>
+    <circle r="3" fill="#0d47a1"/>
+  </g>
+  <text x="50" y="100" font-family="Arial,sans-serif" font-size="7" font-weight="900" text-anchor="middle" fill="#0d47a1" letter-spacing="1">ESQUADRAO</text>
+</svg>

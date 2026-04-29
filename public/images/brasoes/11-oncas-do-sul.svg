@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" role="img" aria-label="Oncas do Sul">
+  <defs>
+    <linearGradient id="b11" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1b5e20"/><stop offset="100%" stop-color="#0d3f12"/>
+    </linearGradient>
+  </defs>
+  <path d="M 12 10 L 88 10 L 88 70 Q 88 100, 50 116 Q 12 100, 12 70 Z" fill="url(#b11)" stroke="#fdd835" stroke-width="2.5"/>
+  <circle cx="32" cy="38" r="3" fill="#fdd835"/><circle cx="68" cy="38" r="3" fill="#fdd835"/>
+  <circle cx="40" cy="55" r="3" fill="#fdd835"/><circle cx="60" cy="55" r="3" fill="#fdd835"/>
+  <circle cx="50" cy="48" r="3" fill="#fdd835"/>
+  <circle cx="32" cy="68" r="3" fill="#fdd835"/><circle cx="68" cy="68" r="3" fill="#fdd835"/>
+  <circle cx="50" cy="74" r="3" fill="#fdd835"/>
+  <text x="50" y="100" font-family="Georgia,serif" font-size="9" font-weight="700" text-anchor="middle" fill="#fdd835" letter-spacing="1">ONCAS</text>
+</svg>

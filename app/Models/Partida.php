@@ -25,11 +25,20 @@ class Partida extends Model
         'status',
         'confirmacao_ate',
         'lista_espera_habilitada',
+        'iniciada_em',
+        'pausada_em',
+        'finalizada_em',
+        'tempo_acumulado_segundos',
+        'placar_a',
+        'placar_b',
     ];
 
     protected $casts = [
         'data_hora' => 'datetime',
         'confirmacao_ate' => 'datetime',
+        'iniciada_em' => 'datetime',
+        'pausada_em' => 'datetime',
+        'finalizada_em' => 'datetime',
         'lista_espera_habilitada' => 'boolean',
         'valor_individual' => 'decimal:2',
     ];
@@ -73,6 +82,50 @@ class Partida extends Model
         return $this->hasMany(Time::class);
     }
 
+    public function eventos(): HasMany
+    {
+        return $this->hasMany(EventoPartida::class)->orderBy('created_at');
+    }
+
+    public function gols(): HasMany
+    {
+        return $this->eventos()->where('tipo', EventoPartida::TIPO_GOL);
+    }
+
+    public function tempoAtualSegundos(): int
+    {
+        $base = (int) $this->tempo_acumulado_segundos;
+        if ($this->iniciada_em && ! $this->pausada_em && ! $this->finalizada_em) {
+            $base += (int) abs($this->iniciada_em->diffInSeconds(now()));
+        }
+        return max(0, $base);
+    }
+
+    public function tempoFormatado(): string
+    {
+        $total = $this->tempoAtualSegundos();
+        $min = intdiv($total, 60);
+        $seg = $total % 60;
+        return sprintf('%02d:%02d', $min, $seg);
+    }
+
+    public function emAndamento(): bool
+    {
+        return $this->iniciada_em !== null
+            && $this->pausada_em === null
+            && $this->finalizada_em === null;
+    }
+
+    public function pausada(): bool
+    {
+        return $this->pausada_em !== null && $this->finalizada_em === null;
+    }
+
+    public function finalizada(): bool
+    {
+        return $this->finalizada_em !== null;
+    }
+
     public function despesas(): HasMany
     {
         return $this->hasMany(Despesa::class);
@@ -90,14 +143,30 @@ class Partida extends Model
 
     public function scopeProximas(Builder $query): Builder
     {
-        return $query->where('data_hora', '>=', now())
-            ->whereIn('status', ['agendada', 'confirmada'])
-            ->orderBy('data_hora');
+        return $query->where(function ($q) {
+            // Agendadas no futuro
+            $q->where(function ($w) {
+                $w->where('data_hora', '>=', now())
+                  ->whereIn('status', ['agendada', 'confirmada']);
+            })
+            // OU acontecendo agora (em andamento, mesmo se data_hora ja passou)
+            ->orWhere('status', 'em_andamento')
+            ->orWhereNotNull('iniciada_em')->whereNull('finalizada_em');
+        })
+        ->orderByDesc('iniciada_em')
+        ->orderBy('data_hora');
     }
 
     public function scopePassadas(Builder $query): Builder
     {
-        return $query->where('data_hora', '<', now())
-            ->orderByDesc('data_hora');
+        return $query->where(function ($q) {
+            $q->where('status', 'finalizada')
+              ->orWhereNotNull('finalizada_em')
+              ->orWhere(function ($w) {
+                  $w->where('data_hora', '<', now())
+                    ->whereNotIn('status', ['em_andamento']);
+              });
+        })
+        ->orderByDesc('data_hora');
     }
 }

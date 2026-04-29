@@ -3,7 +3,7 @@
         <div class="flex justify-between h-16">
             <div class="flex">
                 <a href="{{ route('dashboard') }}" class="shrink-0 flex items-center gap-2 px-2" aria-label="AlfaFut - Pagina inicial">
-                    <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-on-primary font-bold" aria-hidden="true">A</span>
+                    <img src="{{ asset('images/logo/icon.svg') }}" alt="" class="h-9 w-9" aria-hidden="true">
                     <span class="font-semibold text-lg">AlfaFut</span>
                 </a>
 
@@ -18,7 +18,7 @@
                        role="menuitem"
                        class="px-4 py-2 rounded-full text-sm font-medium {{ request()->routeIs('patotas.*') ? 'bg-primary text-on-primary' : 'text-gray-700 hover:bg-gray-100' }}"
                        @if(request()->routeIs('patotas.*')) aria-current="page" @endif>
-                        Patotas
+                        Turmas
                     </a>
                     <a href="{{ route('partidas.index') }}"
                        role="menuitem"
@@ -31,6 +31,12 @@
                        class="px-4 py-2 rounded-full text-sm font-medium {{ request()->routeIs('acessibilidade.*') ? 'bg-primary text-on-primary' : 'text-gray-700 hover:bg-gray-100' }}"
                        @if(request()->routeIs('acessibilidade.*')) aria-current="page" @endif>
                         Acessibilidade
+                    </a>
+                    <a href="{{ route('como-usar') }}"
+                       role="menuitem"
+                       class="px-4 py-2 rounded-full text-sm font-medium {{ request()->routeIs('como-usar') ? 'bg-primary text-on-primary' : 'text-gray-700 hover:bg-gray-100' }}"
+                       @if(request()->routeIs('como-usar')) aria-current="page" @endif>
+                        Como usar
                     </a>
                 </div>
             </div>
@@ -81,7 +87,7 @@
     <div id="menu-mobile" :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden border-t">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">Dashboard</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('patotas.index')" :active="request()->routeIs('patotas.*')">Patotas</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('patotas.index')" :active="request()->routeIs('patotas.*')">Turmas</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('partidas.index')" :active="request()->routeIs('partidas.*')">Partidas</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('acessibilidade.edit')" :active="request()->routeIs('acessibilidade.*')">Acessibilidade</x-responsive-nav-link>
         </div>

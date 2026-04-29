@@ -1,12 +1,12 @@
 <x-app-layout>
     <x-slot name="title">Despesas - {{ $patota->nome }}</x-slot>
     <x-slot name="header">
-        <div class="flex items-center justify-between gap-4">
-            <div>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="min-w-0 flex-1">
                 <p class="opacity-90 text-sm">{{ $patota->nome }}</p>
-                <h1 class="font-bold text-2xl">Despesas</h1>
+                <h1 class="font-bold text-xl sm:text-2xl">Despesas</h1>
             </div>
-            <a href="{{ route('patotas.despesas.create', $patota) }}" class="btn btn-secondary">+ Nova despesa</a>
+            <a href="{{ route('patotas.despesas.create', $patota) }}" class="btn btn-secondary shrink-0">+ Nova</a>
         </div>
     </x-slot>
 

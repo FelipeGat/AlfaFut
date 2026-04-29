@@ -25,12 +25,18 @@ class SorteioTimes
             $patota = $partida->patota;
             $quantidade = $patota->quantidade_times;
 
+            // Sorteia clubes ficticios distintos para cada time
+            $clubesDisponiveis = collect(config('clubes.clubes'))->shuffle()->take($quantidade);
+
             $times = collect();
-            for ($i = 0; $i < $quantidade; $i++) {
+            foreach (range(0, $quantidade - 1) as $i) {
+                $clube = $clubesDisponiveis[$i];
                 $times->push(Time::create([
                     'partida_id' => $partida->id,
-                    'nome' => 'Time ' . chr(65 + $i),
-                    'cor' => $this->corPorIndice($i),
+                    'nome' => $clube['nome'],
+                    'cor' => $clube['cor'],
+                    'brasao' => $clube['brasao'],
+                    'clube_codigo' => $clube['codigo'],
                 ]));
             }
 

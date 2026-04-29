@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" role="img" aria-label="Vingadores FC">
+  <defs>
+    <linearGradient id="b12" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a237e"/><stop offset="100%" stop-color="#000"/>
+    </linearGradient>
+  </defs>
+  <path d="M 8 10 L 92 10 L 92 75 Q 50 110, 8 75 Z" fill="url(#b12)" stroke="#f44336" stroke-width="3"/>
+  <circle cx="50" cy="50" r="28" fill="none" stroke="#f44336" stroke-width="3"/>
+  <text x="50" y="65" font-family="Georgia,serif" font-size="38" font-weight="900" text-anchor="middle" fill="#f44336">V</text>
+  <text x="50" y="100" font-family="Arial,sans-serif" font-size="7" font-weight="900" text-anchor="middle" fill="#fff" letter-spacing="2">VINGADORES</text>
+</svg>

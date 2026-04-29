@@ -66,8 +66,8 @@
             @if ($pagamentos->isEmpty())
                 <p class="mt-3 text-gray-700 text-sm">Esta despesa nao foi rateada. Para rateio automatico, vincule uma partida ao criar.</p>
             @else
-                <div class="mt-3 overflow-x-auto">
-                    <table class="w-full text-sm" aria-describedby="pagamentos-h">
+                <div class="mt-3 -mx-4 sm:mx-0 overflow-x-auto">
+                    <table class="w-full text-sm min-w-[500px]" aria-describedby="pagamentos-h">
                         <thead class="text-left">
                             <tr class="border-b">
                                 <th scope="col" class="py-2 pr-2">Jogador</th>

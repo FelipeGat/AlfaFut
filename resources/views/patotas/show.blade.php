@@ -1,16 +1,21 @@
 <x-app-layout>
     <x-slot name="title">{{ $patota->nome }}</x-slot>
     <x-slot name="header">
-        <div class="flex items-start justify-between gap-4">
-            <div>
-                <h1 class="font-bold text-2xl">{{ $patota->nome }}</h1>
-                <p class="opacity-90 text-sm">{{ $patota->cidade ?? '' }}{{ $patota->estado ? ' / '.$patota->estado : '' }}</p>
+        <div class="flex flex-wrap items-start justify-between gap-3">
+            <div class="min-w-0 flex-1 flex items-start gap-3">
+                @if ($patota->brasao)
+                    <img src="{{ asset($patota->brasao) }}" alt="Brasao {{ $patota->nome }}" class="h-16 sm:h-20 w-auto shrink-0 anim-fade-in" loading="lazy">
+                @endif
+                <div class="min-w-0">
+                    <h1 class="font-bold text-xl sm:text-2xl">{{ $patota->nome }}</h1>
+                    <p class="opacity-90 text-sm">{{ $patota->cidade ?? '' }}{{ $patota->estado ? ' / '.$patota->estado : '' }}</p>
+                </div>
             </div>
             @if ($patota->criador_id === auth()->id())
-                <a href="{{ route('patotas.edit', $patota) }}" class="btn btn-outline bg-white">Editar</a>
+                <a href="{{ route('patotas.edit', $patota) }}" class="btn btn-outline bg-white shrink-0">Editar</a>
             @endif
         </div>
-        <nav aria-label="Areas da patota" class="mt-4 flex gap-2 flex-wrap">
+        <nav aria-label="Areas da turma" class="mt-4 flex gap-2 flex-wrap">
             <a href="{{ route('patotas.mensagens.index', $patota) }}" class="px-3 py-2 rounded-full bg-white/15 text-on-primary text-sm font-medium">💬 Mural</a>
             <a href="{{ route('patotas.despesas.index', $patota) }}" class="px-3 py-2 rounded-full bg-white/15 text-on-primary text-sm font-medium">💰 Despesas</a>
         </nav>
@@ -37,6 +42,10 @@
                 <div>
                     <dt class="text-gray-600">Mensalidade</dt>
                     <dd class="font-medium">R$ {{ number_format($patota->valor_mensalidade, 2, ',', '.') }}</dd>
+                </div>
+                <div class="col-span-2">
+                    <dt class="text-gray-600">Responsavel</dt>
+                    <dd class="font-medium">{{ $patota->responsavel?->apelido ?? $patota->responsavel?->name ?? '-' }}</dd>
                 </div>
                 @if ($patota->criador_id === auth()->id())
                     <div class="col-span-2">

@@ -63,11 +63,85 @@ html[data-reduzir-movimento="1"] *::after {
     }
 }
 
+[x-cloak] { display: none !important; }
+
+/* ===== Animacoes ===== */
+@keyframes pulso {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.05); }
+}
+@keyframes piscar {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+@keyframes slide-down {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes gol-flash {
+    0% { background: rgba(255,193,7,0); }
+    20% { background: rgba(255,193,7,0.85); }
+    100% { background: rgba(255,193,7,0); }
+}
+@keyframes contador-pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); color: #ffeb3b; }
+    100% { transform: scale(1); }
+}
+@keyframes confete-cair {
+    0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+.anim-pulso { animation: pulso 1.6s ease-in-out infinite; }
+.anim-piscar { animation: piscar 1s ease-in-out infinite; }
+.anim-slide-down { animation: slide-down 0.4s ease-out both; }
+.anim-slide-up { animation: slide-up 0.4s ease-out both; }
+.anim-fade-in { animation: fade-in 0.6s ease-out both; }
+.anim-gol-flash { animation: gol-flash 1.5s ease-out; }
+.anim-contador-pop { animation: contador-pop 0.6s ease-out; }
+
+/* Hover suave em cards/buttons */
+.btn { transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+
+/* Respeita prefers-reduced-motion e preferencia salva */
+html[data-reduzir-movimento="1"] .anim-pulso,
+html[data-reduzir-movimento="1"] .anim-piscar,
+html[data-reduzir-movimento="1"] .anim-slide-down,
+html[data-reduzir-movimento="1"] .anim-slide-up,
+html[data-reduzir-movimento="1"] .anim-fade-in,
+html[data-reduzir-movimento="1"] .anim-gol-flash,
+html[data-reduzir-movimento="1"] .anim-contador-pop {
+    animation: none !important;
+}
+
 @layer base {
+    html, body {
+        overflow-x: hidden;
+        max-width: 100%;
+    }
     body {
         background-color: var(--md-sys-color-surface);
         color: var(--md-sys-color-on-surface);
         font-family: 'Roboto', system-ui, -apple-system, sans-serif;
+    }
+    img, video, svg {
+        max-width: 100%;
+        height: auto;
+    }
+    /* Quebrar palavras longas em mobile (URLs, codigos) */
+    p, li, dd, span, a {
+        overflow-wrap: anywhere;
     }
 
     /* WCAG 2.4.7 - Focus visible em TODOS elementos interativos */
@@ -81,6 +155,15 @@ html[data-reduzir-movimento="1"] *::after {
     h2 { font-size: var(--fonte-h2); font-weight: 600; line-height: 1.3; }
     h3 { font-size: var(--fonte-h3); font-weight: 600; line-height: 1.4; }
 
+    /* Em mobile reduz tamanhos pra caberem em 320px */
+    @media (max-width: 640px) {
+        :root {
+            --fonte-h1: 1.5rem;
+            --fonte-h2: 1.25rem;
+            --fonte-h3: 1.125rem;
+        }
+    }
+
     /* WCAG 1.3.1 - relacionar label com campo via :has visivelmente */
     label {
         font-weight: 500;
@@ -92,7 +175,7 @@ html[data-reduzir-movimento="1"] *::after {
 @layer components {
     /* Botoes Material 3 */
     .btn {
-        @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-medium text-sm transition-all min-h-[44px];
+        @apply inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-medium text-sm transition-all min-h-[44px] whitespace-nowrap;
     }
     .btn-primary {
         background-color: var(--md-sys-color-primary);
@@ -115,9 +198,10 @@ html[data-reduzir-movimento="1"] *::after {
 
     /* Cards Material 3 */
     .card {
-        @apply bg-white rounded-2xl shadow-sm p-6;
+        @apply bg-white rounded-2xl shadow-sm p-4 sm:p-6;
         border: 1px solid var(--md-sys-color-outline);
         border-color: rgba(0,0,0,0.08);
+        max-width: 100%;
     }
 
     /* Campos de formulario */

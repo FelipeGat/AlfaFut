@@ -22,6 +22,7 @@ class Patota extends Model
         'cidade',
         'estado',
         'criador_id',
+        'responsavel_id',
         'jogadores_por_time',
         'quantidade_times',
         'valor_mensalidade',
@@ -43,12 +44,21 @@ class Patota extends Model
             if (empty($patota->codigo_convite)) {
                 $patota->codigo_convite = strtoupper(Str::random(8));
             }
+            // Por padrao o criador e tambem o responsavel pela patota
+            if (empty($patota->responsavel_id)) {
+                $patota->responsavel_id = $patota->criador_id;
+            }
         });
     }
 
     public function criador(): BelongsTo
     {
         return $this->belongsTo(User::class, 'criador_id');
+    }
+
+    public function responsavel(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'responsavel_id');
     }
 
     public function membros(): BelongsToMany

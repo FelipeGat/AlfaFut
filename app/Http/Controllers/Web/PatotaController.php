@@ -23,7 +23,8 @@ class PatotaController extends Controller
 
     public function create(): View
     {
-        return view('patotas.create');
+        $clubes = config('clubes.clubes');
+        return view('patotas.create', compact('clubes'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -37,6 +38,7 @@ class PatotaController extends Controller
             'quantidade_times' => ['required', 'integer', 'min:2', 'max:6'],
             'valor_mensalidade' => ['nullable', 'numeric', 'min:0'],
             'publica' => ['nullable', 'boolean'],
+            'brasao' => ['nullable', 'string', 'max:120'],
         ]);
 
         $patota = Patota::create([
@@ -54,7 +56,7 @@ class PatotaController extends Controller
 
         return redirect()
             ->route('patotas.show', $patota)
-            ->with('status', 'Patota criada com sucesso. Compartilhe o codigo de convite com o time.');
+            ->with('status', 'Turma criada com sucesso. Compartilhe o codigo de convite com o time.');
     }
 
     public function show(Request $request, Patota $patota): View
@@ -73,7 +75,10 @@ class PatotaController extends Controller
     {
         abort_unless($patota->criador_id === $request->user()->id, 403);
 
-        return view('patotas.edit', compact('patota'));
+        $membros = $patota->membrosAtivos()->orderBy('name')->get();
+        $clubes = config('clubes.clubes');
+
+        return view('patotas.edit', compact('patota', 'membros', 'clubes'));
     }
 
     public function update(Request $request, Patota $patota): RedirectResponse
@@ -89,6 +94,8 @@ class PatotaController extends Controller
             'quantidade_times' => ['required', 'integer', 'min:2', 'max:6'],
             'valor_mensalidade' => ['nullable', 'numeric', 'min:0'],
             'publica' => ['nullable', 'boolean'],
+            'responsavel_id' => ['nullable', 'exists:users,id'],
+            'brasao' => ['nullable', 'string', 'max:120'],
         ]);
 
         $patota->update([
@@ -96,7 +103,7 @@ class PatotaController extends Controller
             'publica' => (bool) ($dados['publica'] ?? false),
         ]);
 
-        return redirect()->route('patotas.show', $patota)->with('status', 'Patota atualizada.');
+        return redirect()->route('patotas.show', $patota)->with('status', 'Turma atualizada.');
     }
 
     public function destroy(Request $request, Patota $patota): RedirectResponse
@@ -104,7 +111,7 @@ class PatotaController extends Controller
         abort_unless($patota->criador_id === $request->user()->id, 403);
         $patota->delete();
 
-        return redirect()->route('patotas.index')->with('status', 'Patota arquivada.');
+        return redirect()->route('patotas.index')->with('status', 'Turma arquivada.');
     }
 
     private function authorizeMembro(Request $request, Patota $patota): void
@@ -112,6 +119,6 @@ class PatotaController extends Controller
         $eMembro = $patota->membrosAtivos()
             ->where('users.id', $request->user()->id)
             ->exists();
-        abort_unless($eMembro, 403, 'Voce nao faz parte desta patota.');
+        abort_unless($eMembro, 403, 'Voce nao faz parte desta turma.');
     }
 }

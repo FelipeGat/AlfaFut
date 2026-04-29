@@ -14,6 +14,8 @@ class Time extends Model
         'nome',
         'cor',
         'gols',
+        'brasao',
+        'clube_codigo',
     ];
 
     public function partida(): BelongsTo

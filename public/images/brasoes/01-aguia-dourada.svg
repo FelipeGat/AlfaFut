@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" role="img" aria-label="Aguia Dourada FC">
+  <defs>
+    <linearGradient id="b1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a3000"/><stop offset="100%" stop-color="#1a1500"/>
+    </linearGradient>
+  </defs>
+  <path d="M 12 8 L 88 8 L 88 65 Q 88 95, 50 115 Q 12 95, 12 65 Z" fill="url(#b1)" stroke="#d4a017" stroke-width="2.5"/>
+  <path d="M 50 30 L 35 50 L 50 45 L 65 50 Z M 50 45 L 42 70 L 50 60 L 58 70 Z" fill="#d4a017"/>
+  <text x="50" y="92" font-family="Georgia,serif" font-size="11" font-weight="700" text-anchor="middle" fill="#d4a017" letter-spacing="1">AGUIA</text>
+  <text x="50" y="103" font-family="Georgia,serif" font-size="6" text-anchor="middle" fill="#d4a017" letter-spacing="2">DOURADA</text>
+</svg>

@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="title">Editar patota</x-slot>
+    <x-slot name="title">Editar turma</x-slot>
     <x-slot name="header">
         <h1 class="font-bold text-2xl">Editar {{ $patota->nome }}</h1>
     </x-slot>
@@ -30,6 +30,37 @@
                 </div>
             </div>
 
+            <fieldset x-data="{ sel: '{{ old('brasao', $patota->brasao) }}' }">
+                <legend class="font-medium block mb-2">Brasao da turma</legend>
+                <input type="hidden" name="brasao" :value="sel">
+                <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                    @foreach ($clubes as $clube)
+                        <button type="button"
+                                @click="sel = '{{ $clube['brasao'] }}'"
+                                :class="sel === '{{ $clube['brasao'] }}' ? 'ring-4 ring-offset-2 scale-105' : ''"
+                                style="--tw-ring-color: var(--md-sys-color-primary);"
+                                class="bg-white border rounded-lg p-2 transition-all hover:shadow-lg focus:outline-none"
+                                :aria-pressed="sel === '{{ $clube['brasao'] }}' ? 'true' : 'false'"
+                                aria-label="Escolher brasao {{ $clube['nome'] }}">
+                            <img src="{{ asset($clube['brasao']) }}" alt="{{ $clube['nome'] }}" class="w-full h-auto" loading="lazy">
+                            <span class="block text-xs mt-1 text-center text-gray-700 truncate">{{ $clube['nome'] }}</span>
+                        </button>
+                    @endforeach
+                </div>
+            </fieldset>
+
+            <div>
+                <label for="responsavel_id">Responsavel pela turma</label>
+                <select id="responsavel_id" name="responsavel_id" class="select" required>
+                    @foreach ($membros as $m)
+                        <option value="{{ $m->id }}" @selected(old('responsavel_id', $patota->responsavel_id) == $m->id)>
+                            {{ $m->apelido ?? $m->name }}@if ($m->id === $patota->criador_id) (criador)@endif
+                        </option>
+                    @endforeach
+                </select>
+                <p class="text-xs text-gray-600 mt-1">Apenas o responsavel (e o criador) pode controlar o cronometro e marcar gols ao vivo.</p>
+            </div>
+
             <fieldset class="border rounded-lg p-4">
                 <legend class="px-2 font-medium">Configuracao</legend>
                 <div class="grid sm:grid-cols-2 gap-4 mt-2">
@@ -47,7 +78,7 @@
                     </div>
                     <div class="flex items-center mt-7">
                         <input id="publica" name="publica" type="checkbox" value="1" class="h-5 w-5" {{ old('publica', $patota->publica) ? 'checked' : '' }}>
-                        <label for="publica" class="ms-2 mb-0">Patota publica</label>
+                        <label for="publica" class="ms-2 mb-0">Turma publica</label>
                     </div>
                 </div>
             </fieldset>
@@ -58,12 +89,12 @@
             </div>
         </form>
 
-        <form method="POST" action="{{ route('patotas.destroy', $patota) }}" onsubmit="return confirm('Tem certeza que deseja arquivar esta patota?');" class="card">
+        <form method="POST" action="{{ route('patotas.destroy', $patota) }}" onsubmit="return confirm('Tem certeza que deseja arquivar esta turma?');" class="card">
             @csrf
             @method('DELETE')
             <h2 class="text-red-700">Zona perigosa</h2>
-            <p class="text-sm text-gray-700 mt-2">Arquivar a patota oculta ela e suspende as partidas. Esta acao podera ser revertida pelo administrador.</p>
-            <button type="submit" class="btn btn-danger mt-4">Arquivar patota</button>
+            <p class="text-sm text-gray-700 mt-2">Arquivar a turma oculta ela e suspende as partidas. Esta acao podera ser revertida pelo administrador.</p>
+            <button type="submit" class="btn btn-danger mt-4">Arquivar turma</button>
         </form>
     </div>
 </x-app-layout>

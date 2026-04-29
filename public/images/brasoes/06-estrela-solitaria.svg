@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" role="img" aria-label="Estrela Solitaria">
+  <defs>
+    <linearGradient id="b6" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1565c0"/><stop offset="100%" stop-color="#0a2c52"/>
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="55" r="48" fill="url(#b6)" stroke="#fff" stroke-width="3"/>
+  <circle cx="50" cy="55" r="40" fill="none" stroke="#90caf9" stroke-width="0.5"/>
+  <polygon points="50,22 58,46 84,46 63,62 71,88 50,72 29,88 37,62 16,46 42,46" fill="#fff8e1" stroke="#ffd54f" stroke-width="1"/>
+  <text x="50" y="115" font-family="Georgia,serif" font-size="7" font-weight="700" text-anchor="middle" fill="#fff" letter-spacing="2">ESTRELA</text>
+</svg>

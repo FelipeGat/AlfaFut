@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" role="img" aria-label="Leoes da Vila">
+  <defs>
+    <linearGradient id="b2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c62828"/><stop offset="100%" stop-color="#7f1818"/>
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="55" r="45" fill="url(#b2)" stroke="#fff8e1" stroke-width="3"/>
+  <circle cx="50" cy="55" r="38" fill="none" stroke="#ffd54f" stroke-width="1.5"/>
+  <circle cx="50" cy="48" r="14" fill="#ffd54f"/>
+  <circle cx="44" cy="46" r="2" fill="#7f1818"/><circle cx="56" cy="46" r="2" fill="#7f1818"/>
+  <path d="M 47 53 Q 50 57, 53 53" stroke="#7f1818" stroke-width="1.5" fill="none"/>
+  <path d="M 36 38 L 32 30 L 38 35 Z M 64 38 L 68 30 L 62 35 Z M 50 30 L 48 22 L 52 22 Z" fill="#ffd54f"/>
+  <text x="50" y="80" font-family="Georgia,serif" font-size="9" font-weight="700" text-anchor="middle" fill="#ffd54f" letter-spacing="1">LEOES</text>
+  <text x="50" y="115" font-family="Georgia,serif" font-size="6" text-anchor="middle" fill="#ffd54f" letter-spacing="2">DA VILA</text>
+</svg>

@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\PatotaController;
 use App\Http\Controllers\Api\UsuarioController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->name('api.v1.')->group(function () {
     Route::post('auth/registrar', [AuthController::class, 'register']);
     Route::post('auth/login', [AuthController::class, 'login']);
 
