@@ -7,12 +7,15 @@ use App\Http\Controllers\Api\MensagemController;
 use App\Http\Controllers\Api\PartidaController;
 use App\Http\Controllers\Api\PatotaController;
 use App\Http\Controllers\Api\PlacarController;
+use App\Http\Controllers\Api\RecuperacaoSenhaController;
+use App\Http\Controllers\Api\SorteioController;
 use App\Http\Controllers\Api\UsuarioController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->name('api.v1.')->group(function () {
     Route::post('auth/registrar', [AuthController::class, 'register']);
     Route::post('auth/login', [AuthController::class, 'login']);
+    Route::post('auth/esqueci-senha', [RecuperacaoSenhaController::class, 'solicitar']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('auth/eu', [AuthController::class, 'me']);
@@ -24,6 +27,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::post('patotas/entrar', [PatotaController::class, 'entrar']);
         Route::apiResource('patotas', PatotaController::class);
         Route::get('patotas/{patota}/membros', [PatotaController::class, 'membros']);
+        Route::post('patotas/{patota}/sair', [PatotaController::class, 'sair']);
 
         Route::get('patotas/{patota}/partidas', [PartidaController::class, 'index']);
         Route::post('patotas/{patota}/partidas', [PartidaController::class, 'store']);
@@ -41,6 +45,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::post('partidas/{partida}/pausar', [PlacarController::class, 'pausar']);
         Route::post('partidas/{partida}/finalizar', [PlacarController::class, 'finalizar']);
         Route::post('partidas/{partida}/gol', [PlacarController::class, 'gol']);
+        Route::post('partidas/{partida}/sortear', SorteioController::class);
 
         Route::get('patotas/{patota}/despesas', [DespesaController::class, 'index']);
         Route::post('patotas/{patota}/despesas', [DespesaController::class, 'store']);

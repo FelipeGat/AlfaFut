@@ -117,6 +117,31 @@ class PatotaController extends Controller
         return UsuarioResource::collection($patota->membrosAtivos()->orderBy('name')->get());
     }
 
+    public function sair(Request $request, Patota $patota): JsonResponse
+    {
+        $userId = $request->user()->id;
+
+        if ($patota->criador_id === $userId) {
+            return response()->json([
+                'mensagem' => 'O criador nao pode sair da turma. Transfira a responsabilidade antes.',
+            ], 422);
+        }
+
+        $vinculo = $patota->membrosAtivos()
+            ->where('users.id', $userId)
+            ->first();
+
+        if (! $vinculo) {
+            return response()->json(['mensagem' => 'Voce nao faz parte desta turma.'], 404);
+        }
+
+        \App\Models\PatotaMembro::where('patota_id', $patota->id)
+            ->where('user_id', $userId)
+            ->update(['status' => 'inativo', 'saiu_em' => now()]);
+
+        return response()->json(['mensagem' => 'Voce saiu da turma.']);
+    }
+
     private function authorizeMembro(Request $request, Patota $patota): void
     {
         $eMembro = $patota->membrosAtivos()->where('users.id', $request->user()->id)->exists();

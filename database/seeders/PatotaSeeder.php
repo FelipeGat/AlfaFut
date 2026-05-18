@@ -17,15 +17,32 @@ class PatotaSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@alfafut.test'],
+        // Admin GLOBAL com credenciais do projeto
+        $admin = User::updateOrCreate(
+            ['email' => 'felipehenriquegat@gmail.com'],
             [
                 'name' => 'Felipe Henrique',
                 'apelido' => 'Felipe',
                 'telefone' => '(47) 99999-0000',
-                'password' => Hash::make('senha1234'),
+                'password' => Hash::make('Home1512@'),
+                'role' => 'admin',
                 'posicao_preferida' => 'meia',
                 'nivel_habilidade' => 'avancado',
+                'email_verified_at' => now(),
+            ]
+        );
+
+        // Admin de teste (backwards compat)
+        User::updateOrCreate(
+            ['email' => 'admin@alfafut.test'],
+            [
+                'name' => 'Admin Teste',
+                'apelido' => 'AdminT',
+                'password' => Hash::make('senha1234'),
+                'role' => 'admin',
+                'posicao_preferida' => 'meia',
+                'nivel_habilidade' => 'avancado',
+                'email_verified_at' => now(),
             ]
         );
 

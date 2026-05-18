@@ -23,6 +23,7 @@ class User extends Authenticatable
         'posicao_preferida',
         'nivel_habilidade',
         'password',
+        'role',
         'alto_contraste',
         'tamanho_fonte',
         'reduzir_movimento',
@@ -78,5 +79,10 @@ class User extends Authenticatable
     public function nomeExibicao(): string
     {
         return $this->apelido ?: $this->name;
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
     }
 }
