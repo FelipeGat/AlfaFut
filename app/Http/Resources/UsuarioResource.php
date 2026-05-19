@@ -18,6 +18,8 @@ class UsuarioResource extends JsonResource
             'avatar_url' => $this->avatar_url,
             'posicao_preferida' => $this->posicao_preferida,
             'nivel_habilidade' => $this->nivel_habilidade,
+            'role' => $this->role ?? 'user',
+            'is_admin' => $this->isAdmin(),
             'preferencias_acessibilidade' => [
                 'alto_contraste' => (bool) $this->alto_contraste,
                 'tamanho_fonte' => $this->tamanho_fonte,

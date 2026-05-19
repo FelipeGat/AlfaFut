@@ -15,12 +15,23 @@ class PatotaController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection
     {
-        $patotas = $request->user()
-            ->patotas()
-            ->withCount('membrosAtivos as total_membros')
-            ->with('criador')
-            ->orderBy('nome')
-            ->get();
+        $user = $request->user();
+
+        if ($user->isAdmin()) {
+            // Admin global ve todas as turmas
+            $patotas = Patota::query()
+                ->withCount('membrosAtivos as total_membros')
+                ->with('criador')
+                ->orderBy('nome')
+                ->get();
+        } else {
+            $patotas = $user
+                ->patotas()
+                ->withCount('membrosAtivos as total_membros')
+                ->with('criador')
+                ->orderBy('nome')
+                ->get();
+        }
 
         return PatotaResource::collection($patotas);
     }
@@ -144,7 +155,9 @@ class PatotaController extends Controller
 
     private function authorizeMembro(Request $request, Patota $patota): void
     {
-        $eMembro = $patota->membrosAtivos()->where('users.id', $request->user()->id)->exists();
+        $user = $request->user();
+        if ($user->isAdmin()) return; // admin global ve tudo
+        $eMembro = $patota->membrosAtivos()->where('users.id', $user->id)->exists();
         abort_unless($eMembro, 403, 'Voce nao faz parte desta patota.');
     }
 }

@@ -64,6 +64,7 @@ class MensagemController extends Controller
 
     private function authorizeMembro(Request $request, Patota $patota): void
     {
+        if ($request->user()->isAdmin()) return;
         $eMembro = $patota->membrosAtivos()
             ->where('users.id', $request->user()->id)
             ->exists();

@@ -99,12 +99,14 @@ class PartidaController extends Controller
 
     private function authorizeMembro(Request $request, Patota $patota): void
     {
+        if ($request->user()->isAdmin()) return;
         $eMembro = $patota->membrosAtivos()->where('users.id', $request->user()->id)->exists();
         abort_unless($eMembro, 403);
     }
 
     private function authorizeOrganizador(Request $request, Patota $patota): void
     {
+        if ($request->user()->isAdmin()) return;
         $papel = $patota->membrosAtivos()
             ->where('users.id', $request->user()->id)
             ->value('patota_membros.papel');

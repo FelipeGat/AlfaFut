@@ -150,15 +150,16 @@ class PlacarController extends Controller
 
     private function authorizeResponsavel(Request $request, Partida $partida): void
     {
-        $userId = $request->user()->id;
-        $patota = $partida->patota;
+        $user = $request->user();
+        if ($user->isAdmin()) return; // admin global controla tudo
 
-        $eResponsavel = $patota->responsavel_id === $userId
-            || $patota->criador_id === $userId;
+        $patota = $partida->patota;
+        $eResponsavel = $patota->responsavel_id === $user->id
+            || $patota->criador_id === $user->id;
 
         if (! $eResponsavel) {
             $papel = $patota->membrosAtivos()
-                ->where('users.id', $userId)
+                ->where('users.id', $user->id)
                 ->value('patota_membros.papel');
             $eResponsavel = in_array($papel, ['administrador', 'organizador']);
         }

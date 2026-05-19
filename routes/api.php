@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\AdminController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ConfirmacaoController;
 use App\Http\Controllers\Api\DespesaController;
@@ -57,5 +58,14 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::get('patotas/{patota}/mensagens', [MensagemController::class, 'index']);
         Route::post('patotas/{patota}/mensagens', [MensagemController::class, 'store']);
         Route::delete('mensagens/{mensagem}', [MensagemController::class, 'destroy']);
+
+        // Painel administrativo (acesso global)
+        Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
+            Route::get('resumo', [AdminController::class, 'resumo']);
+            Route::get('usuarios', [AdminController::class, 'usuarios']);
+            Route::get('patotas', [AdminController::class, 'patotas']);
+            Route::get('partidas', [AdminController::class, 'partidas']);
+            Route::get('partidas-ativas', [AdminController::class, 'partidasAtivas']);
+        });
     });
 });
