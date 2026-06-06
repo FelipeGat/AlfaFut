@@ -24,6 +24,7 @@ class User extends Authenticatable
         'nivel_habilidade',
         'password',
         'role',
+        'tipo_usuario',
         'alto_contraste',
         'tamanho_fonte',
         'reduzir_movimento',

@@ -26,6 +26,20 @@
                        @if(request()->routeIs('partidas.*')) aria-current="page" @endif>
                         Partidas
                     </a>
+                    <a href="{{ route('campos.catalogo') }}"
+                       role="menuitem"
+                       class="px-4 py-2 rounded-full text-sm font-medium {{ request()->routeIs('campos.*') ? 'bg-primary text-on-primary' : 'text-gray-700 hover:bg-gray-100' }}"
+                       @if(request()->routeIs('campos.*')) aria-current="page" @endif>
+                        Campos
+                    </a>
+                    @if (Auth::user()->tipo_usuario === 'dono_campo')
+                        <a href="{{ route('meus-campos.index') }}"
+                           role="menuitem"
+                           class="px-4 py-2 rounded-full text-sm font-medium {{ request()->routeIs('meus-campos.*') ? 'bg-primary text-on-primary' : 'text-gray-700 hover:bg-gray-100' }}"
+                           @if(request()->routeIs('meus-campos.*')) aria-current="page" @endif>
+                            Meus campos
+                        </a>
+                    @endif
                     <a href="{{ route('acessibilidade.edit') }}"
                        role="menuitem"
                        class="px-4 py-2 rounded-full text-sm font-medium {{ request()->routeIs('acessibilidade.*') ? 'bg-primary text-on-primary' : 'text-gray-700 hover:bg-gray-100' }}"
@@ -89,6 +103,10 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">Dashboard</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('patotas.index')" :active="request()->routeIs('patotas.*')">Turmas</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('partidas.index')" :active="request()->routeIs('partidas.*')">Partidas</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('campos.catalogo')" :active="request()->routeIs('campos.*')">Campos</x-responsive-nav-link>
+            @if (Auth::user()->tipo_usuario === 'dono_campo')
+                <x-responsive-nav-link :href="route('meus-campos.index')" :active="request()->routeIs('meus-campos.*')">Meus campos</x-responsive-nav-link>
+            @endif
             <x-responsive-nav-link :href="route('acessibilidade.edit')" :active="request()->routeIs('acessibilidade.*')">Acessibilidade</x-responsive-nav-link>
         </div>
         <div class="pt-4 pb-1 border-t border-gray-200">

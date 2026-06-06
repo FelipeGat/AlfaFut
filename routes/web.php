@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Web\AcessibilidadeController;
+use App\Http\Controllers\Web\CampoController;
 use App\Http\Controllers\Web\ComoUsarController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\DespesaController;
@@ -32,6 +33,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
     Route::resource('patotas', PatotaController::class);
+
+    // Catalogo publico de campos (todos os logados podem ver)
+    Route::get('campos', [CampoController::class, 'catalogo'])->name('campos.catalogo');
+    Route::get('campos/{campo}', [CampoController::class, 'show'])->name('campos.show');
+
+    // CRUD dos meus campos (dono do campo)
+    Route::get('meus-campos', [CampoController::class, 'meusIndex'])->name('meus-campos.index');
+    Route::get('meus-campos/novo', [CampoController::class, 'create'])->name('meus-campos.create');
+    Route::post('meus-campos', [CampoController::class, 'store'])->name('meus-campos.store');
+    Route::get('meus-campos/{campo}/editar', [CampoController::class, 'edit'])->name('meus-campos.edit');
+    Route::put('meus-campos/{campo}', [CampoController::class, 'update'])->name('meus-campos.update');
+    Route::delete('meus-campos/{campo}', [CampoController::class, 'destroy'])->name('meus-campos.destroy');
 
     Route::get('partidas', [PartidaController::class, 'index'])->name('partidas.index');
     Route::get('partidas/{partida}', [PartidaController::class, 'show'])->name('partidas.show');

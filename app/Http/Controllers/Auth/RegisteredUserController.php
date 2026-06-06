@@ -34,18 +34,24 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'tipo_usuario' => ['required', 'in:jogador,dono_pelada,dono_campo'],
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'tipo_usuario' => $request->tipo_usuario,
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(match ($user->tipo_usuario) {
+            'dono_campo' => route('meus-campos.create'),
+            'dono_pelada' => route('patotas.create'),
+            default => route('dashboard'),
+        });
     }
 }
