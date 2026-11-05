@@ -5,7 +5,7 @@
         <h1 class="font-bold text-xl sm:text-2xl mt-1">{{ $partida->titulo }}</h1>
         <p class="opacity-95 mt-1 text-sm sm:text-base">
             <time datetime="{{ $partida->data_hora->toIso8601String() }}">
-                {{ $partida->data_hora->translatedFormat('l, d \d\e F \a\s H:i') }}
+                {{ $partida->data_hora->translatedFormat('l, d \d\e F') }} às {{ $partida->data_hora->format('H:i') }}
             </time>
         </p>
     </x-slot>
@@ -20,18 +20,21 @@
             <dl class="grid sm:grid-cols-2 gap-4 mt-4 text-sm">
                 <div>
                     <dt class="text-gray-600">Local</dt>
-                    <dd class="font-medium">{{ $partida->local?->nome ?? 'A definir' }}</dd>
-                    @if ($partida->local?->endereco)
-                        <dd class="text-gray-700">{{ $partida->local->endereco }}</dd>
+                    @php
+                        $lugar = $partida->lugar();
+                    @endphp
+                    <dd class="font-medium">{{ $lugar?->nome ?? 'A definir' }}</dd>
+                    @if ($lugar?->endereco)
+                        <dd class="text-gray-700">{{ $lugar->endereco }}</dd>
                     @endif
-                    @if ($partida->local?->acessivel_cadeirante)
+                    @if ($lugar?->acessivel_cadeirante)
                         <dd class="mt-1">
-                            <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-900" role="img" aria-label="Local acessivel para cadeirantes">Acessivel</span>
+                            <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-900" role="img" aria-label="Local acessível para cadeirantes">Acessível</span>
                         </dd>
                     @endif
                 </div>
                 <div>
-                    <dt class="text-gray-600">Duracao</dt>
+                    <dt class="text-gray-600">Duração</dt>
                     <dd class="font-medium">{{ $partida->duracao_minutos }} min</dd>
                 </div>
                 <div>
@@ -39,12 +42,12 @@
                     <dd class="font-medium">R$ {{ number_format($partida->valor_individual, 2, ',', '.') }}</dd>
                 </div>
                 <div>
-                    <dt class="text-gray-600">Status</dt>
-                    <dd class="font-medium uppercase text-xs">{{ $partida->status }}</dd>
+                    <dt class="text-gray-600">Situação</dt>
+                    <dd class="font-medium">{{ $partida->situacao() }}</dd>
                 </div>
                 @if ($partida->confirmacao_ate)
                     <div class="sm:col-span-2">
-                        <dt class="text-gray-600">Confirmar ate</dt>
+                        <dt class="text-gray-600">Confirmar até</dt>
                         <dd class="font-medium">
                             <time datetime="{{ $partida->confirmacao_ate->toIso8601String() }}">
                                 {{ $partida->confirmacao_ate->translatedFormat('d/m H:i') }}
@@ -54,35 +57,45 @@
                 @endif
             </dl>
 
-            <div class="mt-6 flex gap-2 flex-wrap" role="group" aria-label="Acoes da partida">
+            <div class="mt-6 flex gap-2 flex-wrap" role="group" aria-label="Ações da partida">
                 @if ($partida->status === 'agendada' || $partida->status === 'confirmada')
                     <form method="POST" action="{{ route('partidas.confirmar', $partida) }}">
                         @csrf
                         <button type="submit" class="btn btn-primary"
-                                aria-label="Confirmar minha presenca nesta partida">
+                                aria-label="Confirmar minha presença nesta partida">
                             @if ($minhaConfirmacao && $minhaConfirmacao->status === 'confirmado')
-                                Atualizar confirmacao
+                                Atualizar confirmação
                             @else
-                                Confirmar presenca
+                                Confirmar presença
                             @endif
                         </button>
                     </form>
                     <form method="POST" action="{{ route('partidas.recusar', $partida) }}">
                         @csrf
-                        <button type="submit" class="btn btn-outline">Nao vou</button>
+                        <button type="submit" class="btn btn-outline">Não vou</button>
                     </form>
                 @endif
             </div>
 
+            @can('controlar', $partida)
+                @if ($partida->podeSerAlterada())
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        <a href="{{ route('partidas.edit', $partida) }}" class="btn btn-outline">Alterar partida</a>
+                        <form method="POST" action="{{ route('partidas.cancelar', $partida) }}"
+                              onsubmit="return confirm('Cancelar esta partida? Ela não volta a ficar aberta.');">
+                            @csrf
+                            <button type="submit" class="btn btn-danger">Cancelar partida</button>
+                        </form>
+                    </div>
+                @endif
+            @endcan
+
             @php
-                $papelUsuario = $partida->patota->membrosAtivos()
-                    ->where('users.id', auth()->id())
-                    ->value('patota_membros.papel');
-                $eAdmin = in_array($papelUsuario, ['administrador', 'organizador']);
+                $eAdmin = auth()->user()->can('controlar', $partida);
             @endphp
-            @if ($eAdmin && $partida->confirmados->count() >= 2)
+            @if ($eAdmin && $partida->status !== 'cancelada' && $partida->confirmados->count() >= 2)
                 <form method="POST" action="{{ route('partidas.sortear', $partida) }}" class="mt-3"
-                      onsubmit="return confirm('Sortear/re-sortear os times agora? Times atuais serao apagados.');">
+                      onsubmit="return confirm('Sortear os times agora? Os times atuais serão apagados.');">
                     @csrf
                     <button type="submit" class="btn btn-secondary">
                         🎲 {{ $partida->times->count() ? 'Re-sortear times' : 'Sortear times' }}
@@ -90,10 +103,7 @@
                 </form>
             @endif
 
-            @php
-                $eResponsavel = $partida->patota->responsavel_id === auth()->id() || $eAdmin;
-            @endphp
-            @if ($eResponsavel && $partida->times->count() >= 2)
+            @if ($eAdmin && $partida->times->count() >= 2)
                 <div class="mt-3 flex flex-wrap gap-2">
                     @if (! $partida->finalizada())
                         <a href="{{ route('partidas.controle', $partida) }}" class="btn btn-primary">
@@ -126,14 +136,13 @@
             @if ($minhaConfirmacao)
                 <p class="mt-3 text-sm" role="status" aria-live="polite">
                     @if ($minhaConfirmacao->em_lista_espera)
-                        Voce esta na <strong>posicao {{ $minhaConfirmacao->posicao_lista_espera }}</strong> da lista de espera.
+                        Você está na <strong>posição {{ $minhaConfirmacao->posicao_lista_espera }}</strong> da lista de espera.
                     @elseif ($minhaConfirmacao->status === 'confirmado')
-                        Voce confirmou presenca em
+                        Você confirmou presença em
                         <time datetime="{{ $minhaConfirmacao->confirmado_em?->toIso8601String() }}">
-                            {{ $minhaConfirmacao->confirmado_em?->translatedFormat('d/m H:i') }}
-                        </time>.
+                            {{ $minhaConfirmacao->confirmado_em?->translatedFormat('d/m H:i') }}</time>.
                     @elseif ($minhaConfirmacao->status === 'recusado')
-                        Voce informou que nao podera comparecer.
+                        Você informou que não poderá comparecer.
                     @endif
                 </p>
             @endif
@@ -186,7 +195,7 @@
                         @endif
                     </li>
                 @empty
-                    <li class="text-sm text-gray-700">Ninguem confirmou ainda.</li>
+                    <li class="text-sm text-gray-700">Ninguém confirmou ainda.</li>
                 @endforelse
             </ul>
 
@@ -196,7 +205,7 @@
                     @foreach ($partida->listaEspera as $c)
                         <li class="text-gray-700">
                             <span aria-hidden="true">{{ $c->posicao_lista_espera }}.</span>
-                            <span class="sr-only">posicao {{ $c->posicao_lista_espera }}:</span>
+                            <span class="sr-only">posição {{ $c->posicao_lista_espera }}:</span>
                             {{ $c->user->apelido ?? $c->user->name }}
                         </li>
                     @endforeach

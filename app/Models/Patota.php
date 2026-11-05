@@ -28,6 +28,7 @@ class Patota extends Model
         'valor_mensalidade',
         'publica',
         'codigo_convite',
+        'brasao',
     ];
 
     protected $casts = [
@@ -109,6 +110,17 @@ class Patota extends Model
     public function mensagens(): HasMany
     {
         return $this->hasMany(Mensagem::class);
+    }
+
+    public function marcarPartida(User $organizador, array $dados): Partida
+    {
+        return $this->partidas()->create([
+            ...$dados,
+            'organizador_id' => $organizador->id,
+            'vagas_total' => $dados['vagas_total'] ?? $this->vagasPorPartida(),
+            'duracao_minutos' => $dados['duracao_minutos'] ?? 90,
+            'status' => 'agendada',
+        ]);
     }
 
     public function vagasPorPartida(): int

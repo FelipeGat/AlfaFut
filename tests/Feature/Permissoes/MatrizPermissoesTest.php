@@ -27,6 +27,7 @@ class MatrizPermissoesTest extends TestCase
         'leitura' => ['membro', 'organizador', 'responsavel', 'criador', 'admin'],
         'participacao' => ['membro', 'organizador', 'responsavel', 'criador', 'admin'],
         'organizacao' => ['organizador', 'responsavel', 'criador', 'admin'],
+        'gestao' => ['responsavel', 'criador', 'admin'],
         'criador' => ['criador', 'admin'],
     ];
 
@@ -79,6 +80,19 @@ class MatrizPermissoesTest extends TestCase
         ['web', 'POST', 'partidas/{x}/finalizar', 'organizacao'],
         ['web', 'POST', 'partidas/{x}/gol', 'organizacao'],
         ['web', 'DELETE', 'partidas/{x}/eventos/{e}', 'organizacao'],
+        ['web', 'GET', 'patotas/{p}/partidas/nova', 'organizacao'],
+        ['web', 'POST', 'patotas/{p}/partidas', 'organizacao'],
+        ['web', 'GET', 'partidas/{x}/editar', 'organizacao'],
+        ['web', 'PUT', 'partidas/{x}', 'organizacao'],
+        ['web', 'POST', 'partidas/{x}/cancelar', 'organizacao'],
+        ['web', 'GET', 'patotas/{p}/locais', 'organizacao'],
+        ['web', 'GET', 'patotas/{p}/locais/create', 'organizacao'],
+        ['web', 'POST', 'patotas/{p}/locais', 'organizacao'],
+        ['web', 'GET', 'patotas/{p}/membros', 'organizacao'],
+        ['web', 'PATCH', 'patotas/{p}/membros/{m}/papel', 'gestao'],
+        ['web', 'POST', 'patotas/{p}/membros/{m}/responsavel', 'gestao'],
+        ['web', 'POST', 'patotas/{p}/membros/{m}/liberar', 'gestao'],
+        ['web', 'DELETE', 'patotas/{p}/membros/{m}', 'gestao'],
         ['web', 'GET', 'patotas/{p}/edit', 'criador'],
         ['web', 'PUT', 'patotas/{p}', 'criador'],
         ['web', 'DELETE', 'patotas/{p}', 'criador'],
@@ -338,6 +352,7 @@ class MatrizPermissoesTest extends TestCase
             '{x}' => $this->partida->id,
             '{d}' => $this->despesa->id,
             '{e}' => $this->evento->id,
+            '{m}' => $this->pessoas['membro']->id,
         ]);
 
         return $canal === 'api'

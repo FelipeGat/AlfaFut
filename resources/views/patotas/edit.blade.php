@@ -15,7 +15,7 @@
             </div>
 
             <div>
-                <label for="descricao">Descricao</label>
+                <label for="descricao">Descrição</label>
                 <textarea id="descricao" name="descricao" class="textarea" rows="3" maxlength="500">{{ old('descricao', $patota->descricao) }}</textarea>
             </div>
 
@@ -31,7 +31,7 @@
             </div>
 
             <fieldset x-data="{ sel: '{{ old('brasao', $patota->brasao) }}' }">
-                <legend class="font-medium block mb-2">Brasao da turma</legend>
+                <legend class="font-medium block mb-2">Brasão da turma</legend>
                 <input type="hidden" name="brasao" :value="sel">
                 <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
                     @foreach ($clubes as $clube)
@@ -41,7 +41,7 @@
                                 style="--tw-ring-color: var(--md-sys-color-primary);"
                                 class="bg-white border rounded-lg p-2 transition-all hover:shadow-lg focus:outline-none"
                                 :aria-pressed="sel === '{{ $clube['brasao'] }}' ? 'true' : 'false'"
-                                aria-label="Escolher brasao {{ $clube['nome'] }}">
+                                aria-label="Escolher brasão {{ $clube['nome'] }}">
                             <img src="{{ asset($clube['brasao']) }}" alt="{{ $clube['nome'] }}" class="w-full h-auto" loading="lazy">
                             <span class="block text-xs mt-1 text-center text-gray-700 truncate">{{ $clube['nome'] }}</span>
                         </button>
@@ -50,7 +50,7 @@
             </fieldset>
 
             <div>
-                <label for="responsavel_id">Responsavel pela turma</label>
+                <label for="responsavel_id">Responsável pela turma</label>
                 <select id="responsavel_id" name="responsavel_id" class="select" required>
                     @foreach ($membros as $m)
                         <option value="{{ $m->id }}" @selected(old('responsavel_id', $patota->responsavel_id) == $m->id)>
@@ -58,11 +58,11 @@
                         </option>
                     @endforeach
                 </select>
-                <p class="text-xs text-gray-600 mt-1">Apenas o responsavel (e o criador) pode controlar o cronometro e marcar gols ao vivo.</p>
+                <p class="text-xs text-gray-600 mt-1">Só membros ativos podem ser responsáveis. Quem organiza a turma controla o cronômetro e marca os gols ao vivo.</p>
             </div>
 
             <fieldset class="border rounded-lg p-4">
-                <legend class="px-2 font-medium">Configuracao</legend>
+                <legend class="px-2 font-medium">Configuração</legend>
                 <div class="grid sm:grid-cols-2 gap-4 mt-2">
                     <div>
                         <label for="jogadores_por_time">Jogadores por time *</label>
@@ -78,14 +78,14 @@
                     </div>
                     <div class="flex items-center mt-7">
                         <input id="publica" name="publica" type="checkbox" value="1" class="h-5 w-5" {{ old('publica', $patota->publica) ? 'checked' : '' }}>
-                        <label for="publica" class="ms-2 mb-0">Turma publica</label>
+                        <label for="publica" class="ms-2 mb-0">Turma pública</label>
                     </div>
                 </div>
             </fieldset>
 
             <div class="flex items-center justify-end gap-2">
                 <a href="{{ route('patotas.show', $patota) }}" class="btn btn-outline">Cancelar</a>
-                <button type="submit" class="btn btn-primary">Salvar alteracoes</button>
+                <button type="submit" class="btn btn-primary">Salvar alterações</button>
             </div>
         </form>
 
@@ -93,7 +93,7 @@
             @csrf
             @method('DELETE')
             <h2 class="text-red-700">Zona perigosa</h2>
-            <p class="text-sm text-gray-700 mt-2">Arquivar a turma oculta ela e suspende as partidas. Esta acao podera ser revertida pelo administrador.</p>
+            <p class="text-sm text-gray-700 mt-2">Arquivar a turma oculta ela e as partidas. Por enquanto, não há como restaurar pelo site.</p>
             <button type="submit" class="btn btn-danger mt-4">Arquivar turma</button>
         </form>
     </div>

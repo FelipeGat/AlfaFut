@@ -6,6 +6,8 @@ use App\Http\Controllers\Web\CampoController;
 use App\Http\Controllers\Web\ComoUsarController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\DespesaController;
+use App\Http\Controllers\Web\LocalController;
+use App\Http\Controllers\Web\MembroController;
 use App\Http\Controllers\Web\MensagemController;
 use App\Http\Controllers\Web\PartidaController;
 use App\Http\Controllers\Web\PatotaController;
@@ -23,7 +25,21 @@ Route::view('/offline', 'offline')->name('offline');
 Route::middleware(['auth', 'verified', 'cache.headers:no_store;private'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
+    Route::post('patotas/entrar', [PatotaController::class, 'entrar'])->middleware('throttle:entrar-codigo')->name('patotas.entrar');
     Route::resource('patotas', PatotaController::class);
+    Route::post('patotas/{patota}/sair', [PatotaController::class, 'sair'])->name('patotas.sair');
+
+    // Gestão de membros
+    Route::get('patotas/{patota}/membros', [MembroController::class, 'index'])->name('patotas.membros.index');
+    Route::patch('patotas/{patota}/membros/{membro}/papel', [MembroController::class, 'papel'])->name('patotas.membros.papel');
+    Route::post('patotas/{patota}/membros/{membro}/responsavel', [MembroController::class, 'responsavel'])->name('patotas.membros.responsavel');
+    Route::post('patotas/{patota}/membros/{membro}/liberar', [MembroController::class, 'liberar'])->name('patotas.membros.liberar');
+    Route::delete('patotas/{patota}/membros/{membro}', [MembroController::class, 'destroy'])->name('patotas.membros.destroy');
+
+    // Locais da turma
+    Route::resource('patotas.locais', LocalController::class)
+        ->parameters(['locais' => 'local'])
+        ->except('show');
 
     // Catalogo publico de campos (todos os logados podem ver)
     Route::get('campos', [CampoController::class, 'catalogo'])->name('campos.catalogo');
@@ -38,7 +54,12 @@ Route::middleware(['auth', 'verified', 'cache.headers:no_store;private'])->group
     Route::delete('meus-campos/{campo}', [CampoController::class, 'destroy'])->name('meus-campos.destroy');
 
     Route::get('partidas', [PartidaController::class, 'index'])->name('partidas.index');
+    Route::get('patotas/{patota}/partidas/nova', [PartidaController::class, 'create'])->name('partidas.create');
+    Route::post('patotas/{patota}/partidas', [PartidaController::class, 'store'])->name('partidas.store');
     Route::get('partidas/{partida}', [PartidaController::class, 'show'])->name('partidas.show');
+    Route::get('partidas/{partida}/editar', [PartidaController::class, 'edit'])->name('partidas.edit');
+    Route::put('partidas/{partida}', [PartidaController::class, 'update'])->name('partidas.update');
+    Route::post('partidas/{partida}/cancelar', [PartidaController::class, 'cancelar'])->name('partidas.cancelar');
     Route::post('partidas/{partida}/confirmar', [PartidaController::class, 'confirmar'])->name('partidas.confirmar');
     Route::post('partidas/{partida}/recusar', [PartidaController::class, 'recusar'])->name('partidas.recusar');
     Route::post('partidas/{partida}/sortear', SorteioController::class)->name('partidas.sortear');

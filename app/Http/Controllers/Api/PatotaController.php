@@ -8,6 +8,7 @@ use App\Http\Resources\PatotaResource;
 use App\Http\Resources\UsuarioResource;
 use App\Models\Patota;
 use App\Models\PatotaMembro;
+use App\Services\MembrosDaTurma;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -103,21 +104,17 @@ class PatotaController extends Controller
         return response()->json(['mensagem' => 'Patota arquivada.']);
     }
 
-    public function entrar(Request $request): JsonResponse
+    public function entrar(Request $request, MembrosDaTurma $membros): JsonResponse
     {
         $request->validate([
             'codigo_convite' => ['required', 'string', 'size:8'],
         ]);
 
-        $patota = Patota::where('codigo_convite', strtoupper($request->codigo_convite))->firstOrFail();
-
-        PatotaMembro::firstOrCreate(
-            ['patota_id' => $patota->id, 'user_id' => $request->user()->id],
-            ['papel' => 'membro', 'status' => 'ativo']
-        );
+        $patota = $membros->porCodigo($request->codigo_convite);
+        $membros->entrar($request->user(), $patota);
 
         return response()->json([
-            'mensagem' => 'Voce entrou na '.$patota->nome,
+            'mensagem' => 'Você entrou na '.$patota->nome,
             'patota' => new PatotaResource($patota),
         ]);
     }
@@ -133,28 +130,10 @@ class PatotaController extends Controller
             : UsuarioResource::collection($membros);
     }
 
-    public function sair(Request $request, Patota $patota): JsonResponse
+    public function sair(Request $request, Patota $patota, MembrosDaTurma $membros): JsonResponse
     {
-        $userId = $request->user()->id;
+        $membros->sair($request->user(), $patota);
 
-        if ($patota->criador_id === $userId) {
-            return response()->json([
-                'mensagem' => 'O criador nao pode sair da turma. Transfira a responsabilidade antes.',
-            ], 422);
-        }
-
-        $vinculo = $patota->membrosAtivos()
-            ->where('users.id', $userId)
-            ->first();
-
-        if (! $vinculo) {
-            return response()->json(['mensagem' => 'Voce nao faz parte desta turma.'], 404);
-        }
-
-        PatotaMembro::where('patota_id', $patota->id)
-            ->where('user_id', $userId)
-            ->update(['status' => 'inativo', 'saiu_em' => now()]);
-
-        return response()->json(['mensagem' => 'Voce saiu da turma.']);
+        return response()->json(['mensagem' => 'Você saiu da turma.']);
     }
 }

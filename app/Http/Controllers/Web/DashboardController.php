@@ -21,7 +21,7 @@ class DashboardController extends Controller
         $proximasPartidas = Partida::query()
             ->whereIn('patota_id', $patotas->pluck('id'))
             ->proximas()
-            ->with(['patota', 'local', 'confirmacoes'])
+            ->with(['patota', 'local', 'campo', 'confirmacoes'])
             ->limit(5)
             ->get();
 

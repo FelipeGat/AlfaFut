@@ -53,12 +53,20 @@
                 </div>
             @endif
 
+            @if (session('erro'))
+                <div role="alert" class="max-w-7xl mx-auto mt-4 px-4 sm:px-6 lg:px-8">
+                    <div class="bg-red-50 border-l-4 border-red-700 text-red-900 p-4 rounded">
+                        {{ session('erro') }}
+                    </div>
+                </div>
+            @endif
+
             {{ $slot }}
         </main>
 
         <footer class="bg-gray-900 text-gray-100 mt-12" role="contentinfo">
             <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-xs sm:text-sm">
-                <p>AlfaFut &middot; Atividade de Extensao Uniasselvi</p>
+                <p>AlfaFut &middot; Atividade de Extensão Uniasselvi</p>
                 <p class="mt-1 opacity-80">Modelo 3C, Material Design e WCAG 2.1.</p>
             </div>
         </footer>

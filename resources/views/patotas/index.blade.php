@@ -7,10 +7,15 @@
         </div>
     </x-slot>
 
-    <div class="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <section aria-labelledby="entrar-heading" class="card">
+            <h2 id="entrar-heading" class="mb-3">Recebeu um convite?</h2>
+            @include('partials.entrar-codigo')
+        </section>
+
         @if ($patotas->isEmpty())
             <div class="card text-center">
-                <p class="text-lg text-gray-700">Voce ainda nao participa de nenhuma turma.</p>
+                <p class="text-lg text-gray-700">Você ainda não participa de nenhuma turma.</p>
                 <a href="{{ route('patotas.create') }}" class="btn btn-primary mt-4">Criar minha primeira turma</a>
             </div>
         @else
@@ -25,7 +30,7 @@
                         <div class="mt-3 flex items-center gap-2 text-xs">
                             <span class="px-2 py-1 rounded-full bg-gray-100">{{ $patota->jogadores_por_time }}x{{ $patota->jogadores_por_time }}</span>
                             @if ($patota->publica)
-                                <span class="px-2 py-1 rounded-full bg-green-100 text-green-900">publica</span>
+                                <span class="px-2 py-1 rounded-full bg-green-100 text-green-900">pública</span>
                             @endif
                         </div>
                     </li>

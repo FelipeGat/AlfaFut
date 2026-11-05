@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Exceptions\RegraDaTurma;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +16,7 @@ class Partida extends Model
     protected $fillable = [
         'patota_id',
         'local_id',
+        'campo_id',
         'organizador_id',
         'titulo',
         'descricao',
@@ -51,6 +53,17 @@ class Partida extends Model
     public function local(): BelongsTo
     {
         return $this->belongsTo(Local::class);
+    }
+
+    public function campo(): BelongsTo
+    {
+        return $this->belongsTo(Campo::class);
+    }
+
+    /** O lugar do jogo: um local da turma ou um campo do catálogo. */
+    public function lugar(): Local|Campo|null
+    {
+        return $this->local ?? $this->campo;
     }
 
     public function organizador(): BelongsTo
@@ -98,6 +111,7 @@ class Partida extends Model
         if ($this->iniciada_em && ! $this->pausada_em && ! $this->finalizada_em) {
             $base += (int) abs($this->iniciada_em->diffInSeconds(now()));
         }
+
         return max(0, $base);
     }
 
@@ -106,6 +120,7 @@ class Partida extends Model
         $total = $this->tempoAtualSegundos();
         $min = intdiv($total, 60);
         $seg = $total % 60;
+
         return sprintf('%02d:%02d', $min, $seg);
     }
 
@@ -124,6 +139,32 @@ class Partida extends Model
     public function finalizada(): bool
     {
         return $this->finalizada_em !== null;
+    }
+
+    public function podeSerAlterada(): bool
+    {
+        return in_array($this->status, ['agendada', 'confirmada'], true)
+            && $this->iniciada_em === null
+            && $this->finalizada_em === null;
+    }
+
+    public function exigirAlteravel(): void
+    {
+        if (! $this->podeSerAlterada()) {
+            throw new RegraDaTurma('Esta partida não pode mais ser alterada, porque já começou, terminou ou foi cancelada.');
+        }
+    }
+
+    public function situacao(): string
+    {
+        return match ($this->status) {
+            'agendada' => 'Agendada',
+            'confirmada' => 'Confirmada',
+            'em_andamento' => 'Em andamento',
+            'finalizada' => 'Finalizada',
+            'cancelada' => 'Cancelada',
+            default => (string) $this->status,
+        };
     }
 
     public function despesas(): HasMany
@@ -147,26 +188,26 @@ class Partida extends Model
             // Agendadas no futuro
             $q->where(function ($w) {
                 $w->where('data_hora', '>=', now())
-                  ->whereIn('status', ['agendada', 'confirmada']);
+                    ->whereIn('status', ['agendada', 'confirmada']);
             })
             // OU acontecendo agora (em andamento, mesmo se data_hora ja passou)
-            ->orWhere('status', 'em_andamento')
-            ->orWhereNotNull('iniciada_em')->whereNull('finalizada_em');
+                ->orWhere('status', 'em_andamento')
+                ->orWhereNotNull('iniciada_em')->whereNull('finalizada_em');
         })
-        ->orderByDesc('iniciada_em')
-        ->orderBy('data_hora');
+            ->orderByDesc('iniciada_em')
+            ->orderBy('data_hora');
     }
 
     public function scopePassadas(Builder $query): Builder
     {
         return $query->where(function ($q) {
-            $q->where('status', 'finalizada')
-              ->orWhereNotNull('finalizada_em')
-              ->orWhere(function ($w) {
-                  $w->where('data_hora', '<', now())
-                    ->whereNotIn('status', ['em_andamento']);
-              });
+            $q->whereIn('status', ['finalizada', 'cancelada'])
+                ->orWhereNotNull('finalizada_em')
+                ->orWhere(function ($w) {
+                    $w->where('data_hora', '<', now())
+                        ->whereNotIn('status', ['em_andamento']);
+                });
         })
-        ->orderByDesc('data_hora');
+            ->orderByDesc('data_hora');
     }
 }

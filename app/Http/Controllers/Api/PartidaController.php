@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SalvarPartidaRequest;
 use App\Http\Resources\PartidaResource;
 use App\Models\Partida;
 use App\Models\Patota;
@@ -17,7 +18,7 @@ class PartidaController extends Controller
         $this->authorize('view', $patota);
 
         $filtro = $request->query('filtro', 'proximas');
-        $query = $patota->partidas()->with(['local', 'organizador', 'confirmacoes']);
+        $query = $patota->partidas()->with(['local', 'campo', 'organizador', 'confirmacoes']);
 
         if ($filtro === 'passadas') {
             $query->passadas();
@@ -28,32 +29,12 @@ class PartidaController extends Controller
         return PartidaResource::collection($query->get());
     }
 
-    public function store(Request $request, Patota $patota): JsonResponse
+    public function store(SalvarPartidaRequest $request, Patota $patota): JsonResponse
     {
-        $this->authorize('organizar', $patota);
-
-        $dados = $request->validate([
-            'local_id' => ['nullable', 'exists:locais,id'],
-            'titulo' => ['required', 'string', 'max:120'],
-            'descricao' => ['nullable', 'string'],
-            'data_hora' => ['required', 'date', 'after:now'],
-            'duracao_minutos' => ['nullable', 'integer', 'min:30', 'max:240'],
-            'vagas_total' => ['nullable', 'integer', 'min:4'],
-            'valor_individual' => ['nullable', 'numeric', 'min:0'],
-            'confirmacao_ate' => ['nullable', 'date', 'before:data_hora'],
-            'lista_espera_habilitada' => ['nullable', 'boolean'],
-        ]);
-
-        $partida = $patota->partidas()->create([
-            ...$dados,
-            'organizador_id' => $request->user()->id,
-            'vagas_total' => $dados['vagas_total'] ?? $patota->vagasPorPartida(),
-            'duracao_minutos' => $dados['duracao_minutos'] ?? 90,
-            'status' => 'agendada',
-        ]);
+        $partida = $patota->marcarPartida($request->user(), $request->dados());
 
         return response()->json(
-            new PartidaResource($partida->load(['local', 'organizador'])),
+            new PartidaResource($partida->load(['local', 'campo', 'organizador'])),
             201
         );
     }
@@ -63,34 +44,28 @@ class PartidaController extends Controller
         $this->authorize('view', $partida);
 
         return new PartidaResource(
-            $partida->load(['local', 'organizador', 'confirmacoes.user', 'times.jogadores'])
+            $partida->load(['local', 'campo', 'organizador', 'confirmacoes.user', 'times.jogadores'])
         );
     }
 
-    public function update(Request $request, Partida $partida): PartidaResource
+    public function update(SalvarPartidaRequest $request, Partida $partida): PartidaResource
     {
-        $this->authorize('controlar', $partida);
+        $partida->exigirAlteravel();
 
-        $dados = $request->validate([
-            'local_id' => ['nullable', 'exists:locais,id'],
-            'titulo' => ['sometimes', 'string', 'max:120'],
-            'descricao' => ['nullable', 'string'],
-            'data_hora' => ['sometimes', 'date'],
-            'duracao_minutos' => ['nullable', 'integer', 'min:30', 'max:240'],
-            'vagas_total' => ['sometimes', 'integer', 'min:4'],
-            'valor_individual' => ['nullable', 'numeric', 'min:0'],
-            'confirmacao_ate' => ['nullable', 'date'],
-            'status' => ['sometimes', 'in:agendada,confirmada,em_andamento,finalizada,cancelada'],
+        $partida->update([
+            ...$request->dados(),
+            ...$request->validate([
+                'status' => ['sometimes', 'in:agendada,confirmada,em_andamento,finalizada,cancelada'],
+            ]),
         ]);
 
-        $partida->update($dados);
-
-        return new PartidaResource($partida->fresh(['local', 'organizador']));
+        return new PartidaResource($partida->fresh(['local', 'campo', 'organizador']));
     }
 
     public function destroy(Request $request, Partida $partida): JsonResponse
     {
         $this->authorize('controlar', $partida);
+        $partida->exigirAlteravel();
 
         $partida->update(['status' => 'cancelada']);
 

@@ -67,6 +67,7 @@ class AppServiceProvider extends ServiceProvider
         return back()
             ->withHeaders($headers)
             ->withInput($request->except(['password', 'password_confirmation']))
-            ->withErrors(['email' => $mensagem]);
+            ->withErrors(['email' => $mensagem])
+            ->with('erro', $mensagem);
     }
 }

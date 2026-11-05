@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SalvarPartidaRequest;
+use App\Models\Campo;
 use App\Models\Partida;
 use App\Models\PartidaConfirmacao;
+use App\Models\Patota;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class PartidaController extends Controller
@@ -18,7 +22,7 @@ class PartidaController extends Controller
 
         $query = Partida::query()
             ->whereIn('patota_id', $patotaIds)
-            ->with(['patota', 'local', 'confirmacoes']);
+            ->with(['patota', 'local', 'campo', 'confirmacoes']);
 
         $partidas = $filtro === 'passadas'
             ? $query->passadas()->limit(20)->get()
@@ -30,7 +34,7 @@ class PartidaController extends Controller
     public function show(Request $request, Partida $partida): View
     {
         $this->authorize('view', $partida);
-        $partida->load(['patota', 'local', 'organizador', 'confirmacoes.user', 'times.jogadores']);
+        $partida->load(['patota', 'local', 'campo', 'organizador', 'confirmacoes.user', 'times.jogadores']);
         $minhaConfirmacao = $partida->confirmacoes->firstWhere('user_id', $request->user()->id);
 
         return view('partidas.show', compact('partida', 'minhaConfirmacao'));
@@ -54,8 +58,8 @@ class PartidaController extends Controller
         );
 
         return back()->with('status', $emListaEspera
-            ? 'Voce entrou na lista de espera.'
-            : 'Presenca confirmada!');
+            ? 'Você entrou na lista de espera.'
+            : 'Presença confirmada!');
     }
 
     public function recusar(Request $request, Partida $partida): RedirectResponse
@@ -67,32 +71,71 @@ class PartidaController extends Controller
             ['status' => 'recusado', 'em_lista_espera' => false]
         );
 
-        return back()->with('status', 'Voce recusou esta partida.');
+        return back()->with('status', 'Você recusou esta partida.');
     }
 
-    // Stubs minimos para satisfazer o resource controller.
-    public function create(): View
+    public function create(Patota $patota): View
     {
-        abort(404);
+        $this->authorize('organizar', $patota);
+
+        return view('partidas.create', [
+            'patota' => $patota,
+            'partida' => null,
+            ...$this->lugares($patota),
+        ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(SalvarPartidaRequest $request, Patota $patota): RedirectResponse
     {
-        abort(404);
+        $partida = $patota->marcarPartida($request->user(), $request->dados());
+
+        return redirect()->route('partidas.show', $partida)->with('status', 'Partida marcada.');
     }
 
-    public function edit(Partida $partida): View
+    public function edit(Partida $partida): View|RedirectResponse
     {
-        abort(404);
+        $this->authorize('controlar', $partida);
+
+        if (! $partida->podeSerAlterada()) {
+            return redirect()->route('partidas.show', $partida)
+                ->with('erro', 'Esta partida não pode mais ser alterada, porque já começou, terminou ou foi cancelada.');
+        }
+
+        return view('partidas.edit', [
+            'patota' => $partida->patota,
+            'partida' => $partida,
+            ...$this->lugares($partida->patota, $partida),
+        ]);
     }
 
-    public function update(Request $request, Partida $partida): RedirectResponse
+    public function update(SalvarPartidaRequest $request, Partida $partida): RedirectResponse
     {
-        abort(404);
+        $partida->exigirAlteravel();
+        $partida->update($request->dados());
+
+        return redirect()->route('partidas.show', $partida)->with('status', 'Partida alterada.');
     }
 
-    public function destroy(Partida $partida): RedirectResponse
+    public function cancelar(Partida $partida): RedirectResponse
     {
-        abort(404);
+        $this->authorize('controlar', $partida);
+        $partida->exigirAlteravel();
+
+        $partida->update(['status' => 'cancelada']);
+
+        return redirect()->route('partidas.show', $partida)->with('status', 'Partida cancelada.');
+    }
+
+    /** @return array{locais: Collection, campos: Collection} */
+    private function lugares(Patota $patota, ?Partida $partida = null): array
+    {
+        return [
+            'locais' => $patota->locais()->orderBy('nome')->get(),
+            'campos' => Campo::query()
+                ->where(fn ($q) => $q->where('ativo', true)->orWhere('id', $partida?->campo_id))
+                ->orderBy('cidade')
+                ->orderBy('nome')
+                ->get(),
+        ];
     }
 }

@@ -10,7 +10,7 @@
                aria-selected="{{ $filtro === 'proximas' ? 'true' : 'false' }}"
                href="{{ route('partidas.index', ['filtro' => 'proximas']) }}"
                class="px-4 py-2 rounded-full text-sm font-medium {{ $filtro === 'proximas' ? 'bg-primary text-on-primary' : 'bg-white border' }}">
-                Proximas
+                Próximas
             </a>
             <a role="tab"
                aria-selected="{{ $filtro === 'passadas' ? 'true' : 'false' }}"
@@ -21,7 +21,7 @@
         </div>
 
         @if ($partidas->isEmpty())
-            <div class="card text-center text-gray-700">Nenhuma partida {{ $filtro === 'proximas' ? 'proxima' : 'passada' }}.</div>
+            <div class="card text-center text-gray-700">Nenhuma partida {{ $filtro === 'proximas' ? 'próxima' : 'passada' }}.</div>
         @else
             <ul class="space-y-3" role="list">
                 @foreach ($partidas as $partida)
@@ -36,20 +36,24 @@
                                     <p class="text-sm text-gray-700">
                                         {{ $partida->patota->nome }} &middot;
                                         <time datetime="{{ $partida->data_hora->toIso8601String() }}">
-                                            {{ $partida->data_hora->translatedFormat('D, d \d\e M \a\s H:i') }}
+                                            {{ $partida->data_hora->translatedFormat('D, d \d\e M') }} às {{ $partida->data_hora->format('H:i') }}
                                         </time>
                                     </p>
-                                    <p class="text-xs text-gray-600 mt-1">{{ $partida->local?->nome ?? 'Local a definir' }}</p>
+                                    <p class="text-xs text-gray-600 mt-1">{{ $partida->lugar()?->nome ?? 'Local a definir' }}</p>
                                 </div>
                                 <div class="text-right space-y-1">
-                                    <span class="inline-block px-2 py-1 rounded-full bg-gray-100 text-xs">{{ $partida->vagasDisponiveis() }}/{{ $partida->vagas_total }} vagas</span>
+                                    @if ($partida->status === 'cancelada')
+                                        <span class="inline-block px-2 py-1 rounded-full bg-red-100 text-red-900 text-xs">Cancelada</span>
+                                    @else
+                                        <span class="inline-block px-2 py-1 rounded-full bg-gray-100 text-xs">{{ $partida->vagasDisponiveis() }}/{{ $partida->vagas_total }} vagas</span>
+                                    @endif
                                     @if ($minha)
                                         @if ($minha->em_lista_espera)
                                             <span class="block text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-900">Lista de espera</span>
                                         @elseif ($minha->status === 'confirmado')
-                                            <span class="block text-xs px-2 py-1 rounded-full bg-green-100 text-green-900">Voce confirmou</span>
+                                            <span class="block text-xs px-2 py-1 rounded-full bg-green-100 text-green-900">Você confirmou</span>
                                         @elseif ($minha->status === 'recusado')
-                                            <span class="block text-xs px-2 py-1 rounded-full bg-red-100 text-red-900">Voce recusou</span>
+                                            <span class="block text-xs px-2 py-1 rounded-full bg-red-100 text-red-900">Você recusou</span>
                                         @endif
                                     @endif
                                 </div>

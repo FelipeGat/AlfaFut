@@ -12,7 +12,7 @@ class CampoController extends Controller
 {
     public function meusIndex(Request $request): View
     {
-        $this->autorizaDonoCampo($request);
+        $this->authorize('create', Campo::class);
 
         $campos = Campo::where('dono_id', $request->user()->id)
             ->orderBy('nome')
@@ -23,45 +23,39 @@ class CampoController extends Controller
 
     public function create(Request $request): View
     {
-        $this->autorizaDonoCampo($request);
+        $this->authorize('create', Campo::class);
 
         return view('campos.create', [
             'tiposPiso' => Campo::tiposPiso(),
         ]);
     }
 
-    private function autorizaDonoCampo(Request $request): void
-    {
-        abort_unless(
-            in_array($request->user()->tipo_usuario, ['dono_campo', 'admin'])
-                || $request->user()->isAdmin(),
-            403,
-            'Apenas donos de campo podem acessar esta area.'
-        );
-    }
-
     public function store(Request $request): RedirectResponse
     {
-        $dados = $this->validar($request);
-        $campo = Campo::create([
-            ...$dados,
+        $this->authorize('create', Campo::class);
+
+        Campo::create([
+            ...$this->validar($request),
+            'ativo' => true,
             'dono_id' => $request->user()->id,
         ]);
 
         return redirect()
             ->route('meus-campos.index')
-            ->with('status', 'Campo cadastrado! Ele ja aparece no catalogo publico.');
+            ->with('status', 'Campo cadastrado. Ele já aparece no catálogo.');
     }
 
     public function show(Request $request, Campo $campo): View
     {
-        // Visivel pra qualquer logado (catalogo publico)
+        $this->authorize('view', $campo);
+
         return view('campos.show', compact('campo'));
     }
 
     public function edit(Request $request, Campo $campo): View
     {
-        abort_unless($campo->dono_id === $request->user()->id, 403);
+        $this->authorize('update', $campo);
+
         return view('campos.edit', [
             'campo' => $campo,
             'tiposPiso' => Campo::tiposPiso(),
@@ -70,8 +64,12 @@ class CampoController extends Controller
 
     public function update(Request $request, Campo $campo): RedirectResponse
     {
-        abort_unless($campo->dono_id === $request->user()->id, 403);
-        $campo->update($this->validar($request));
+        $this->authorize('update', $campo);
+
+        $campo->update([
+            ...$this->validar($request),
+            'ativo' => $request->boolean('ativo'),
+        ]);
 
         return redirect()
             ->route('meus-campos.index')
@@ -80,7 +78,8 @@ class CampoController extends Controller
 
     public function destroy(Request $request, Campo $campo): RedirectResponse
     {
-        abort_unless($campo->dono_id === $request->user()->id, 403);
+        $this->authorize('delete', $campo);
+
         $campo->delete();
 
         return redirect()
@@ -94,8 +93,8 @@ class CampoController extends Controller
         $cidade = $request->query('cidade');
 
         $campos = Campo::ativos()
-            ->when($busca, fn($q) => $q->where('nome', 'like', "%{$busca}%"))
-            ->when($cidade, fn($q) => $q->where('cidade', $cidade))
+            ->when($busca, fn ($q) => $q->where('nome', 'like', "%{$busca}%"))
+            ->when($cidade, fn ($q) => $q->where('cidade', $cidade))
             ->with('dono:id,name')
             ->orderBy('cidade')
             ->orderBy('nome')
@@ -113,22 +112,24 @@ class CampoController extends Controller
 
     private function validar(Request $request): array
     {
-        return $request->validate([
+        $dados = $request->validate([
             'nome' => ['required', 'string', 'max:120'],
             'endereco' => ['nullable', 'string', 'max:200'],
             'cidade' => ['nullable', 'string', 'max:80'],
             'estado' => ['nullable', 'string', 'size:2'],
             'cep' => ['nullable', 'string', 'max:9'],
-            'tipo_piso' => ['nullable', 'in:' . implode(',', array_keys(Campo::tiposPiso()))],
-            'coberto' => ['nullable', 'boolean'],
-            'possui_vestiario' => ['nullable', 'boolean'],
-            'possui_estacionamento' => ['nullable', 'boolean'],
-            'acessivel_cadeirante' => ['nullable', 'boolean'],
-            'valor_hora' => ['nullable', 'numeric', 'min:0'],
+            'tipo_piso' => ['nullable', 'in:'.implode(',', array_keys(Campo::tiposPiso()))],
+            'valor_hora' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
             'contato_whatsapp' => ['nullable', 'string', 'max:20'],
-            'descricao' => ['nullable', 'string'],
+            'descricao' => ['nullable', 'string', 'max:2000'],
             'foto_url' => ['nullable', 'url', 'max:255'],
-            'ativo' => ['nullable', 'boolean'],
         ]);
+
+        // Caixa desmarcada não vem no formulário.
+        foreach (['coberto', 'possui_vestiario', 'possui_estacionamento', 'acessivel_cadeirante'] as $caixa) {
+            $dados[$caixa] = $request->boolean($caixa);
+        }
+
+        return $dados;
     }
 }

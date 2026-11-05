@@ -240,7 +240,7 @@ Ref: constitution IV · tipo: `contradicts` · severidade: `CRITICAL`
 
 As capturas em `public/images/screenshots/`, usadas em `welcome.blade.php` e `como-usar.blade.php`, mostram o nome de uma pessoa real (por exemplo, "Patota do Felipe" em `06-patota-detalhe.png`). A constitution proíbe dado real em captura de tela. Bloqueia a publicação.
 
-- [ ] 7.5.1 Refazer as capturas com o seed fictício, junto com as telas da Etapa 3 e a landing nova
+- [x] 7.5.1 Refazer as capturas com o seed fictício, junto com as telas da Etapa 3 e a landing nova <!-- feito em docs/specs/fluxo-web-turma, tarefa 7.2 -->
 
 <!-- converge-key: f2c88962bc5c -->
 

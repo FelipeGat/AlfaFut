@@ -30,6 +30,13 @@ class PartidaResource extends JsonResource
                 'cidade' => $this->local?->cidade,
                 'acessivel_cadeirante' => (bool) $this->local?->acessivel_cadeirante,
             ]),
+            'campo' => $this->whenLoaded('campo', fn () => $this->campo ? [
+                'id' => $this->campo->id,
+                'nome' => $this->campo->nome,
+                'endereco' => $this->campo->endereco,
+                'cidade' => $this->campo->cidade,
+                'acessivel_cadeirante' => (bool) $this->campo->acessivel_cadeirante,
+            ] : null),
             'organizador' => new UsuarioResource($this->whenLoaded('organizador')),
             'confirmados_count' => $this->whenLoaded('confirmados', fn () => $this->confirmados->count()),
             'lista_espera_count' => $this->whenLoaded('listaEspera', fn () => $this->listaEspera->count()),

@@ -90,7 +90,7 @@ Body:
 | GET | `/patotas/{id}` | Detalhe da patota |
 | PATCH | `/patotas/{id}` | Atualiza (apenas criador) |
 | DELETE | `/patotas/{id}` | Arquiva (apenas criador) |
-| POST | `/patotas/entrar` | Entra com codigo de convite |
+| POST | `/patotas/entrar` | Entra com codigo de convite; reativa quem saiu; removido recebe 422 ate liberarem a volta pelo site; codigo invalido recebe 404 |
 | GET | `/patotas/{id}/membros` | Lista membros ativos |
 
 ### Quem ve o que em um usuario
@@ -108,6 +108,14 @@ Em `/patotas/{id}/membros`, organizador e admin global recebem tambem `email`, `
 | GET | `/partidas/{id}` | Detalhe |
 | PATCH | `/partidas/{id}` | Atualiza |
 | DELETE | `/partidas/{id}` | Cancela |
+
+Regras de partida, iguais às do site:
+
+- `local_id` só de local da mesma turma; `campo_id` só de campo ativo, ou o que a partida já usa; os dois juntos dão 422.
+- `data_hora` futura; `confirmacao_ate` antes do início; `vagas_total` de 4 a 200 e nunca abaixo dos confirmados; `valor_individual` até 99999,99.
+- Partida em andamento, finalizada ou cancelada não muda: `PATCH` e `DELETE` respondem 422 com `{mensagem}`.
+- A resposta traz `campo` ao lado de `local`, com os mesmos campos. Datas saem no horário de Brasília (`-03:00`).
+
 
 ### Confirmacoes
 | Metodo | Rota | Descricao |

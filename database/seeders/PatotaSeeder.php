@@ -79,7 +79,7 @@ class PatotaSeeder extends Seeder
             ['slug' => 'patota-exemplo'],
             [
                 'nome' => 'Patota Exemplo',
-                'descricao' => 'Pelada de quarta e sabado, todos os niveis sao bem-vindos.',
+                'descricao' => 'Pelada de quarta e sábado, todos os níveis são bem-vindos.',
                 'cidade' => 'Joinville',
                 'estado' => 'SC',
                 'criador_id' => $admin->id,
@@ -123,8 +123,8 @@ class PatotaSeeder extends Seeder
             [
                 'local_id' => $local->id,
                 'organizador_id' => $admin->id,
-                'titulo' => 'Pelada de sabado',
-                'descricao' => 'Confirma presenca ate sexta as 18h.',
+                'titulo' => 'Pelada de sábado',
+                'descricao' => 'Confirme presença até sexta às 18h.',
                 'duracao_minutos' => 90,
                 'vagas_total' => $patota->vagasPorPartida(),
                 'valor_individual' => 18.00,
@@ -136,16 +136,16 @@ class PatotaSeeder extends Seeder
         foreach (array_slice($usuarios, 0, 8) as $u) {
             PartidaConfirmacao::firstOrCreate(
                 ['partida_id' => $partida->id, 'user_id' => $u->id],
-                ['status' => 'confirmado', 'em_lista_espera' => false]
+                ['status' => 'confirmado', 'em_lista_espera' => false, 'confirmado_em' => now()]
             );
         }
         PartidaConfirmacao::firstOrCreate(
             ['partida_id' => $partida->id, 'user_id' => $admin->id],
-            ['status' => 'confirmado']
+            ['status' => 'confirmado', 'confirmado_em' => now()]
         );
 
         $despesa = Despesa::firstOrCreate(
-            ['partida_id' => $partida->id, 'descricao' => 'Aluguel do campo - sabado'],
+            ['partida_id' => $partida->id, 'descricao' => 'Aluguel do campo - sábado'],
             [
                 'patota_id' => $patota->id,
                 'criada_por_id' => $admin->id,

@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\Patota;
 use App\Models\PatotaMembro;
+use App\Services\MembrosDaTurma;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class PatotaController extends Controller
@@ -39,7 +41,7 @@ class PatotaController extends Controller
             'quantidade_times' => ['required', 'integer', 'min:2', 'max:6'],
             'valor_mensalidade' => ['nullable', 'numeric', 'min:0'],
             'publica' => ['nullable', 'boolean'],
-            'brasao' => ['nullable', 'string', 'max:120'],
+            'brasao' => ['nullable', Rule::in(array_column(config('clubes.clubes'), 'brasao'))],
         ]);
 
         $patota = Patota::create([
@@ -57,7 +59,7 @@ class PatotaController extends Controller
 
         return redirect()
             ->route('patotas.show', $patota)
-            ->with('status', 'Turma criada com sucesso. Compartilhe o codigo de convite com o time.');
+            ->with('status', 'Turma criada. Compartilhe o código de convite com o time.');
     }
 
     public function show(Request $request, Patota $patota): View
@@ -95,8 +97,11 @@ class PatotaController extends Controller
             'quantidade_times' => ['required', 'integer', 'min:2', 'max:6'],
             'valor_mensalidade' => ['nullable', 'numeric', 'min:0'],
             'publica' => ['nullable', 'boolean'],
-            'responsavel_id' => ['nullable', 'exists:users,id'],
-            'brasao' => ['nullable', 'string', 'max:120'],
+            'responsavel_id' => [
+                'nullable',
+                Rule::exists('patota_membros', 'user_id')->where('patota_id', $patota->id)->where('status', 'ativo'),
+            ],
+            'brasao' => ['nullable', Rule::in(array_column(config('clubes.clubes'), 'brasao'))],
         ]);
 
         $patota->update([
@@ -113,5 +118,26 @@ class PatotaController extends Controller
         $patota->delete();
 
         return redirect()->route('patotas.index')->with('status', 'Turma arquivada.');
+    }
+
+    public function entrar(Request $request, MembrosDaTurma $membros): RedirectResponse
+    {
+        $dados = $request->validate([
+            'codigo_convite' => ['required', 'string', 'max:20'],
+        ]);
+
+        $patota = $membros->porCodigo($dados['codigo_convite']);
+        $entrou = $membros->entrar($request->user(), $patota);
+
+        return redirect()->route('patotas.show', $patota)->with('status', $entrou
+            ? "Você entrou na turma {$patota->nome}."
+            : "Você já faz parte da turma {$patota->nome}.");
+    }
+
+    public function sair(Request $request, Patota $patota, MembrosDaTurma $membros): RedirectResponse
+    {
+        $membros->sair($request->user(), $patota);
+
+        return redirect()->route('patotas.index')->with('status', "Você saiu da turma {$patota->nome}.");
     }
 }

@@ -58,7 +58,7 @@ class Campo extends Model
     {
         return [
             'grama_natural' => 'Grama natural',
-            'grama_sintetica' => 'Grama sintetica',
+            'grama_sintetica' => 'Grama sintética',
             'saibro' => 'Saibro',
             'quadra_coberta' => 'Quadra coberta',
             'futsal' => 'Futsal',
