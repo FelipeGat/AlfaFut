@@ -171,3 +171,21 @@ curl http://localhost/AlfaFut/public/api/v1/patotas \
 curl -X POST http://localhost/AlfaFut/public/api/v1/partidas/1/confirmar \
   -H "Authorization: Bearer {token}"
 ```
+
+## Vaga, dinheiro e placar (Etapa 4)
+
+Toda recusa por regra responde `422 {"mensagem": "..."}`.
+
+- `POST /partidas/{id}/confirmar`: recusa partida cancelada, iniciada, finalizada, com horário passado ou prazo vencido. Repetir mantém a situação. Partida cheia entra na fila, ou é recusada se a lista estiver desligada.
+- `POST /partidas/{id}/recusar` e `DELETE /partidas/{id}/confirmacao`: valem até a partida começar e fazem a fila andar.
+- `PATCH /partidas/{id}`: `status` aceita só `agendada`, `confirmada` e `cancelada`.
+- `POST /partidas/{id}/iniciar`, `pausar` e `finalizar`: seguem a ordem da partida. Repetir responde 200 sem mudar nada. Iniciar exige times sorteados.
+- `POST /partidas/{id}/gol`: exige partida iniciada e não encerrada. `jogador_id` precisa ser do time informado; no gol contra, do outro time.
+- `POST /partidas/{id}/sortear`: só antes de a partida começar.
+- `POST /patotas/{id}/despesas`: `rateada` ausente vale `false`; `rateada: true` exige `partida_id` com confirmados. `valor_total` vai até 999999.99, com 2 casas.
+- `PATCH /despesas/{id}`: não aceita `status`. Alterar `valor_total` refaz o rateio e não aceita menos que o já pago.
+- `POST /despesas/{id}/refazer-rateio`, `marcar-paga` e `cancelar`: para quem organiza. `DELETE /despesas/{id}` é recusado se houver pagamento.
+- `POST /pagamentos/{id}/quitar`: soma ao que já foi pago e não passa do saldo. Quem organiza só registra por quem não é mais membro ativo.
+- `POST /patotas/{id}/sair`: a resposta traz `pendente`, o valor em aberto da pessoa na turma.
+- `GET /patotas/arquivadas` e `POST /patotas/{id}/restaurar`: só para quem criou a turma.
+- `POST /patotas/{id}/mensagens`: `partida_id` precisa ser da turma.

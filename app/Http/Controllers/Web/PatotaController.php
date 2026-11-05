@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Exceptions\RegraDaTurma;
 use App\Http\Controllers\Controller;
 use App\Models\Patota;
 use App\Models\PatotaMembro;
 use App\Services\MembrosDaTurma;
+use App\Support\Dinheiro;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -19,8 +21,9 @@ class PatotaController extends Controller
             ->withCount('membrosAtivos as total_membros')
             ->orderBy('nome')
             ->get();
+        $arquivadas = Patota::onlyTrashed()->where('criador_id', $request->user()->id)->orderBy('nome')->get();
 
-        return view('patotas.index', compact('patotas'));
+        return view('patotas.index', compact('patotas', 'arquivadas'));
     }
 
     public function create(): View
@@ -39,7 +42,7 @@ class PatotaController extends Controller
             'estado' => ['nullable', 'string', 'size:2'],
             'jogadores_por_time' => ['required', 'integer', 'min:3', 'max:11'],
             'quantidade_times' => ['required', 'integer', 'min:2', 'max:6'],
-            'valor_mensalidade' => ['nullable', 'numeric', 'min:0'],
+            'valor_mensalidade' => ['nullable', 'numeric', 'decimal:0,2', 'min:0', 'max:99999.99'],
             'publica' => ['nullable', 'boolean'],
             'brasao' => ['nullable', Rule::in(array_column(config('clubes.clubes'), 'brasao'))],
         ]);
@@ -95,7 +98,7 @@ class PatotaController extends Controller
             'estado' => ['nullable', 'string', 'size:2'],
             'jogadores_por_time' => ['required', 'integer', 'min:3', 'max:11'],
             'quantidade_times' => ['required', 'integer', 'min:2', 'max:6'],
-            'valor_mensalidade' => ['nullable', 'numeric', 'min:0'],
+            'valor_mensalidade' => ['nullable', 'numeric', 'decimal:0,2', 'min:0', 'max:99999.99'],
             'publica' => ['nullable', 'boolean'],
             'responsavel_id' => [
                 'nullable',
@@ -136,8 +139,22 @@ class PatotaController extends Controller
 
     public function sair(Request $request, Patota $patota, MembrosDaTurma $membros): RedirectResponse
     {
-        $membros->sair($request->user(), $patota);
+        $pendente = $membros->sair($request->user(), $patota);
 
-        return redirect()->route('patotas.index')->with('status', "Você saiu da turma {$patota->nome}.");
+        return redirect()->route('patotas.index')->with('status', "Você saiu da turma {$patota->nome}.".
+            ($pendente > 0 ? ' Ficou pendente '.Dinheiro::formatar($pendente).' nas despesas dela: combine com quem organiza.' : ''));
+    }
+
+    public function restaurar(Patota $patota): RedirectResponse
+    {
+        $this->authorize('restore', $patota);
+
+        if (! $patota->trashed()) {
+            throw new RegraDaTurma('Esta turma não está arquivada.');
+        }
+
+        $patota->restore();
+
+        return redirect()->route('patotas.show', $patota)->with('status', 'Turma restaurada.');
     }
 }

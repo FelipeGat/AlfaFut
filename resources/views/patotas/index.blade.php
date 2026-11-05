@@ -37,5 +37,22 @@
                 @endforeach
             </ul>
         @endif
+
+        @if ($arquivadas->isNotEmpty())
+            <section aria-labelledby="arquivadas-h" class="card">
+                <h2 id="arquivadas-h">Turmas arquivadas</h2>
+                <ul class="mt-3 space-y-2" role="list">
+                    @foreach ($arquivadas as $arquivada)
+                        <li class="flex flex-wrap items-center justify-between gap-2">
+                            <span>{{ $arquivada->nome }}</span>
+                            <form method="POST" action="{{ route('patotas.restaurar', $arquivada) }}">
+                                @csrf
+                                <button type="submit" class="btn btn-outline">Restaurar {{ $arquivada->nome }}</button>
+                            </form>
+                        </li>
+                    @endforeach
+                </ul>
+            </section>
+        @endif
     </div>
 </x-app-layout>

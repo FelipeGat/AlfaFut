@@ -7,6 +7,7 @@ use App\Http\Requests\SalvarPartidaRequest;
 use App\Http\Resources\PartidaResource;
 use App\Models\Partida;
 use App\Models\Patota;
+use App\Services\VagasDaPartida;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -48,16 +49,17 @@ class PartidaController extends Controller
         );
     }
 
-    public function update(SalvarPartidaRequest $request, Partida $partida): PartidaResource
+    public function update(SalvarPartidaRequest $request, Partida $partida, VagasDaPartida $vagas): PartidaResource
     {
         $partida->exigirAlteravel();
 
         $partida->update([
             ...$request->dados(),
             ...$request->validate([
-                'status' => ['sometimes', 'in:agendada,confirmada,em_andamento,finalizada,cancelada'],
+                'status' => ['sometimes', 'in:agendada,confirmada,cancelada'],
             ]),
         ]);
+        $vagas->reorganizar($partida);
 
         return new PartidaResource($partida->fresh(['local', 'campo', 'organizador']));
     }

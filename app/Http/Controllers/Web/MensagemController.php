@@ -7,6 +7,7 @@ use App\Models\Mensagem;
 use App\Models\Patota;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class MensagemController extends Controller
@@ -31,7 +32,7 @@ class MensagemController extends Controller
 
         $dados = $request->validate([
             'conteudo' => ['required', 'string', 'max:1000'],
-            'partida_id' => ['nullable', 'exists:partidas,id'],
+            'partida_id' => ['nullable', Rule::exists('partidas', 'id')->where('patota_id', $patota->id)],
             'tipo' => ['nullable', 'in:texto,aviso,enquete'],
             'fixada' => ['nullable', 'boolean'],
         ]);

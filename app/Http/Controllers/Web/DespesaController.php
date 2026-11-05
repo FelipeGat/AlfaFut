@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DarBaixaRequest;
+use App\Http\Requests\SalvarDespesaRequest;
 use App\Models\Despesa;
 use App\Models\Pagamento;
 use App\Models\Patota;
+use App\Services\FinanceiroDaTurma;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class DespesaController extends Controller
@@ -35,43 +37,9 @@ class DespesaController extends Controller
         return view('despesas.create', compact('patota', 'partidas'));
     }
 
-    public function store(Request $request, Patota $patota): RedirectResponse
+    public function store(SalvarDespesaRequest $request, Patota $patota, FinanceiroDaTurma $financeiro): RedirectResponse
     {
-        $this->authorize('organizar', $patota);
-
-        $dados = $request->validate([
-            'partida_id' => ['nullable', Rule::exists('partidas', 'id')->where('patota_id', $patota->id)],
-            'descricao' => ['required', 'string', 'max:160'],
-            'categoria' => ['required', 'in:locacao,arbitragem,material,alimentacao,outro'],
-            'valor_total' => ['required', 'numeric', 'min:0.01'],
-            'data_despesa' => ['required', 'date'],
-            'rateada' => ['nullable', 'boolean'],
-        ]);
-
-        $despesa = $patota->despesas()->create([
-            ...$dados,
-            'criada_por_id' => $request->user()->id,
-            'rateada' => (bool) ($dados['rateada'] ?? false),
-            'status' => 'aberta',
-        ]);
-
-        if ($despesa->rateada && $despesa->partida_id) {
-            $partida = $patota->partidas()->with('confirmados')->find($despesa->partida_id);
-            $confirmados = $partida->confirmados;
-            $rateio = $confirmados->count() > 0
-                ? round((float) $despesa->valor_total / $confirmados->count(), 2)
-                : 0;
-
-            foreach ($confirmados as $c) {
-                Pagamento::create([
-                    'despesa_id' => $despesa->id,
-                    'user_id' => $c->user_id,
-                    'valor_devido' => $rateio,
-                    'data_vencimento' => $despesa->data_despesa,
-                    'status' => 'pendente',
-                ]);
-            }
-        }
+        $despesa = $financeiro->criar($patota, $request->user(), $request->validated());
 
         return redirect()
             ->route('patotas.despesas.show', [$patota, $despesa])
@@ -85,32 +53,60 @@ class DespesaController extends Controller
 
         $despesa->load(['partida', 'criadaPor']);
         $pagamentos = $despesa->pagamentos()->with('user')->get();
+        $podeGerir = $request->user()->can('update', $despesa);
+        $movimentos = $podeGerir ? $despesa->movimentos()->with('user')->latest('id')->get() : collect();
 
-        return view('despesas.show', compact('patota', 'despesa', 'pagamentos'));
+        return view('despesas.show', compact('patota', 'despesa', 'pagamentos', 'podeGerir', 'movimentos'));
     }
 
-    public function destroy(Request $request, Patota $patota, Despesa $despesa): RedirectResponse
+    public function destroy(Request $request, Patota $patota, Despesa $despesa, FinanceiroDaTurma $financeiro): RedirectResponse
     {
-        $this->authorize('organizar', $patota);
-        abort_unless($despesa->patota_id === $patota->id, 404);
+        $this->autorizarGestao($patota, $despesa);
 
-        $despesa->delete();
+        $financeiro->remover($despesa, $request->user());
 
         return redirect()->route('patotas.despesas.index', $patota)->with('status', 'Despesa removida.');
     }
 
-    public function pagar(Request $request, Patota $patota, Pagamento $pagamento): RedirectResponse
+    public function refazerRateio(Request $request, Patota $patota, Despesa $despesa, FinanceiroDaTurma $financeiro): RedirectResponse
     {
-        $this->authorize('quitar', $pagamento);
+        $this->autorizarGestao($patota, $despesa);
+
+        $financeiro->refazerRateio($despesa, $request->user());
+
+        return back()->with('status', 'Rateio refeito com os confirmados atuais.');
+    }
+
+    public function marcarPaga(Request $request, Patota $patota, Despesa $despesa, FinanceiroDaTurma $financeiro): RedirectResponse
+    {
+        $this->autorizarGestao($patota, $despesa);
+
+        $financeiro->marcarComoPaga($despesa, $request->user());
+
+        return back()->with('status', 'Despesa marcada como paga.');
+    }
+
+    public function cancelar(Request $request, Patota $patota, Despesa $despesa, FinanceiroDaTurma $financeiro): RedirectResponse
+    {
+        $this->autorizarGestao($patota, $despesa);
+
+        $financeiro->cancelar($despesa, $request->user());
+
+        return back()->with('status', 'Despesa cancelada.');
+    }
+
+    public function pagar(DarBaixaRequest $request, Patota $patota, Pagamento $pagamento, FinanceiroDaTurma $financeiro): RedirectResponse
+    {
         abort_unless($pagamento->despesa->patota_id === $patota->id, 404);
 
-        $dados = $request->validate([
-            'valor_pago' => ['required', 'numeric', 'min:0.01'],
-            'forma_pagamento' => ['required', 'in:pix,dinheiro,transferencia,cartao'],
-        ]);
-
-        $pagamento->quitar((float) $dados['valor_pago'], $dados['forma_pagamento']);
+        $financeiro->darBaixa($pagamento, $request->user(), $request->validated('valor_pago'), $request->validated('forma_pagamento'));
 
         return back()->with('status', 'Pagamento registrado.');
+    }
+
+    private function autorizarGestao(Patota $patota, Despesa $despesa): void
+    {
+        $this->authorize('organizar', $patota);
+        abort_unless($despesa->patota_id === $patota->id, 404);
     }
 }

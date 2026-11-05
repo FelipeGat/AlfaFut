@@ -17,12 +17,31 @@
          x-init="iniciarPolling()">
 
         <!-- Placar resumido -->
+        @if ($partida->times->count() > 2)
+        <section class="card text-center" aria-live="polite">
+            <p class="text-sm uppercase tracking-wider text-gray-600">Cronômetro</p>
+            <p class="text-3xl sm:text-5xl font-bold font-mono"
+               :class="{'anim-pulso': dados.em_andamento}"
+               x-text="dados.tempo_formatado">{{ $partida->tempoFormatado() }}</p>
+            <ul class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-4" role="list">
+                @foreach ($partida->times->sortBy('id') as $time)
+                    <li data-placar-time="{{ $time->id }}">
+                        @if ($time->brasao)
+                            <img src="{{ asset($time->brasao) }}" alt="Brasão {{ $time->nome }}" class="h-16 w-auto mx-auto" loading="lazy">
+                        @endif
+                        <p class="text-sm uppercase tracking-wider text-gray-700 mt-1 truncate">{{ $time->nome }}</p>
+                        <p class="text-5xl font-black mt-1" x-text="golsDe({{ $time->id }})">{{ $time->gols }}</p>
+                    </li>
+                @endforeach
+            </ul>
+        </section>
+        @else
         <section class="card text-center" aria-live="polite">
             <div class="grid grid-cols-3 items-center gap-2">
                 <div>
                     @if ($partida->times->count() > 0)
                         @if ($partida->times[0]->brasao)
-                            <img src="{{ asset($partida->times[0]->brasao) }}" alt="Brasao {{ $partida->times[0]->nome }}" class="h-16 sm:h-24 w-auto mx-auto" loading="lazy">
+                            <img src="{{ asset($partida->times[0]->brasao) }}" alt="Brasão {{ $partida->times[0]->nome }}" class="h-16 sm:h-24 w-auto mx-auto" loading="lazy">
                         @endif
                         <p class="text-sm sm:text-base uppercase tracking-wider text-gray-700 mt-1 truncate">{{ $partida->times[0]->nome }}</p>
                         <p class="text-5xl sm:text-7xl font-black mt-1"
@@ -31,7 +50,7 @@
                     @endif
                 </div>
                 <div class="text-center">
-                    <p class="text-sm uppercase tracking-wider text-gray-600">Cronometro</p>
+                    <p class="text-sm uppercase tracking-wider text-gray-600">Cronômetro</p>
                     <p class="text-3xl sm:text-5xl font-bold font-mono"
                        :class="{'anim-pulso': dados.em_andamento}"
                        x-text="dados.tempo_formatado">{{ $partida->tempoFormatado() }}</p>
@@ -39,7 +58,7 @@
                 <div>
                     @if ($partida->times->count() > 1)
                         @if ($partida->times[1]->brasao)
-                            <img src="{{ asset($partida->times[1]->brasao) }}" alt="Brasao {{ $partida->times[1]->nome }}" class="h-16 sm:h-24 w-auto mx-auto" loading="lazy">
+                            <img src="{{ asset($partida->times[1]->brasao) }}" alt="Brasão {{ $partida->times[1]->nome }}" class="h-16 sm:h-24 w-auto mx-auto" loading="lazy">
                         @endif
                         <p class="text-sm sm:text-base uppercase tracking-wider text-gray-700 mt-1 truncate">{{ $partida->times[1]->nome }}</p>
                         <p class="text-5xl sm:text-7xl font-black mt-1"
@@ -49,12 +68,15 @@
                 </div>
             </div>
         </section>
+        @endif
 
         <!-- Botoes principais -->
         <section class="card">
             <h2 class="text-lg font-semibold mb-4">Controle do tempo</h2>
             <div class="grid grid-cols-2 gap-3">
-                @if (! $partida->finalizada())
+                @if ($partida->status === 'cancelada')
+                    <p class="col-span-2 text-sm text-gray-700" role="status">Esta partida foi cancelada.</p>
+                @elseif (! $partida->finalizada())
                     @if (! $partida->emAndamento())
                         <form method="POST" action="{{ route('partidas.iniciar', $partida) }}">
                             @csrf
@@ -72,7 +94,7 @@
                     @endif
 
                     <form method="POST" action="{{ route('partidas.finalizar', $partida) }}"
-                          onsubmit="return confirm('Encerrar a partida agora? Esta acao nao pode ser desfeita.');">
+                          onsubmit="return confirm('Encerrar a partida agora? Esta ação não pode ser desfeita.');">
                         @csrf
                         <button type="submit" class="btn btn-danger w-full text-base py-4">
                             🏁 Finalizar
@@ -86,7 +108,7 @@
             </div>
         </section>
 
-        @if (! $partida->finalizada() && $partida->times->count() >= 2)
+        @if ($partida->iniciada_em && ! $partida->finalizada() && $partida->status !== 'cancelada' && $partida->times->count() >= 2)
             <!-- Marcar gol -->
             <section class="card">
                 <h2 class="text-lg font-semibold mb-4">⚽ Marcar gol</h2>
@@ -94,7 +116,7 @@
                     @foreach ($partida->times as $time)
                         <div class="border rounded-xl p-4">
                             @if ($time->brasao)
-                                <img src="{{ asset($time->brasao) }}" alt="Brasao {{ $time->nome }}" class="h-16 w-auto mx-auto mb-2" loading="lazy">
+                                <img src="{{ asset($time->brasao) }}" alt="Brasão {{ $time->nome }}" class="h-16 w-auto mx-auto mb-2" loading="lazy">
                             @endif
                             <h3 class="font-semibold text-center text-lg mb-3" style="color: var(--md-sys-color-primary);">
                                 {{ $time->nome }}
@@ -125,7 +147,7 @@
         <section class="card">
             <h2 class="text-lg font-semibold mb-3">Eventos registrados</h2>
             @if ($partida->eventos->isEmpty())
-                <p class="text-sm text-gray-700">Nenhum evento ainda. Inicie a partida para comecar.</p>
+                <p class="text-sm text-gray-700">Nenhum evento ainda. Inicie a partida para começar.</p>
             @else
                 <ul class="space-y-2" role="list">
                     @foreach ($partida->eventos->reverse() as $ev)
@@ -151,7 +173,7 @@
                                     <span class="text-gray-600">· {{ $ev->time->nome }}</span>
                                 @endif
                             </span>
-                            @if (in_array($ev->tipo, ['gol', 'gol_contra']))
+                            @if (in_array($ev->tipo, ['gol', 'gol_contra']) && ! $partida->finalizada())
                                 <form method="POST" action="{{ route('partidas.eventos.destroy', [$partida, $ev]) }}"
                                       onsubmit="return confirm('Remover este gol?');">
                                     @csrf
@@ -175,12 +197,16 @@
             'placar_b' => $partida->placar_b,
             'tempo_formatado' => $partida->tempoFormatado(),
             'em_andamento' => $partida->emAndamento(),
+            'times' => $partida->times->map(fn ($t) => ['id' => $t->id, 'gols' => $t->gols])->values(),
         ]) !!};
         function controle(partidaId) {
             return {
                 dados: DADOS_INICIAIS_CTRL,
                 flashA: false,
                 flashB: false,
+                golsDe(id) {
+                    return (this.dados.times ?? []).find((time) => time.id === id)?.gols ?? 0;
+                },
                 iniciarPolling() {
                     setInterval(() => this.atualizar(), 4000);
                     setInterval(() => {

@@ -14,7 +14,9 @@ class DespesaPolicy extends PolicyDeTurma
 
     public function update(User $user, Despesa $despesa): bool
     {
-        return $despesa->patota?->temOrganizador($user) ?? false;
+        return $despesa->patota !== null
+            && ! $despesa->patota->trashed()
+            && $despesa->patota->temOrganizador($user);
     }
 
     public function delete(User $user, Despesa $despesa): bool

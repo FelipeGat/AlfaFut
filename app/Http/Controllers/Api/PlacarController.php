@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\EventoPartida;
+use App\Http\Requests\RegistrarGolRequest;
 use App\Models\Partida;
+use App\Services\PlacarDaPartida;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class PlacarController extends Controller
 {
@@ -54,110 +54,29 @@ class PlacarController extends Controller
         ]);
     }
 
-    public function iniciar(Request $request, Partida $partida): JsonResponse
+    public function iniciar(Request $request, Partida $partida, PlacarDaPartida $placar): JsonResponse
     {
         $this->authorize('controlar', $partida);
 
-        if ($partida->finalizada()) {
-            return response()->json(['mensagem' => 'Partida ja foi finalizada.'], 422);
-        }
-
-        if ($partida->pausada()) {
-            $partida->update(['iniciada_em' => now(), 'pausada_em' => null]);
-            $this->logEvento($partida, $request, EventoPartida::TIPO_RETOMADA);
-
-            return response()->json(['mensagem' => 'Partida retomada.']);
-        }
-
-        $partida->update([
-            'iniciada_em' => now(),
-            'tempo_acumulado_segundos' => 0,
-            'placar_a' => 0,
-            'placar_b' => 0,
-            'status' => 'em_andamento',
-        ]);
-        $this->logEvento($partida, $request, EventoPartida::TIPO_INICIO);
-
-        return response()->json(['mensagem' => 'Partida iniciada!']);
+        return response()->json(['mensagem' => $placar->iniciar($partida, $request->user())]);
     }
 
-    public function pausar(Request $request, Partida $partida): JsonResponse
+    public function pausar(Request $request, Partida $partida, PlacarDaPartida $placar): JsonResponse
     {
         $this->authorize('controlar', $partida);
 
-        if (! $partida->emAndamento()) {
-            return response()->json(['mensagem' => 'Partida nao esta em andamento.'], 422);
-        }
-
-        $segundos = (int) abs($partida->iniciada_em->diffInSeconds(now()));
-        $partida->update([
-            'pausada_em' => now(),
-            'tempo_acumulado_segundos' => $partida->tempo_acumulado_segundos + $segundos,
-        ]);
-        $this->logEvento($partida, $request, EventoPartida::TIPO_PAUSA);
-
-        return response()->json(['mensagem' => 'Partida pausada.']);
+        return response()->json(['mensagem' => $placar->pausar($partida, $request->user())]);
     }
 
-    public function finalizar(Request $request, Partida $partida): JsonResponse
+    public function finalizar(Request $request, Partida $partida, PlacarDaPartida $placar): JsonResponse
     {
         $this->authorize('controlar', $partida);
 
-        $partida->update([
-            'finalizada_em' => now(),
-            'tempo_acumulado_segundos' => $partida->tempoAtualSegundos(),
-            'status' => 'finalizada',
-        ]);
-        $this->logEvento($partida, $request, EventoPartida::TIPO_FIM);
-
-        return response()->json(['mensagem' => 'Partida encerrada!']);
+        return response()->json(['mensagem' => $placar->finalizar($partida, $request->user())]);
     }
 
-    public function gol(Request $request, Partida $partida): JsonResponse
+    public function gol(RegistrarGolRequest $request, Partida $partida, PlacarDaPartida $placar): JsonResponse
     {
-        $this->authorize('controlar', $partida);
-
-        $dados = $request->validate([
-            'time_id' => ['required', 'exists:times,id'],
-            'jogador_id' => ['nullable', 'exists:users,id'],
-            'tipo' => ['nullable', 'in:gol,gol_contra'],
-        ]);
-
-        $tipo = $dados['tipo'] ?? EventoPartida::TIPO_GOL;
-        $time = $partida->times()->findOrFail($dados['time_id']);
-
-        EventoPartida::create([
-            'partida_id' => $partida->id,
-            'time_id' => $time->id,
-            'jogador_id' => $dados['jogador_id'] ?? null,
-            'tipo' => $tipo,
-            'minuto' => intdiv($partida->tempoAtualSegundos(), 60),
-            'registrado_por_id' => $request->user()->id,
-        ]);
-
-        $time->increment('gols');
-        $times = $partida->times()->orderBy('id')->get();
-        $partida->update([
-            'placar_a' => $times[0]?->gols ?? 0,
-            'placar_b' => $times[1]?->gols ?? 0,
-        ]);
-
-        if (! empty($dados['jogador_id'])) {
-            $time->jogadores()->updateExistingPivot($dados['jogador_id'], [
-                'gols' => DB::raw('gols + 1'),
-            ]);
-        }
-
-        return response()->json(['mensagem' => 'Gol registrado!']);
-    }
-
-    private function logEvento(Partida $partida, Request $request, string $tipo): void
-    {
-        EventoPartida::create([
-            'partida_id' => $partida->id,
-            'tipo' => $tipo,
-            'minuto' => intdiv($partida->tempoAtualSegundos(), 60),
-            'registrado_por_id' => $request->user()->id,
-        ]);
+        return response()->json(['mensagem' => $placar->registrarGol($partida, $request->user(), $request->validated())]);
     }
 }

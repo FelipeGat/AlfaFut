@@ -107,6 +107,26 @@
         </header>
 
         <main class="px-4 sm:px-8 py-6 flex items-center justify-center">
+            @if ($partida->times->count() > 2)
+            <div class="w-full max-w-6xl">
+                <div class="text-center mb-6">
+                    <div class="relogio" :class="{'anim-pulso': dados.em_andamento}" x-text="dados.tempo_formatado">00:00</div>
+                    <p class="opacity-70 mt-2 text-sm uppercase tracking-wider">cronômetro</p>
+                </div>
+                <div class="grid grid-cols-2 lg:grid-cols-3 gap-6">
+                    <template x-for="time in dados.times" :key="time.id">
+                        <div class="text-center anim-fade-in">
+                            <template x-if="time.brasao">
+                                <img :src="'/' + time.brasao" :alt="'Brasão ' + time.nome"
+                                     class="mx-auto" style="height: clamp(50px, 10vw, 100px); width: auto;">
+                            </template>
+                            <div class="time-nome mt-3" x-text="time.nome"></div>
+                            <div class="time-gols mt-2" x-text="time.gols"></div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+            @else
             <div class="placar-grid w-full max-w-6xl">
                 <div class="text-center anim-fade-in">
                     <template x-if="dados.times[0]?.brasao">
@@ -135,6 +155,7 @@
                          x-text="dados.placar_b"></div>
                 </div>
             </div>
+            @endif
         </main>
 
         <footer class="px-4 sm:px-8 pb-6">

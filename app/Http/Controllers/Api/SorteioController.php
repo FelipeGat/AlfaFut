@@ -14,10 +14,6 @@ class SorteioController extends Controller
     {
         $this->authorize('controlar', $partida);
 
-        if ($partida->confirmados()->count() < 2) {
-            return response()->json(['mensagem' => 'E preciso ao menos 2 confirmados.'], 422);
-        }
-
         $sorteio->sortear($partida);
 
         return response()->json(['mensagem' => 'Times sorteados!']);

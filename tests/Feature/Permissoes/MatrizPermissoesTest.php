@@ -48,6 +48,9 @@ class MatrizPermissoesTest extends TestCase
         ['api', 'POST', 'patotas/{p}/despesas', 'organizacao'],
         ['api', 'PATCH', 'despesas/{d}', 'organizacao'],
         ['api', 'DELETE', 'despesas/{d}', 'organizacao'],
+        ['api', 'POST', 'despesas/{d}/refazer-rateio', 'organizacao'],
+        ['api', 'POST', 'despesas/{d}/marcar-paga', 'organizacao'],
+        ['api', 'POST', 'despesas/{d}/cancelar', 'organizacao'],
         ['api', 'POST', 'patotas/{p}/partidas', 'organizacao'],
         ['api', 'PATCH', 'partidas/{x}', 'organizacao'],
         ['api', 'DELETE', 'partidas/{x}', 'organizacao'],
@@ -58,6 +61,7 @@ class MatrizPermissoesTest extends TestCase
         ['api', 'POST', 'partidas/{x}/sortear', 'organizacao'],
         ['api', 'PATCH', 'patotas/{p}', 'criador'],
         ['api', 'DELETE', 'patotas/{p}', 'criador'],
+        ['api', 'POST', 'patotas/{p}/restaurar', 'criador'],
 
         ['web', 'GET', 'patotas/{p}', 'leitura'],
         ['web', 'GET', 'partidas/{x}', 'leitura'],
@@ -73,6 +77,9 @@ class MatrizPermissoesTest extends TestCase
         ['web', 'GET', 'patotas/{p}/despesas/criar', 'organizacao'],
         ['web', 'POST', 'patotas/{p}/despesas', 'organizacao'],
         ['web', 'DELETE', 'patotas/{p}/despesas/{d}', 'organizacao'],
+        ['web', 'POST', 'patotas/{p}/despesas/{d}/refazer-rateio', 'organizacao'],
+        ['web', 'POST', 'patotas/{p}/despesas/{d}/marcar-paga', 'organizacao'],
+        ['web', 'POST', 'patotas/{p}/despesas/{d}/cancelar', 'organizacao'],
         ['web', 'POST', 'partidas/{x}/sortear', 'organizacao'],
         ['web', 'GET', 'partidas/{x}/controle', 'organizacao'],
         ['web', 'POST', 'partidas/{x}/iniciar', 'organizacao'],
@@ -96,6 +103,7 @@ class MatrizPermissoesTest extends TestCase
         ['web', 'GET', 'patotas/{p}/edit', 'criador'],
         ['web', 'PUT', 'patotas/{p}', 'criador'],
         ['web', 'DELETE', 'patotas/{p}', 'criador'],
+        ['web', 'POST', 'patotas/{p}/restaurar', 'criador'],
     ];
 
     /** @var array<string, User> */

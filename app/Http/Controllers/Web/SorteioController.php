@@ -14,12 +14,8 @@ class SorteioController extends Controller
     {
         $this->authorize('controlar', $partida);
 
-        if ($partida->confirmados()->count() < 2) {
-            return back()->with('status', 'E preciso ao menos 2 confirmados para sortear.');
-        }
-
         $sorteio->sortear($partida);
 
-        return back()->with('status', 'Times sorteados! Verifique a escalacao abaixo.');
+        return back()->with('status', 'Times sorteados! Confira a escalação abaixo.');
     }
 }

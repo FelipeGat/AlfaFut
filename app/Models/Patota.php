@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -35,6 +36,17 @@ class Patota extends Model
         'publica' => 'boolean',
         'valor_mensalidade' => 'decimal:2',
     ];
+
+    /** Em branco vira zero: a coluna não aceita vazio. */
+    protected function valorMensalidade(): Attribute
+    {
+        return Attribute::make(set: fn ($valor) => $valor ?? 0);
+    }
+
+    protected function publica(): Attribute
+    {
+        return Attribute::make(set: fn ($valor) => (bool) $valor);
+    }
 
     protected static function booted(): void
     {

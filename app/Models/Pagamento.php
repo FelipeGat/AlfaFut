@@ -35,14 +35,4 @@ class Pagamento extends Model
     {
         return $this->belongsTo(User::class);
     }
-
-    public function quitar(float $valor, string $forma = 'pix'): void
-    {
-        $this->update([
-            'valor_pago' => $valor,
-            'data_pagamento' => now()->toDateString(),
-            'forma_pagamento' => $forma,
-            'status' => $valor >= $this->valor_devido ? 'pago' : 'parcial',
-        ]);
-    }
 }

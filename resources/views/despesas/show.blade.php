@@ -6,9 +6,30 @@
     </x-slot>
 
     <div class="py-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-3 gap-6">
+        @if ($podeGerir && $despesa->status === 'aberta' && $despesa->partida?->status === 'cancelada')
+            <p class="lg:col-span-3 rounded-lg border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-900" role="status">
+                A partida desta despesa foi cancelada. Se ela não será cobrada, cancele a despesa.
+            </p>
+        @endif
+
+        @if ($podeGerir && $despesa->rateioDesatualizado())
+            <div class="lg:col-span-3 rounded-lg border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-900" role="status">
+                <p>Os confirmados mudaram depois deste rateio. Quem pagou continua com o que pagou, e o restante é dividido de novo.</p>
+                <form method="POST" action="{{ route('patotas.despesas.refazer-rateio', [$patota, $despesa]) }}" class="mt-2"
+                      onsubmit="return confirm('Refazer o rateio com os confirmados atuais? O valor de cada pessoa pode mudar.');">
+                    @csrf
+                    <button type="submit" class="btn btn-secondary">Refazer rateio</button>
+                </form>
+            </div>
+        @endif
+
         <section aria-labelledby="resumo-h" class="card lg:col-span-1">
             <h2 id="resumo-h">Resumo</h2>
             <dl class="mt-3 space-y-3 text-sm">
+                <div>
+                    <dt class="text-gray-600">Situação</dt>
+                    <dd class="font-semibold">{{ ['aberta' => 'Aberta', 'fechada' => 'Fechada', 'cancelada' => 'Cancelada'][$despesa->status] ?? $despesa->status }}</dd>
+                </div>
                 <div>
                     <dt class="text-gray-600">Valor total</dt>
                     <dd class="text-3xl font-bold">R$ {{ number_format($despesa->valor_total, 2, ',', '.') }}</dd>
@@ -49,14 +70,30 @@
                 </div>
             </dl>
 
-            @if ($patota->criador_id === auth()->id())
-                <form method="POST" action="{{ route('patotas.despesas.destroy', [$patota, $despesa]) }}"
-                      onsubmit="return confirm('Remover esta despesa? Esta acao nao pode ser desfeita.');"
-                      class="mt-6 pt-4 border-t">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger">Remover despesa</button>
-                </form>
+            @if ($podeGerir)
+                <div class="mt-6 pt-4 border-t flex flex-wrap gap-2">
+                    @if ($despesa->status === 'aberta' && $pagamentos->isEmpty())
+                        <form method="POST" action="{{ route('patotas.despesas.marcar-paga', [$patota, $despesa]) }}">
+                            @csrf
+                            <button type="submit" class="btn btn-primary">Marcar como paga</button>
+                        </form>
+                    @endif
+                    @if ($despesa->status === 'aberta')
+                        <form method="POST" action="{{ route('patotas.despesas.cancelar', [$patota, $despesa]) }}"
+                              onsubmit="return confirm('Cancelar esta despesa? O que já foi pago fica registrado, e as parcelas em aberto são encerradas.');">
+                            @csrf
+                            <button type="submit" class="btn btn-outline">Cancelar despesa</button>
+                        </form>
+                    @endif
+                    @if ($despesa->centavosPagos() === 0)
+                        <form method="POST" action="{{ route('patotas.despesas.destroy', [$patota, $despesa]) }}"
+                              onsubmit="return confirm('Remover esta despesa? Esta ação não pode ser desfeita.');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger">Remover despesa</button>
+                        </form>
+                    @endif
+                </div>
             @endif
         </section>
 
@@ -64,7 +101,7 @@
             <h2 id="pagamentos-h">Pagamentos ({{ $pagamentos->count() }})</h2>
 
             @if ($pagamentos->isEmpty())
-                <p class="mt-3 text-gray-700 text-sm">Esta despesa nao foi rateada. Para rateio automatico, vincule uma partida ao criar.</p>
+                <p class="mt-3 text-gray-700 text-sm">Esta despesa não foi rateada. Para dividir entre os confirmados, escolha uma partida ao lançar.</p>
             @else
                 <div class="mt-3 -mx-4 sm:mx-0 overflow-x-auto">
                     <table class="w-full text-sm min-w-[500px]" aria-describedby="pagamentos-h">
@@ -73,8 +110,8 @@
                                 <th scope="col" class="py-2 pr-2">Jogador</th>
                                 <th scope="col" class="py-2 pr-2 text-right">Devido</th>
                                 <th scope="col" class="py-2 pr-2 text-right">Pago</th>
-                                <th scope="col" class="py-2 pr-2">Status</th>
-                                <th scope="col" class="py-2 pr-2">Acao</th>
+                                <th scope="col" class="py-2 pr-2">Situação</th>
+                                <th scope="col" class="py-2 pr-2">Ação</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y">
@@ -98,24 +135,28 @@
                                             @case('parcial')
                                                 <span class="inline-block text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-900">Parcial</span>
                                                 @break
+                                            @case('cancelado')
+                                                <span class="inline-block text-xs px-2 py-1 rounded-full bg-gray-100">Cancelada</span>
+                                                @break
                                             @default
                                                 <span class="inline-block text-xs px-2 py-1 rounded-full bg-gray-100">Pendente</span>
                                         @endswitch
                                     </td>
                                     <td class="py-3 pr-2">
-                                        @if ($p->user_id === auth()->id() && $p->status !== 'pago')
+                                        @if ($despesa->status === 'aberta' && in_array($p->status, ['pendente', 'parcial'], true) && auth()->user()->can('quitar', $p))
+                                            @php $saldoDaParcela = \App\Support\Dinheiro::centavos($p->valor_devido) - \App\Support\Dinheiro::centavos($p->valor_pago); @endphp
                                             <details class="inline-block">
-                                                <summary class="btn btn-primary text-xs cursor-pointer" style="min-height:36px;padding:6px 12px">Pagar</summary>
+                                                <summary class="btn btn-primary text-xs cursor-pointer" style="min-height:36px;padding:6px 12px">{{ $p->user_id === auth()->id() ? 'Pagar' : 'Registrar recebimento' }}</summary>
                                                 <form method="POST" action="{{ route('patotas.pagamentos.quitar', [$patota, $p]) }}" class="absolute mt-2 z-10 bg-white p-3 border rounded-lg shadow-lg w-72">
                                                     @csrf
                                                     <label for="vp-{{ $p->id }}" class="text-xs">Valor pago (R$)</label>
-                                                    <input id="vp-{{ $p->id }}" name="valor_pago" type="number" step="0.01" min="0.01" required class="input mb-2" value="{{ $p->valor_devido }}" inputmode="decimal">
+                                                    <input id="vp-{{ $p->id }}" name="valor_pago" type="number" step="0.01" min="0.01" max="{{ \App\Support\Dinheiro::decimal($saldoDaParcela) }}" required class="input mb-2" value="{{ \App\Support\Dinheiro::decimal($saldoDaParcela) }}" inputmode="decimal">
                                                     <label for="fp-{{ $p->id }}" class="text-xs">Forma</label>
                                                     <select id="fp-{{ $p->id }}" name="forma_pagamento" required class="select mb-2">
                                                         <option value="pix">PIX</option>
                                                         <option value="dinheiro">Dinheiro</option>
-                                                        <option value="transferencia">Transferencia</option>
-                                                        <option value="cartao">Cartao</option>
+                                                        <option value="transferencia">Transferência</option>
+                                                        <option value="cartao">Cartão</option>
                                                     </select>
                                                     <button type="submit" class="btn btn-primary w-full">Confirmar pagamento</button>
                                                 </form>
@@ -138,5 +179,18 @@
                 </div>
             @endif
         </section>
+        @if ($podeGerir && $movimentos->isNotEmpty())
+            <section aria-labelledby="historico-h" class="card lg:col-span-3">
+                <h2 id="historico-h">Histórico</h2>
+                <ul class="mt-3 space-y-2 text-sm" role="list">
+                    @foreach ($movimentos as $movimento)
+                        <li>
+                            <time datetime="{{ $movimento->created_at->toIso8601String() }}" class="text-gray-600">{{ $movimento->created_at->translatedFormat('d/m H:i') }}</time>
+                            &middot; <strong>{{ $movimento->user?->nomeExibicao() ?? 'Sem registro' }}</strong>: {{ $movimento->descricao }}
+                        </li>
+                    @endforeach
+                </ul>
+            </section>
+        @endif
     </div>
 </x-app-layout>

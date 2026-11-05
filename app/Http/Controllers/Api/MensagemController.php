@@ -9,6 +9,7 @@ use App\Models\Patota;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Validation\Rule;
 
 class MensagemController extends Controller
 {
@@ -32,7 +33,7 @@ class MensagemController extends Controller
         $this->authorize('participar', $patota);
 
         $dados = $request->validate([
-            'partida_id' => ['nullable', 'exists:partidas,id'],
+            'partida_id' => ['nullable', Rule::exists('partidas', 'id')->where('patota_id', $patota->id)],
             'conteudo' => ['required', 'string', 'max:1000'],
             'tipo' => ['nullable', 'in:texto,aviso,enquete'],
             'fixada' => ['nullable', 'boolean'],

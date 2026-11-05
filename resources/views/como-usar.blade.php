@@ -351,7 +351,8 @@
                         <div class="first-letter">
                             <p>Ao abrir uma partida, o membro tem dois botões: <strong>Confirmar presença</strong> e <strong>Não vou</strong>. A escolha é instantânea e aparece na lista da partida, visível para a turma.</p>
                             <p>Se a partida estiver <strong>cheia</strong>, quem confirma entra automaticamente em uma <strong>lista de espera ordenada</strong>.</p>
-                            <p>Sua posição fica visível ("posição 2 da lista de espera"). E você pode trocar de "vou" para "não vou" pela mesma tela.</p>
+                            <p>Sua posição fica visível ("posição 2 da lista de espera"). Quando alguém desiste, o primeiro da fila vira titular e os outros sobem. Se quem organiza desligar a lista de espera, a partida cheia recusa novas confirmações.</p>
+                            <p>Confirmar vale até o prazo definido na partida. Avisar que <strong>não vai</strong> vale até a partida começar, mesmo depois do prazo.</p>
                         </div>
                     </div>
                 </section>
@@ -364,9 +365,9 @@
                     <p class="lead my-4">Cada time recebe nome e brasão de clube fictício. Os 20 escudos disponíveis são redistribuídos a cada partida.</p>
                     <div class="grid md:grid-cols-2 gap-6 jornal-corpo">
                         <div class="first-letter">
-                            <p>Com pelo menos 2 confirmados, quem organiza clica em <strong>🎲 Sortear times</strong>. O sorteio considera <strong>posição</strong> e <strong>nível</strong> de quem tem esses dados no cadastro; a tela de perfil do site ainda não pede essas informações.</p>
+                            <p>Com pelo menos 2 confirmados, quem organiza clica em <strong>🎲 Sortear times</strong>. O sorteio usa a <strong>posição</strong> e o <strong>nível</strong> informados em <strong>Meu perfil</strong>, e os times ficam com diferença de no máximo 1 jogador.</p>
                             <p>Cada time sorteado recebe <strong>brasão e nome de clube</strong> escolhidos ao acaso entre os 20: hoje pode ser <em>Onças do Sul × Fênix FC</em>, na próxima <em>Águia Dourada × Tubarões da Praia</em>.</p>
-                            <p>Quer sortear de novo? Clique novamente, e o sorteio refaz tudo, inclusive os brasões.</p>
+                            <p>Quer sortear de novo? Clique novamente, e o sorteio refaz tudo, inclusive os brasões. Depois que a partida começa, os times não mudam mais.</p>
                         </div>
                         <figure class="bg-white p-6 rounded-lg img-jornal">
                             <div class="grid grid-cols-2 gap-4 items-center">
@@ -455,7 +456,8 @@
                     <div class="grid md:grid-cols-2 gap-6 jornal-corpo">
                         <div class="first-letter">
                             <p>Cada turma tem uma área <strong>💰 Despesas</strong>. Quem organiza lança a despesa (locação, arbitragem, material, alimentação), informa o valor total e marca <em>"Ratear entre os confirmados da partida"</em>.</p>
-                            <p>O sistema cria um <strong>pagamento individual</strong> para cada confirmado, dividindo o valor igualmente. Cada pessoa abre a despesa, vê quanto deve, registra que pagou e informa a forma usada (PIX, dinheiro, transferência ou cartão). O AlfaFut não recebe nem processa o pagamento.</p>
+                            <p>O sistema cria um <strong>pagamento individual</strong> para cada confirmado, e a soma fecha exatamente com o total. Cada pessoa abre a despesa, vê quanto deve, registra o que pagou e informa a forma usada (PIX, dinheiro, transferência ou cartão). O AlfaFut só registra: o dinheiro não passa pelo sistema.</p>
+                            <p>Se a lista de confirmados mudar, a tela avisa quem organiza, que pode <strong>refazer o rateio</strong> sem perder o que já foi pago. Todas as mudanças ficam no histórico da despesa.</p>
                             <p>O painel da despesa mostra o <strong>total pago</strong>, o <strong>saldo aberto</strong> e a situação de cada pagamento.</p>
                         </div>
                         <figure>

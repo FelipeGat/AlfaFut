@@ -45,9 +45,10 @@ class Partida extends Model
         'valor_individual' => 'decimal:2',
     ];
 
+    /** Inclui a turma arquivada: a partida dela continua aberta para leitura. */
     public function patota(): BelongsTo
     {
-        return $this->belongsTo(Patota::class);
+        return $this->belongsTo(Patota::class)->withTrashed();
     }
 
     public function local(): BelongsTo
@@ -141,15 +142,51 @@ class Partida extends Model
         return $this->finalizada_em !== null;
     }
 
+    public function turmaArquivada(): bool
+    {
+        return (bool) $this->patota?->trashed();
+    }
+
+    public function comecou(): bool
+    {
+        return $this->iniciada_em !== null
+            || $this->finalizada_em !== null
+            || in_array($this->status, ['em_andamento', 'finalizada'], true);
+    }
+
     public function podeSerAlterada(): bool
     {
         return in_array($this->status, ['agendada', 'confirmada'], true)
-            && $this->iniciada_em === null
-            && $this->finalizada_em === null;
+            && ! $this->comecou()
+            && ! $this->turmaArquivada();
+    }
+
+    /** Por que não dá mais para avisar que não vai. Vale até a partida começar, mesmo depois do prazo de confirmar. */
+    public function motivoParaNaoRecusar(): ?string
+    {
+        return match (true) {
+            $this->turmaArquivada() => 'Esta turma está arquivada.',
+            $this->status === 'cancelada' => 'Esta partida foi cancelada.',
+            $this->comecou() => 'Esta partida já começou ou terminou.',
+            default => null,
+        };
+    }
+
+    public function motivoParaNaoConfirmar(): ?string
+    {
+        return $this->motivoParaNaoRecusar() ?? match (true) {
+            $this->data_hora->isPast() => 'O horário desta partida já passou.',
+            $this->confirmacao_ate?->isPast() ?? false => 'O prazo para confirmar presença nesta partida acabou.',
+            default => null,
+        };
     }
 
     public function exigirAlteravel(): void
     {
+        if ($this->turmaArquivada()) {
+            throw new RegraDaTurma('Esta turma está arquivada.');
+        }
+
         if (! $this->podeSerAlterada()) {
             throw new RegraDaTurma('Esta partida não pode mais ser alterada, porque já começou, terminou ou foi cancelada.');
         }

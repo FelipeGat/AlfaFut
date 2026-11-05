@@ -8,10 +8,10 @@
     <div class="py-8 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <form method="POST" action="{{ route('patotas.despesas.store', $patota) }}" class="card space-y-6" aria-describedby="form-help">
             @csrf
-            <p id="form-help" class="text-sm text-gray-700">Os campos marcados com asterisco (*) sao obrigatorios.</p>
+            <p id="form-help" class="text-sm text-gray-700">Os campos marcados com asterisco (*) são obrigatórios.</p>
 
             <div>
-                <label for="descricao">Descricao *</label>
+                <label for="descricao">Descrição *</label>
                 <input id="descricao" name="descricao" type="text" class="input" required maxlength="160" value="{{ old('descricao') }}">
                 @error('descricao')<p class="text-red-700 text-sm mt-1" role="alert">{{ $message }}</p>@enderror
             </div>
@@ -20,10 +20,10 @@
                 <div>
                     <label for="categoria">Categoria *</label>
                     <select id="categoria" name="categoria" class="select" required>
-                        <option value="locacao" @selected(old('categoria') === 'locacao')>Locacao do campo</option>
+                        <option value="locacao" @selected(old('categoria') === 'locacao')>Locação do campo</option>
                         <option value="arbitragem" @selected(old('categoria') === 'arbitragem')>Arbitragem</option>
                         <option value="material" @selected(old('categoria') === 'material')>Material (bolas, coletes)</option>
-                        <option value="alimentacao" @selected(old('categoria') === 'alimentacao')>Alimentacao</option>
+                        <option value="alimentacao" @selected(old('categoria') === 'alimentacao')>Alimentação</option>
                         <option value="outro" @selected(old('categoria') === 'outro')>Outro</option>
                     </select>
                 </div>
@@ -36,7 +36,8 @@
             <div class="grid sm:grid-cols-2 gap-4">
                 <div>
                     <label for="valor_total">Valor total (R$) *</label>
-                    <input id="valor_total" name="valor_total" type="number" class="input" required step="0.01" min="0.01" inputmode="decimal" value="{{ old('valor_total') }}">
+                    <input id="valor_total" name="valor_total" type="number" class="input" required step="0.01" min="0.01" max="999999.99" inputmode="decimal" value="{{ old('valor_total') }}">
+                    @error('valor_total')<p class="text-red-700 text-sm mt-1" role="alert">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label for="partida_id">Partida (opcional)</label>
@@ -58,7 +59,7 @@
                     <label for="rateada" class="mb-0">
                         Ratear entre os confirmados da partida
                         <span class="block text-sm text-gray-600 font-normal mt-1">
-                            O sistema cria automaticamente um pagamento individual para cada confirmado, dividindo o valor.
+                            Escolha a partida acima. O sistema divide o valor entre os confirmados, com a soma exata do total. Se os confirmados mudarem, você pode refazer a divisão na tela da despesa.
                         </span>
                     </label>
                 </div>

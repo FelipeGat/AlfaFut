@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\RegraDaTurma;
 use App\Models\Partida;
 use App\Models\Time;
 use App\Models\TimeJogador;
@@ -19,11 +20,19 @@ class SorteioTimes
     public function sortear(Partida $partida): Collection
     {
         return DB::transaction(function () use ($partida) {
-            $partida->times()->delete();
+            $partida = Partida::whereKey($partida->getKey())->lockForUpdate()->firstOrFail();
+            $this->exigirPodeSortear($partida);
 
             $confirmados = $partida->confirmados()->with('user')->get();
-            $patota = $partida->patota;
-            $quantidade = $patota->quantidade_times;
+
+            if ($confirmados->count() < 2) {
+                throw new RegraDaTurma('É preciso ao menos 2 confirmados para sortear.');
+            }
+
+            $partida->times()->delete();
+
+            // Nunca mais times que jogadores: nenhum time fica vazio
+            $quantidade = min($partida->patota->quantidade_times, $confirmados->count());
 
             // Sorteia clubes ficticios distintos para cada time
             $clubesDisponiveis = collect(config('clubes.clubes'))->shuffle()->take($quantidade);
@@ -49,7 +58,8 @@ class SorteioTimes
             $goleiros = $jogadores->where('posicao_preferida', 'goleiro')->values();
             $linha = $jogadores->where('posicao_preferida', '!=', 'goleiro')->values();
 
-            $somaPorTime = $times->mapWithKeys(fn ($t) => [$t->id => 0]);
+            $tamanhoPorTime = $times->mapWithKeys(fn ($t) => [$t->id => 0])->all();
+            $somaPorTime = $tamanhoPorTime;
 
             // 1. Distribuir goleiros (um por time, se houver)
             foreach ($goleiros as $i => $goleiro) {
@@ -59,22 +69,44 @@ class SorteioTimes
                     'user_id' => $goleiro->id,
                     'posicao' => 'goleiro',
                 ]);
+                $tamanhoPorTime[$time->id]++;
                 $somaPorTime[$time->id] += self::PESO_NIVEL[$goleiro->nivel_habilidade] ?? 2;
             }
 
-            // 2. Snake draft pelos demais (jogadores ja ordenados desc por nivel)
+            // 2. Demais jogadores, do maior nivel ao menor: primeiro o time com menos gente, depois o de menor soma
             foreach ($linha as $jogador) {
-                $timeMenorSoma = $times->sortBy(fn ($t) => $somaPorTime[$t->id])->first();
+                $timeMenor = $times
+                    ->sortBy([
+                        fn ($a, $b) => $tamanhoPorTime[$a->id] <=> $tamanhoPorTime[$b->id],
+                        fn ($a, $b) => $somaPorTime[$a->id] <=> $somaPorTime[$b->id],
+                    ])
+                    ->first();
                 TimeJogador::create([
-                    'time_id' => $timeMenorSoma->id,
+                    'time_id' => $timeMenor->id,
                     'user_id' => $jogador->id,
                     'posicao' => $jogador->posicao_preferida,
                 ]);
-                $somaPorTime[$timeMenorSoma->id] += self::PESO_NIVEL[$jogador->nivel_habilidade] ?? 2;
+                $tamanhoPorTime[$timeMenor->id]++;
+                $somaPorTime[$timeMenor->id] += self::PESO_NIVEL[$jogador->nivel_habilidade] ?? 2;
             }
 
             return $times->map(fn ($t) => $t->load('jogadores'));
         });
+    }
+
+    private function exigirPodeSortear(Partida $partida): void
+    {
+        if ($partida->turmaArquivada()) {
+            throw new RegraDaTurma('Esta turma está arquivada.');
+        }
+
+        if ($partida->status === 'cancelada') {
+            throw new RegraDaTurma('Esta partida foi cancelada.');
+        }
+
+        if ($partida->comecou()) {
+            throw new RegraDaTurma('Esta partida já começou. Os times não podem mais ser sorteados.');
+        }
     }
 
     private function corPorIndice(int $i): string

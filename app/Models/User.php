@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -43,6 +44,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
     {
         return [
             'email_verified_at' => 'datetime',
+            'excluida_em' => 'datetime',
             'data_nascimento' => 'date',
             'password' => 'hashed',
             'alto_contraste' => 'boolean',
@@ -50,6 +52,12 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
             'leitor_tela_otimizado' => 'boolean',
             'necessidades_acessibilidade' => 'array',
         ];
+    }
+
+    /** Em branco vale o padrão da coluna, que não aceita vazio. */
+    protected function nivelHabilidade(): Attribute
+    {
+        return Attribute::make(set: fn ($valor) => $valor ?? 'intermediario');
     }
 
     public function patotasCriadas(): HasMany

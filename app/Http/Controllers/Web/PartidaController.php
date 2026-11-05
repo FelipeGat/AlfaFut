@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SalvarPartidaRequest;
 use App\Models\Campo;
 use App\Models\Partida;
-use App\Models\PartidaConfirmacao;
 use App\Models\Patota;
+use App\Services\VagasDaPartida;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -40,36 +40,22 @@ class PartidaController extends Controller
         return view('partidas.show', compact('partida', 'minhaConfirmacao'));
     }
 
-    public function confirmar(Request $request, Partida $partida): RedirectResponse
+    public function confirmar(Request $request, Partida $partida, VagasDaPartida $vagas): RedirectResponse
     {
         $this->authorize('participar', $partida);
 
-        $emListaEspera = $partida->isCheia();
-        PartidaConfirmacao::updateOrCreate(
-            ['partida_id' => $partida->id, 'user_id' => $request->user()->id],
-            [
-                'status' => 'confirmado',
-                'em_lista_espera' => $emListaEspera,
-                'posicao_lista_espera' => $emListaEspera
-                    ? ($partida->listaEspera()->max('posicao_lista_espera') ?? 0) + 1
-                    : null,
-                'confirmado_em' => now(),
-            ]
-        );
+        $confirmacao = $vagas->confirmar($partida, $request->user());
 
-        return back()->with('status', $emListaEspera
-            ? 'Você entrou na lista de espera.'
+        return back()->with('status', $confirmacao->em_lista_espera
+            ? 'Você está na lista de espera.'
             : 'Presença confirmada!');
     }
 
-    public function recusar(Request $request, Partida $partida): RedirectResponse
+    public function recusar(Request $request, Partida $partida, VagasDaPartida $vagas): RedirectResponse
     {
         $this->authorize('participar', $partida);
 
-        PartidaConfirmacao::updateOrCreate(
-            ['partida_id' => $partida->id, 'user_id' => $request->user()->id],
-            ['status' => 'recusado', 'em_lista_espera' => false]
-        );
+        $vagas->recusar($partida, $request->user());
 
         return back()->with('status', 'Você recusou esta partida.');
     }
@@ -108,10 +94,11 @@ class PartidaController extends Controller
         ]);
     }
 
-    public function update(SalvarPartidaRequest $request, Partida $partida): RedirectResponse
+    public function update(SalvarPartidaRequest $request, Partida $partida, VagasDaPartida $vagas): RedirectResponse
     {
         $partida->exigirAlteravel();
         $partida->update($request->dados());
+        $vagas->reorganizar($partida);
 
         return redirect()->route('partidas.show', $partida)->with('status', 'Partida alterada.');
     }

@@ -14,6 +14,11 @@ use Illuminate\Support\Facades\DB;
  */
 class MembrosDaTurma
 {
+    public function __construct(
+        private readonly VagasDaPartida $vagas,
+        private readonly FinanceiroDaTurma $financeiro,
+    ) {}
+
     public function porCodigo(string $codigo): Patota
     {
         return Patota::where('codigo_convite', strtoupper(trim($codigo)))->first()
@@ -45,7 +50,8 @@ class MembrosDaTurma
         return true;
     }
 
-    public function sair(User $user, Patota $patota): void
+    /** @return int o que a pessoa deixou pendente na turma, em centavos */
+    public function sair(User $user, Patota $patota): int
     {
         if ($patota->criador_id === $user->id) {
             throw new RegraDaTurma('Quem criou a turma não pode sair dela. Se a turma acabou, arquive pela tela de editar.');
@@ -56,6 +62,8 @@ class MembrosDaTurma
         }
 
         $this->desligar($patota, $user, 'inativo');
+
+        return $this->financeiro->pendenteDe($patota, $user);
     }
 
     public function remover(Patota $patota, User $quemPediu, User $membro): void
@@ -118,6 +126,8 @@ class MembrosDaTurma
             if ($patota->responsavel_id === $membro->id) {
                 $patota->update(['responsavel_id' => $patota->criador_id]);
             }
+
+            $this->vagas->liberarNaTurma($patota, $membro);
         });
     }
 

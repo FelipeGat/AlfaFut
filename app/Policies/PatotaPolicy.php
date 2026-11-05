@@ -37,4 +37,9 @@ class PatotaPolicy extends PolicyDeTurma
     {
         return $patota->criador_id === $user->id;
     }
+
+    public function restore(User $user, Patota $patota): bool
+    {
+        return $patota->criador_id === $user->id;
+    }
 }

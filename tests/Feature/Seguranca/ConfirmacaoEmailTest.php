@@ -95,7 +95,7 @@ class ConfirmacaoEmailTest extends TestCase
         $this->actingAs($user)->get('/profile')->assertOk();
         $this->actingAs($user, 'sanctum')->patchJson('/api/v1/perfil', ['apelido' => 'Novo'])->assertOk();
         $this->actingAs($user, 'web')->delete('/profile', ['password' => 'password'])->assertRedirect('/');
-        $this->assertDatabaseMissing('users', ['id' => $user->id]);
+        $this->assertNotNull($user->fresh()->excluida_em);
     }
 
     public function test_reenvio_pelo_site_tem_limite_em_portugues(): void

@@ -6,14 +6,12 @@
     </x-slot>
 
     @php
-        $totalGols = (int) $partida->placar_a + (int) $partida->placar_b;
-        $timeA = $partida->times[0] ?? null;
-        $timeB = $partida->times[1] ?? null;
-        $vencedor = null;
-        if ($timeA && $timeB) {
-            if ($partida->placar_a > $partida->placar_b) $vencedor = $timeA;
-            elseif ($partida->placar_b > $partida->placar_a) $vencedor = $timeB;
-        }
+        $times = $partida->times->sortBy('id')->values();
+        $totalGols = $times->sum('gols');
+        $lideres = $times->where('gols', $times->max('gols'))->values();
+        $vencedor = $lideres->count() === 1 ? $lideres->first() : null;
+        $timeA = $times[0] ?? null;
+        $timeB = $times[1] ?? null;
     @endphp
 
     <!-- Confetti -->
@@ -26,10 +24,23 @@
         <!-- Placar final -->
         <section class="card text-center anim-fade-in">
             <p class="text-xs uppercase tracking-widest text-gray-700 mb-3">Placar final</p>
+            @if ($times->count() > 2)
+            <ul class="grid grid-cols-2 sm:grid-cols-3 gap-4" role="list">
+                @foreach ($times as $time)
+                    <li data-placar-time="{{ $time->id }}">
+                        @if ($time->brasao)
+                            <img src="{{ asset($time->brasao) }}" alt="Brasão {{ $time->nome }}" class="h-20 w-auto mx-auto anim-fade-in" loading="lazy">
+                        @endif
+                        <p class="text-sm font-semibold uppercase mt-2 truncate">{{ $time->nome }}</p>
+                        <p class="text-5xl font-black mt-2">{{ $time->gols }}</p>
+                    </li>
+                @endforeach
+            </ul>
+            @else
             <div class="grid grid-cols-3 items-center gap-2">
                 <div>
                     @if ($timeA?->brasao)
-                        <img src="{{ asset($timeA->brasao) }}" alt="Brasao {{ $timeA->nome }}" class="h-20 sm:h-32 w-auto mx-auto anim-fade-in" loading="lazy">
+                        <img src="{{ asset($timeA->brasao) }}" alt="Brasão {{ $timeA->nome }}" class="h-20 sm:h-32 w-auto mx-auto anim-fade-in" loading="lazy">
                     @endif
                     <p class="text-sm sm:text-lg font-semibold uppercase mt-2 truncate">{{ $timeA?->nome ?? 'Time A' }}</p>
                     <p class="text-5xl sm:text-8xl font-black mt-2">{{ $partida->placar_a }}</p>
@@ -37,17 +48,20 @@
                 <div class="text-2xl sm:text-4xl text-gray-400">×</div>
                 <div>
                     @if ($timeB?->brasao)
-                        <img src="{{ asset($timeB->brasao) }}" alt="Brasao {{ $timeB->nome }}" class="h-20 sm:h-32 w-auto mx-auto anim-fade-in" loading="lazy">
+                        <img src="{{ asset($timeB->brasao) }}" alt="Brasão {{ $timeB->nome }}" class="h-20 sm:h-32 w-auto mx-auto anim-fade-in" loading="lazy">
                     @endif
                     <p class="text-sm sm:text-lg font-semibold uppercase mt-2 truncate">{{ $timeB?->nome ?? 'Time B' }}</p>
                     <p class="text-5xl sm:text-8xl font-black mt-2">{{ $partida->placar_b }}</p>
                 </div>
             </div>
+            @endif
 
             @if ($vencedor)
                 <p class="mt-6 text-lg">
                     🏆 <strong style="color: var(--md-sys-color-primary);">{{ $vencedor->nome }}</strong> venceu!
                 </p>
+            @elseif ($times->count() > 2)
+                <p class="mt-6 text-lg">🤝 Empate entre {{ $lideres->pluck('nome')->join(', ', ' e ') }}</p>
             @else
                 <p class="mt-6 text-lg">🤝 Empate</p>
             @endif

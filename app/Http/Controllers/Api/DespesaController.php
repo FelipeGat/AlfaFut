@@ -3,15 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DarBaixaRequest;
+use App\Http\Requests\SalvarDespesaRequest;
 use App\Http\Resources\DespesaResource;
 use App\Models\Despesa;
 use App\Models\Pagamento;
-use App\Models\Partida;
 use App\Models\Patota;
+use App\Services\FinanceiroDaTurma;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Validation\Rule;
 
 class DespesaController extends Controller
 {
@@ -24,44 +25,9 @@ class DespesaController extends Controller
         );
     }
 
-    public function store(Request $request, Patota $patota): JsonResponse
+    public function store(SalvarDespesaRequest $request, Patota $patota, FinanceiroDaTurma $financeiro): JsonResponse
     {
-        $this->authorize('organizar', $patota);
-
-        $dados = $request->validate([
-            'partida_id' => ['nullable', Rule::exists('partidas', 'id')->where('patota_id', $patota->id)],
-            'descricao' => ['required', 'string', 'max:160'],
-            'categoria' => ['required', 'in:locacao,arbitragem,material,alimentacao,outro'],
-            'valor_total' => ['required', 'numeric', 'min:0.01'],
-            'data_despesa' => ['required', 'date'],
-            'rateada' => ['nullable', 'boolean'],
-        ]);
-
-        $despesa = $patota->despesas()->create([
-            ...$dados,
-            'criada_por_id' => $request->user()->id,
-            'status' => 'aberta',
-        ]);
-
-        if ($despesa->rateada && $despesa->partida_id) {
-            $partida = Partida::with('confirmados')->find($despesa->partida_id);
-            $confirmados = $partida->confirmados;
-            $rateio = $confirmados->count() > 0
-                ? round($despesa->valor_total / $confirmados->count(), 2)
-                : 0;
-
-            foreach ($confirmados as $c) {
-                Pagamento::create([
-                    'despesa_id' => $despesa->id,
-                    'user_id' => $c->user_id,
-                    'valor_devido' => $rateio,
-                    'data_vencimento' => $despesa->data_despesa,
-                    'status' => 'pendente',
-                ]);
-            }
-        }
-
-        return response()->json(new DespesaResource($despesa), 201);
+        return response()->json(new DespesaResource($financeiro->criar($patota, $request->user(), $request->validated())), 201);
     }
 
     public function show(Despesa $despesa): JsonResponse
@@ -81,39 +47,50 @@ class DespesaController extends Controller
         ]);
     }
 
-    public function update(Request $request, Despesa $despesa): DespesaResource
+    public function update(SalvarDespesaRequest $request, Despesa $despesa, FinanceiroDaTurma $financeiro): DespesaResource
     {
-        $this->authorize('update', $despesa);
-
-        $despesa->update($request->validate([
-            'descricao' => ['sometimes', 'string', 'max:160'],
-            'categoria' => ['sometimes', 'in:locacao,arbitragem,material,alimentacao,outro'],
-            'valor_total' => ['sometimes', 'numeric', 'min:0.01'],
-            'status' => ['sometimes', 'in:aberta,fechada,cancelada'],
-        ]));
-
-        return new DespesaResource($despesa);
+        return new DespesaResource($financeiro->alterar($despesa, $request->user(), $request->validated()));
     }
 
-    public function destroy(Despesa $despesa): JsonResponse
+    public function destroy(Request $request, Despesa $despesa, FinanceiroDaTurma $financeiro): JsonResponse
     {
         $this->authorize('delete', $despesa);
 
-        $despesa->delete();
+        $financeiro->remover($despesa, $request->user());
 
         return response()->json(['mensagem' => 'Despesa removida.']);
     }
 
-    public function pagar(Request $request, Pagamento $pagamento): JsonResponse
+    public function refazerRateio(Request $request, Despesa $despesa, FinanceiroDaTurma $financeiro): JsonResponse
     {
-        $this->authorize('quitar', $pagamento);
+        $this->authorize('update', $despesa);
 
-        $dados = $request->validate([
-            'valor_pago' => ['required', 'numeric', 'min:0.01'],
-            'forma_pagamento' => ['required', 'in:pix,dinheiro,transferencia,cartao'],
-        ]);
+        $financeiro->refazerRateio($despesa, $request->user());
 
-        $pagamento->quitar((float) $dados['valor_pago'], $dados['forma_pagamento']);
+        return response()->json(['mensagem' => 'Rateio refeito com os confirmados atuais.']);
+    }
+
+    public function marcarPaga(Request $request, Despesa $despesa, FinanceiroDaTurma $financeiro): JsonResponse
+    {
+        $this->authorize('update', $despesa);
+
+        $financeiro->marcarComoPaga($despesa, $request->user());
+
+        return response()->json(['mensagem' => 'Despesa marcada como paga.']);
+    }
+
+    public function cancelar(Request $request, Despesa $despesa, FinanceiroDaTurma $financeiro): JsonResponse
+    {
+        $this->authorize('update', $despesa);
+
+        $financeiro->cancelar($despesa, $request->user());
+
+        return response()->json(['mensagem' => 'Despesa cancelada.']);
+    }
+
+    public function pagar(DarBaixaRequest $request, Pagamento $pagamento, FinanceiroDaTurma $financeiro): JsonResponse
+    {
+        $financeiro->darBaixa($pagamento, $request->user(), $request->validated('valor_pago'), $request->validated('forma_pagamento'));
 
         return response()->json(['mensagem' => 'Pagamento registrado.']);
     }

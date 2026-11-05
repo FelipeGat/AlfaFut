@@ -14,11 +14,11 @@ class PartidaPolicy extends PolicyDeTurma
 
     public function participar(User $user, Partida $partida): bool
     {
-        return $this->view($user, $partida);
+        return $this->view($user, $partida) && ! $partida->turmaArquivada();
     }
 
     public function controlar(User $user, Partida $partida): bool
     {
-        return $partida->patota?->temOrganizador($user) ?? false;
+        return ! $partida->turmaArquivada() && ($partida->patota?->temOrganizador($user) ?? false);
     }
 }

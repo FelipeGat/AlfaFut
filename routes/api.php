@@ -28,9 +28,11 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
         Route::middleware('verified')->group(function () {
             Route::post('patotas/entrar', [PatotaController::class, 'entrar'])->middleware('throttle:entrar-codigo');
+            Route::get('patotas/arquivadas', [PatotaController::class, 'arquivadas']);
             Route::apiResource('patotas', PatotaController::class);
             Route::get('patotas/{patota}/membros', [PatotaController::class, 'membros']);
             Route::post('patotas/{patota}/sair', [PatotaController::class, 'sair']);
+            Route::post('patotas/{patota}/restaurar', [PatotaController::class, 'restaurar'])->withTrashed();
 
             Route::get('patotas/{patota}/partidas', [PartidaController::class, 'index']);
             Route::post('patotas/{patota}/partidas', [PartidaController::class, 'store']);
@@ -55,6 +57,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             Route::get('despesas/{despesa}', [DespesaController::class, 'show']);
             Route::patch('despesas/{despesa}', [DespesaController::class, 'update']);
             Route::delete('despesas/{despesa}', [DespesaController::class, 'destroy']);
+            Route::post('despesas/{despesa}/refazer-rateio', [DespesaController::class, 'refazerRateio']);
+            Route::post('despesas/{despesa}/marcar-paga', [DespesaController::class, 'marcarPaga']);
+            Route::post('despesas/{despesa}/cancelar', [DespesaController::class, 'cancelar']);
             Route::post('pagamentos/{pagamento}/quitar', [DespesaController::class, 'pagar']);
 
             Route::get('patotas/{patota}/mensagens', [MensagemController::class, 'index']);

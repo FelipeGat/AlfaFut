@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RegistrarGolRequest;
 use App\Models\EventoPartida;
 use App\Models\Partida;
+use App\Services\PlacarDaPartida;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class PlacarController extends Controller
@@ -38,6 +39,7 @@ class PlacarController extends Controller
         $partida->load(['patota', 'times.jogadores', 'eventos.jogador', 'eventos.time']);
 
         $artilheiros = $partida->gols()
+            ->whereNotNull('jogador_id')
             ->with('jogador', 'time')
             ->get()
             ->groupBy('jogador_id')
@@ -83,147 +85,38 @@ class PlacarController extends Controller
         ]);
     }
 
-    public function iniciar(Request $request, Partida $partida): RedirectResponse
+    public function iniciar(Request $request, Partida $partida, PlacarDaPartida $placar): RedirectResponse
     {
         $this->authorize('controlar', $partida);
 
-        if ($partida->finalizada()) {
-            return back()->with('status', 'Partida ja foi finalizada.');
-        }
-
-        // Se estava pausada, retoma
-        if ($partida->pausada()) {
-            $partida->update([
-                'iniciada_em' => now(),
-                'pausada_em' => null,
-            ]);
-            $this->logEvento($partida, $request, EventoPartida::TIPO_RETOMADA);
-
-            return back()->with('status', 'Partida retomada.');
-        }
-
-        // Caso primeira vez
-        $partida->update([
-            'iniciada_em' => now(),
-            'tempo_acumulado_segundos' => 0,
-            'placar_a' => 0,
-            'placar_b' => 0,
-            'status' => 'em_andamento',
-        ]);
-        $this->logEvento($partida, $request, EventoPartida::TIPO_INICIO);
-
-        return back()->with('status', 'Partida iniciada!');
+        return back()->with('status', $placar->iniciar($partida, $request->user()));
     }
 
-    public function pausar(Request $request, Partida $partida): RedirectResponse
+    public function pausar(Request $request, Partida $partida, PlacarDaPartida $placar): RedirectResponse
     {
         $this->authorize('controlar', $partida);
 
-        if (! $partida->emAndamento()) {
-            return back()->with('status', 'Partida nao esta em andamento.');
-        }
-
-        $segundosDecorridos = (int) abs($partida->iniciada_em->diffInSeconds(now()));
-        $partida->update([
-            'pausada_em' => now(),
-            'tempo_acumulado_segundos' => $partida->tempo_acumulado_segundos + $segundosDecorridos,
-        ]);
-        $this->logEvento($partida, $request, EventoPartida::TIPO_PAUSA);
-
-        return back()->with('status', 'Partida pausada.');
+        return back()->with('status', $placar->pausar($partida, $request->user()));
     }
 
-    public function finalizar(Request $request, Partida $partida): RedirectResponse
+    public function finalizar(Request $request, Partida $partida, PlacarDaPartida $placar): RedirectResponse
     {
         $this->authorize('controlar', $partida);
-
-        $tempoFinal = $partida->tempoAtualSegundos();
-        $partida->update([
-            'finalizada_em' => now(),
-            'tempo_acumulado_segundos' => $tempoFinal,
-            'status' => 'finalizada',
-        ]);
-        $this->logEvento($partida, $request, EventoPartida::TIPO_FIM);
 
         return redirect()->route('partidas.resultado', $partida)
-            ->with('status', 'Partida encerrada!');
+            ->with('status', $placar->finalizar($partida, $request->user()));
     }
 
-    public function gol(Request $request, Partida $partida): RedirectResponse
+    public function gol(RegistrarGolRequest $request, Partida $partida, PlacarDaPartida $placar): RedirectResponse
     {
-        $this->authorize('controlar', $partida);
-
-        $dados = $request->validate([
-            'time_id' => ['required', 'exists:times,id'],
-            'jogador_id' => ['nullable', 'exists:users,id'],
-            'tipo' => ['nullable', 'in:gol,gol_contra'],
-            'observacao' => ['nullable', 'string', 'max:120'],
-        ]);
-
-        $tipo = $dados['tipo'] ?? EventoPartida::TIPO_GOL;
-        $time = $partida->times()->findOrFail($dados['time_id']);
-
-        EventoPartida::create([
-            'partida_id' => $partida->id,
-            'time_id' => $time->id,
-            'jogador_id' => $dados['jogador_id'] ?? null,
-            'tipo' => $tipo,
-            'minuto' => intdiv($partida->tempoAtualSegundos(), 60),
-            'observacao' => $dados['observacao'] ?? null,
-            'registrado_por_id' => $request->user()->id,
-        ]);
-
-        // Atualiza placar
-        $time->increment('gols');
-        $times = $partida->times()->orderBy('id')->get();
-        $partida->update([
-            'placar_a' => $times[0]?->gols ?? 0,
-            'placar_b' => $times[1]?->gols ?? 0,
-        ]);
-
-        // Atualiza estatisticas individuais
-        if (! empty($dados['jogador_id'])) {
-            $partida->times()->where('id', $time->id)
-                ->first()
-                ?->jogadores()
-                ->updateExistingPivot($dados['jogador_id'], [
-                    'gols' => DB::raw('gols + 1'),
-                ]);
-        }
-
-        return back()->with('status', '⚽ Gol registrado!');
+        return back()->with('status', $placar->registrarGol($partida, $request->user(), $request->validated()));
     }
 
-    public function removerEvento(Request $request, Partida $partida, EventoPartida $evento): RedirectResponse
+    public function removerEvento(Partida $partida, EventoPartida $evento, PlacarDaPartida $placar): RedirectResponse
     {
         $this->authorize('controlar', $partida);
         abort_unless($evento->partida_id === $partida->id, 404);
 
-        // Se for gol, decrementa
-        if (in_array($evento->tipo, [EventoPartida::TIPO_GOL, EventoPartida::TIPO_GOL_CONTRA])) {
-            $time = $evento->time;
-            if ($time && $time->gols > 0) {
-                $time->decrement('gols');
-            }
-            $times = $partida->times()->orderBy('id')->get();
-            $partida->update([
-                'placar_a' => $times[0]?->gols ?? 0,
-                'placar_b' => $times[1]?->gols ?? 0,
-            ]);
-        }
-
-        $evento->delete();
-
-        return back()->with('status', 'Evento removido.');
-    }
-
-    private function logEvento(Partida $partida, Request $request, string $tipo): void
-    {
-        EventoPartida::create([
-            'partida_id' => $partida->id,
-            'tipo' => $tipo,
-            'minuto' => intdiv($partida->tempoAtualSegundos(), 60),
-            'registrado_por_id' => $request->user()->id,
-        ]);
+        return back()->with('status', $placar->removerGol($partida, $evento));
     }
 }

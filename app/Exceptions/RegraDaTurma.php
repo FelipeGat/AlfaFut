@@ -21,6 +21,8 @@ class RegraDaTurma extends RuntimeException
             return response()->json(['mensagem' => $this->getMessage()], $this->statusNaApi);
         }
 
-        return back()->with('erro', $this->getMessage());
+        return back()
+            ->withInput($request->except(['password', 'password_confirmation', 'current_password']))
+            ->with('erro', $this->getMessage());
     }
 }

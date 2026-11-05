@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Dinheiro;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -26,9 +27,10 @@ class Despesa extends Model
         'valor_total' => 'decimal:2',
     ];
 
+    /** Inclui a turma arquivada: a despesa dela continua aberta para leitura. */
     public function patota(): BelongsTo
     {
-        return $this->belongsTo(Patota::class);
+        return $this->belongsTo(Patota::class)->withTrashed();
     }
 
     public function partida(): BelongsTo
@@ -46,13 +48,40 @@ class Despesa extends Model
         return $this->hasMany(Pagamento::class);
     }
 
-    public function totalPago(): float
+    public function movimentos(): HasMany
     {
-        return (float) $this->pagamentos()->sum('valor_pago');
+        return $this->hasMany(MovimentoFinanceiro::class);
     }
 
+    public function centavosPagos(): int
+    {
+        return $this->pagamentos()->get()->sum(fn (Pagamento $p) => Dinheiro::centavos($p->valor_pago));
+    }
+
+    public function totalPago(): float
+    {
+        return Dinheiro::reais($this->centavosPagos());
+    }
+
+    /** Fechada ou cancelada não tem saldo a receber. */
     public function saldoAberto(): float
     {
-        return (float) $this->valor_total - $this->totalPago();
+        return $this->status === 'aberta'
+            ? Dinheiro::reais(Dinheiro::centavos($this->valor_total) - $this->centavosPagos())
+            : 0.0;
+    }
+
+    /** A lista de confirmados da partida não é mais a que está nas parcelas em aberto. */
+    public function rateioDesatualizado(): bool
+    {
+        if (! $this->rateada || $this->status !== 'aberta' || ! $this->partida) {
+            return false;
+        }
+
+        $confirmados = $this->partida->confirmados()->pluck('user_id');
+        $parcelas = $this->pagamentos()->get();
+
+        return $confirmados->diff($parcelas->pluck('user_id'))->isNotEmpty()
+            || $parcelas->where('status', 'pendente')->pluck('user_id')->diff($confirmados)->isNotEmpty();
     }
 }

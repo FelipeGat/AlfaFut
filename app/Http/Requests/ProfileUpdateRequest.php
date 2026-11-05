@@ -18,6 +18,9 @@ class ProfileUpdateRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            'apelido' => ['nullable', 'string', 'max:60'],
+            'posicao_preferida' => ['nullable', 'in:goleiro,zagueiro,lateral,meia,atacante'],
+            'nivel_habilidade' => ['nullable', 'in:iniciante,intermediario,avancado'],
             'email' => [
                 'required',
                 'string',

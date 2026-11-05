@@ -13,6 +13,11 @@
     <div class="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-3 gap-6">
 
         <section aria-labelledby="info-h" class="card lg:col-span-2">
+            @if ($partida->turmaArquivada())
+                <p class="mb-4 rounded-lg border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-900" role="status">
+                    Esta turma está arquivada. A partida fica disponível só para consulta.
+                </p>
+            @endif
             <h2 id="info-h">Detalhes</h2>
             @if ($partida->descricao)
                 <p class="mt-2 text-gray-700">{{ $partida->descricao }}</p>
@@ -57,25 +62,35 @@
                 @endif
             </dl>
 
+            @php
+                $podeParticipar = auth()->user()->can('participar', $partida);
+                $jaConfirmou = $minhaConfirmacao?->status === 'confirmado';
+                $motivoFechada = $partida->motivoParaNaoConfirmar();
+                $lotadaSemFila = ! $motivoFechada && ! $jaConfirmou && $partida->isCheia() && ! $partida->lista_espera_habilitada;
+            @endphp
             <div class="mt-6 flex gap-2 flex-wrap" role="group" aria-label="Ações da partida">
-                @if ($partida->status === 'agendada' || $partida->status === 'confirmada')
+                @if ($podeParticipar && ! $motivoFechada && ! $jaConfirmou && ! $lotadaSemFila)
                     <form method="POST" action="{{ route('partidas.confirmar', $partida) }}">
                         @csrf
                         <button type="submit" class="btn btn-primary"
                                 aria-label="Confirmar minha presença nesta partida">
-                            @if ($minhaConfirmacao && $minhaConfirmacao->status === 'confirmado')
-                                Atualizar confirmação
-                            @else
-                                Confirmar presença
-                            @endif
+                            Confirmar presença
                         </button>
                     </form>
+                @endif
+                @if ($podeParticipar && ! $partida->motivoParaNaoRecusar() && $minhaConfirmacao?->status !== 'recusado')
                     <form method="POST" action="{{ route('partidas.recusar', $partida) }}">
                         @csrf
                         <button type="submit" class="btn btn-outline">Não vou</button>
                     </form>
                 @endif
             </div>
+
+            @if (! $partida->turmaArquivada() && ($motivoFechada || $lotadaSemFila))
+                <p class="mt-3 text-sm text-gray-700" role="status">
+                    {{ $motivoFechada ?? 'Esta partida está lotada e não tem lista de espera.' }}
+                </p>
+            @endif
 
             @can('controlar', $partida)
                 @if ($partida->podeSerAlterada())
@@ -93,7 +108,7 @@
             @php
                 $eAdmin = auth()->user()->can('controlar', $partida);
             @endphp
-            @if ($eAdmin && $partida->status !== 'cancelada' && $partida->confirmados->count() >= 2)
+            @if ($eAdmin && $partida->podeSerAlterada() && $partida->confirmados->count() >= 2)
                 <form method="POST" action="{{ route('partidas.sortear', $partida) }}" class="mt-3"
                       onsubmit="return confirm('Sortear os times agora? Os times atuais serão apagados.');">
                     @csrf
@@ -105,7 +120,7 @@
 
             @if ($eAdmin && $partida->times->count() >= 2)
                 <div class="mt-3 flex flex-wrap gap-2">
-                    @if (! $partida->finalizada())
+                    @if (! $partida->finalizada() && $partida->status !== 'cancelada' && ! $partida->turmaArquivada())
                         <a href="{{ route('partidas.controle', $partida) }}" class="btn btn-primary">
                             🎮 Controle ao vivo
                         </a>

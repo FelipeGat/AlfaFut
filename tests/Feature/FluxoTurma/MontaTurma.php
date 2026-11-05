@@ -52,6 +52,14 @@ trait MontaTurma
             ->first();
     }
 
+    protected function novoMembro(): User
+    {
+        $user = User::factory()->create();
+        PatotaMembro::create(['patota_id' => $this->turma->id, 'user_id' => $user->id, 'papel' => 'membro', 'status' => 'ativo']);
+
+        return $user;
+    }
+
     protected function partida(array $dados = []): Partida
     {
         return Partida::factory()->create([

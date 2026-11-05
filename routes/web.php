@@ -28,6 +28,7 @@ Route::middleware(['auth', 'verified', 'cache.headers:no_store;private'])->group
     Route::post('patotas/entrar', [PatotaController::class, 'entrar'])->middleware('throttle:entrar-codigo')->name('patotas.entrar');
     Route::resource('patotas', PatotaController::class);
     Route::post('patotas/{patota}/sair', [PatotaController::class, 'sair'])->name('patotas.sair');
+    Route::post('patotas/{patota}/restaurar', [PatotaController::class, 'restaurar'])->withTrashed()->name('patotas.restaurar');
 
     // Gestão de membros
     Route::get('patotas/{patota}/membros', [MembroController::class, 'index'])->name('patotas.membros.index');
@@ -81,6 +82,9 @@ Route::middleware(['auth', 'verified', 'cache.headers:no_store;private'])->group
     Route::post('patotas/{patota}/despesas', [DespesaController::class, 'store'])->name('patotas.despesas.store');
     Route::get('patotas/{patota}/despesas/{despesa}', [DespesaController::class, 'show'])->name('patotas.despesas.show');
     Route::delete('patotas/{patota}/despesas/{despesa}', [DespesaController::class, 'destroy'])->name('patotas.despesas.destroy');
+    Route::post('patotas/{patota}/despesas/{despesa}/refazer-rateio', [DespesaController::class, 'refazerRateio'])->name('patotas.despesas.refazer-rateio');
+    Route::post('patotas/{patota}/despesas/{despesa}/marcar-paga', [DespesaController::class, 'marcarPaga'])->name('patotas.despesas.marcar-paga');
+    Route::post('patotas/{patota}/despesas/{despesa}/cancelar', [DespesaController::class, 'cancelar'])->name('patotas.despesas.cancelar');
     Route::post('patotas/{patota}/pagamentos/{pagamento}/quitar', [DespesaController::class, 'pagar'])->name('patotas.pagamentos.quitar');
 
     // Mural / mensagens

@@ -14,7 +14,7 @@ class UsuarioController extends Controller
             'name' => ['sometimes', 'string', 'max:120'],
             'apelido' => ['nullable', 'string', 'max:60'],
             'telefone' => ['nullable', 'string', 'max:20'],
-            'avatar_url' => ['nullable', 'url'],
+            'avatar_url' => ['nullable', 'url', 'max:255'],
             'data_nascimento' => ['nullable', 'date'],
             'posicao_preferida' => ['nullable', 'in:goleiro,zagueiro,lateral,meia,atacante'],
             'nivel_habilidade' => ['nullable', 'in:iniciante,intermediario,avancado'],
