@@ -13,6 +13,8 @@ class PlacarController extends Controller
 {
     public function dados(Partida $partida): JsonResponse
     {
+        $this->authorize('view', $partida);
+
         $partida->loadMissing(['times.jogadores', 'eventos.jogador', 'eventos.time']);
 
         return response()->json([
@@ -54,7 +56,7 @@ class PlacarController extends Controller
 
     public function iniciar(Request $request, Partida $partida): JsonResponse
     {
-        $this->authorizeResponsavel($request, $partida);
+        $this->authorize('controlar', $partida);
 
         if ($partida->finalizada()) {
             return response()->json(['mensagem' => 'Partida ja foi finalizada.'], 422);
@@ -63,6 +65,7 @@ class PlacarController extends Controller
         if ($partida->pausada()) {
             $partida->update(['iniciada_em' => now(), 'pausada_em' => null]);
             $this->logEvento($partida, $request, EventoPartida::TIPO_RETOMADA);
+
             return response()->json(['mensagem' => 'Partida retomada.']);
         }
 
@@ -80,7 +83,7 @@ class PlacarController extends Controller
 
     public function pausar(Request $request, Partida $partida): JsonResponse
     {
-        $this->authorizeResponsavel($request, $partida);
+        $this->authorize('controlar', $partida);
 
         if (! $partida->emAndamento()) {
             return response()->json(['mensagem' => 'Partida nao esta em andamento.'], 422);
@@ -98,7 +101,7 @@ class PlacarController extends Controller
 
     public function finalizar(Request $request, Partida $partida): JsonResponse
     {
-        $this->authorizeResponsavel($request, $partida);
+        $this->authorize('controlar', $partida);
 
         $partida->update([
             'finalizada_em' => now(),
@@ -112,7 +115,7 @@ class PlacarController extends Controller
 
     public function gol(Request $request, Partida $partida): JsonResponse
     {
-        $this->authorizeResponsavel($request, $partida);
+        $this->authorize('controlar', $partida);
 
         $dados = $request->validate([
             'time_id' => ['required', 'exists:times,id'],
@@ -146,25 +149,6 @@ class PlacarController extends Controller
         }
 
         return response()->json(['mensagem' => 'Gol registrado!']);
-    }
-
-    private function authorizeResponsavel(Request $request, Partida $partida): void
-    {
-        $user = $request->user();
-        if ($user->isAdmin()) return; // admin global controla tudo
-
-        $patota = $partida->patota;
-        $eResponsavel = $patota->responsavel_id === $user->id
-            || $patota->criador_id === $user->id;
-
-        if (! $eResponsavel) {
-            $papel = $patota->membrosAtivos()
-                ->where('users.id', $user->id)
-                ->value('patota_membros.papel');
-            $eResponsavel = in_array($papel, ['administrador', 'organizador']);
-        }
-
-        abort_unless($eResponsavel, 403, 'Apenas o responsavel pode controlar a partida.');
     }
 
     private function logEvento(Partida $partida, Request $request, string $tipo): void

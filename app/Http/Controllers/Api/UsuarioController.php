@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\UsuarioResource;
+use App\Http\Resources\MeuUsuarioResource;
 use Illuminate\Http\Request;
 
 class UsuarioController extends Controller
 {
-    public function atualizarPerfil(Request $request): UsuarioResource
+    public function atualizarPerfil(Request $request): MeuUsuarioResource
     {
         $dados = $request->validate([
             'name' => ['sometimes', 'string', 'max:120'],
@@ -22,10 +22,10 @@ class UsuarioController extends Controller
 
         $request->user()->update($dados);
 
-        return new UsuarioResource($request->user()->fresh());
+        return new MeuUsuarioResource($request->user()->fresh());
     }
 
-    public function atualizarAcessibilidade(Request $request): UsuarioResource
+    public function atualizarAcessibilidade(Request $request): MeuUsuarioResource
     {
         $dados = $request->validate([
             'alto_contraste' => ['nullable', 'boolean'],
@@ -38,6 +38,6 @@ class UsuarioController extends Controller
 
         $request->user()->update($dados);
 
-        return new UsuarioResource($request->user()->fresh());
+        return new MeuUsuarioResource($request->user()->fresh());
     }
 }

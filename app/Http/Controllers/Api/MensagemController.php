@@ -14,7 +14,7 @@ class MensagemController extends Controller
 {
     public function index(Request $request, Patota $patota): AnonymousResourceCollection
     {
-        $this->authorizeMembro($request, $patota);
+        $this->authorize('view', $patota);
 
         $mensagens = $patota->mensagens()
             ->with('autor')
@@ -29,7 +29,7 @@ class MensagemController extends Controller
 
     public function store(Request $request, Patota $patota): JsonResponse
     {
-        $this->authorizeMembro($request, $patota);
+        $this->authorize('participar', $patota);
 
         $dados = $request->validate([
             'partida_id' => ['nullable', 'exists:partidas,id'],
@@ -37,6 +37,10 @@ class MensagemController extends Controller
             'tipo' => ['nullable', 'in:texto,aviso,enquete'],
             'fixada' => ['nullable', 'boolean'],
         ]);
+
+        if (! empty($dados['fixada']) && $request->user()->cannot('organizar', $patota)) {
+            $dados['fixada'] = false;
+        }
 
         $mensagem = $patota->mensagens()->create([
             ...$dados,
@@ -51,23 +55,10 @@ class MensagemController extends Controller
 
     public function destroy(Request $request, Mensagem $mensagem): JsonResponse
     {
-        abort_unless(
-            $mensagem->autor_id === $request->user()->id
-                || $mensagem->patota->criador_id === $request->user()->id,
-            403
-        );
+        $this->authorize('delete', $mensagem);
 
         $mensagem->delete();
 
         return response()->json(['mensagem' => 'Removida.']);
-    }
-
-    private function authorizeMembro(Request $request, Patota $patota): void
-    {
-        if ($request->user()->isAdmin()) return;
-        $eMembro = $patota->membrosAtivos()
-            ->where('users.id', $request->user()->id)
-            ->exists();
-        abort_unless($eMembro, 403);
     }
 }

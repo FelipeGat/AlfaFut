@@ -40,7 +40,7 @@
 +------------------------------------------+
 | AlfaFut         Acessibilidade  [sair]   |
 +------------------------------------------+
-| Ola, Felipe!                             |
+| Ola, Marcos!                             |
 | Pronto para a proxima pelada?            |
 +------------------------------------------+
 |                                          |
@@ -51,17 +51,17 @@
 |                                          |
 | Minhas patotas             [+Nova]       |
 | ----------------------------------       |
-| > Patota do Felipe (15 membros)          |
+| > Patota do Marcos (15 membros)          |
 | > Time da quadra (8 membros)             |
 |                                          |
 | Proximas partidas                        |
 | ----------------------------------       |
 | > Pelada de sabado                       |
-|   Patota do Felipe - Sab 15:00           |
+|   Patota do Marcos - Sab 15:00           |
 |   Arena Boa Vista - 2 vagas              |
 |                                          |
 | > Treino de quarta                       |
-|   Patota do Felipe - Qua 19:00           |
+|   Patota do Marcos - Qua 19:00           |
 |   Arena Boa Vista - 0 vagas (espera)     |
 |                                          |
 +------------------------------------------+
@@ -81,7 +81,7 @@
 | <-  Pelada de sabado                     |
 +------------------------------------------+
 |                                          |
-| Patota do Felipe                         |
+| Patota do Marcos                         |
 | Sabado, 02 de maio as 15:00              |
 |                                          |
 | Detalhes:                                |
@@ -172,7 +172,7 @@
 
 ```
 +------------------------------------------+
-| <-  Despesas - Patota do Felipe          |
+| <-  Despesas - Patota do Marcos          |
 +------------------------------------------+
 | [+] Nova despesa                         |
 |                                          |

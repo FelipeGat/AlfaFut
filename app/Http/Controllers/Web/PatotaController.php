@@ -13,7 +13,7 @@ class PatotaController extends Controller
 {
     public function index(Request $request): View
     {
-        $patotas = $request->user()->patotas()
+        $patotas = $request->user()->patotasAtivas()
             ->withCount('membrosAtivos as total_membros')
             ->orderBy('nome')
             ->get();
@@ -24,6 +24,7 @@ class PatotaController extends Controller
     public function create(): View
     {
         $clubes = config('clubes.clubes');
+
         return view('patotas.create', compact('clubes'));
     }
 
@@ -61,7 +62,7 @@ class PatotaController extends Controller
 
     public function show(Request $request, Patota $patota): View
     {
-        $this->authorizeMembro($request, $patota);
+        $this->authorize('view', $patota);
 
         $patota->load('criador');
         $patota->loadCount('membrosAtivos as total_membros');
@@ -73,7 +74,7 @@ class PatotaController extends Controller
 
     public function edit(Request $request, Patota $patota): View
     {
-        abort_unless($patota->criador_id === $request->user()->id, 403);
+        $this->authorize('update', $patota);
 
         $membros = $patota->membrosAtivos()->orderBy('name')->get();
         $clubes = config('clubes.clubes');
@@ -83,7 +84,7 @@ class PatotaController extends Controller
 
     public function update(Request $request, Patota $patota): RedirectResponse
     {
-        abort_unless($patota->criador_id === $request->user()->id, 403);
+        $this->authorize('update', $patota);
 
         $dados = $request->validate([
             'nome' => ['required', 'string', 'max:120'],
@@ -108,17 +109,9 @@ class PatotaController extends Controller
 
     public function destroy(Request $request, Patota $patota): RedirectResponse
     {
-        abort_unless($patota->criador_id === $request->user()->id, 403);
+        $this->authorize('delete', $patota);
         $patota->delete();
 
         return redirect()->route('patotas.index')->with('status', 'Turma arquivada.');
-    }
-
-    private function authorizeMembro(Request $request, Patota $patota): void
-    {
-        $eMembro = $patota->membrosAtivos()
-            ->where('users.id', $request->user()->id)
-            ->exists();
-        abort_unless($eMembro, 403, 'Voce nao faz parte desta turma.');
     }
 }

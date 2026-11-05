@@ -93,7 +93,7 @@ Em cada ciclo, registrar:
 ## Como testar visualmente
 
 1. Servidor rodando em `http://localhost/AlfaFut/public`.
-2. Login: `admin@alfafut.test` / `senha1234`.
+2. Login: `admin@alfafut.test`, com a senha mostrada pelo `db:seed`.
 3. Acesse `/acessibilidade` e ative alto contraste para validar WCAG 1.4.6.
 4. Use `Tab` para navegar - todo elemento deve receber foco visivel.
 5. Use Lighthouse (Chrome DevTools) > meta de Acessibilidade >= 95.

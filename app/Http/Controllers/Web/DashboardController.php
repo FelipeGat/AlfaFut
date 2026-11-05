@@ -13,7 +13,7 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        $patotas = $user->patotas()
+        $patotas = $user->patotasAtivas()
             ->withCount('membrosAtivos as total_membros')
             ->orderBy('nome')
             ->get();

@@ -6,7 +6,6 @@ use App\Models\EventoPartida;
 use App\Models\Partida;
 use App\Models\PartidaConfirmacao;
 use App\Models\Patota;
-use App\Models\User;
 use App\Services\SorteioTimes;
 use Illuminate\Console\Command;
 
@@ -20,11 +19,18 @@ class PartidaDemo extends Command
 
     public function handle(SorteioTimes $sorteio): int
     {
+        if (! app()->environment(['local', 'testing'])) {
+            $this->error('Este comando só roda em ambiente local ou de teste.');
+
+            return 1;
+        }
+
         $patota = Patota::firstOrFail();
         $partida = $patota->partidas()->orderByDesc('data_hora')->first();
 
         if (! $partida) {
             $this->error('Patota sem partidas. Rode o seeder primeiro: php artisan db:seed --class=PatotaSeeder');
+
             return 1;
         }
 
@@ -49,7 +55,9 @@ class PartidaDemo extends Command
 
         // Reset de eventos antigos e placar
         $partida->eventos()->delete();
-        foreach ($times as $t) $t->update(['gols' => 0]);
+        foreach ($times as $t) {
+            $t->update(['gols' => 0]);
+        }
 
         // Marca partida iniciada N minutos atras
         $minutosAtras = (int) $this->option('minutos');
@@ -88,7 +96,9 @@ class PartidaDemo extends Command
         ];
 
         foreach ($golsParaMarcar as $gol) {
-            if ($gol['minuto'] > $minutosAtras) continue;
+            if ($gol['minuto'] > $minutosAtras) {
+                continue;
+            }
 
             EventoPartida::create([
                 'partida_id' => $partida->id,
@@ -101,7 +111,7 @@ class PartidaDemo extends Command
             ]);
 
             $gol['time']->increment('gols');
-            $this->line("  ⚽ {$gol['minuto']}' - " . ($gol['jogador']?->apelido ?? 'desconhecido') . " (" . $gol['time']->nome . ")");
+            $this->line("  ⚽ {$gol['minuto']}' - ".($gol['jogador']?->apelido ?? 'desconhecido').' ('.$gol['time']->nome.')');
         }
 
         $partida->update([
@@ -110,10 +120,10 @@ class PartidaDemo extends Command
         ]);
 
         $this->newLine();
-        $this->info("✅ Partida demo pronta!");
+        $this->info('✅ Partida demo pronta!');
         $this->info("Placar atual: {$timeA->fresh()->gols} x {$timeB->fresh()->gols} ({$timeA->nome} vs {$timeB->nome})");
         $this->newLine();
-        $this->line("Acesse no navegador (logado como admin@alfafut.test / senha1234):");
+        $this->line('Acesse no navegador (logado como admin@alfafut.test, com a senha que o seed mostrou):');
         $this->line("  TV (projete na televisao):    http://127.0.0.1:8000/partidas/{$partida->id}/tv");
         $this->line("  Controle (responsavel):       http://127.0.0.1:8000/partidas/{$partida->id}/controle");
 

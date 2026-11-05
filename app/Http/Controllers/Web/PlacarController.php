@@ -15,19 +15,25 @@ class PlacarController extends Controller
 {
     public function tv(Partida $partida): View
     {
+        $this->authorize('view', $partida);
+
         $partida->load(['patota', 'times.jogadores', 'eventos.jogador', 'eventos.time']);
+
         return view('placar.tv', compact('partida'));
     }
 
     public function controle(Request $request, Partida $partida): View
     {
-        $this->authorizeResponsavel($request, $partida);
+        $this->authorize('controlar', $partida);
         $partida->load(['patota', 'times.jogadores', 'eventos.jogador', 'eventos.time']);
+
         return view('placar.controle', compact('partida'));
     }
 
     public function resultado(Partida $partida): View
     {
+        $this->authorize('view', $partida);
+
         abort_unless($partida->finalizada(), 404, 'A partida ainda nao foi finalizada.');
         $partida->load(['patota', 'times.jogadores', 'eventos.jogador', 'eventos.time']);
 
@@ -48,6 +54,8 @@ class PlacarController extends Controller
 
     public function dados(Partida $partida): JsonResponse
     {
+        $this->authorize('view', $partida);
+
         $partida->loadMissing(['times', 'eventos.jogador', 'eventos.time']);
 
         return response()->json([
@@ -77,7 +85,7 @@ class PlacarController extends Controller
 
     public function iniciar(Request $request, Partida $partida): RedirectResponse
     {
-        $this->authorizeResponsavel($request, $partida);
+        $this->authorize('controlar', $partida);
 
         if ($partida->finalizada()) {
             return back()->with('status', 'Partida ja foi finalizada.');
@@ -90,6 +98,7 @@ class PlacarController extends Controller
                 'pausada_em' => null,
             ]);
             $this->logEvento($partida, $request, EventoPartida::TIPO_RETOMADA);
+
             return back()->with('status', 'Partida retomada.');
         }
 
@@ -108,7 +117,7 @@ class PlacarController extends Controller
 
     public function pausar(Request $request, Partida $partida): RedirectResponse
     {
-        $this->authorizeResponsavel($request, $partida);
+        $this->authorize('controlar', $partida);
 
         if (! $partida->emAndamento()) {
             return back()->with('status', 'Partida nao esta em andamento.');
@@ -126,7 +135,7 @@ class PlacarController extends Controller
 
     public function finalizar(Request $request, Partida $partida): RedirectResponse
     {
-        $this->authorizeResponsavel($request, $partida);
+        $this->authorize('controlar', $partida);
 
         $tempoFinal = $partida->tempoAtualSegundos();
         $partida->update([
@@ -142,7 +151,7 @@ class PlacarController extends Controller
 
     public function gol(Request $request, Partida $partida): RedirectResponse
     {
-        $this->authorizeResponsavel($request, $partida);
+        $this->authorize('controlar', $partida);
 
         $dados = $request->validate([
             'time_id' => ['required', 'exists:times,id'],
@@ -187,7 +196,7 @@ class PlacarController extends Controller
 
     public function removerEvento(Request $request, Partida $partida, EventoPartida $evento): RedirectResponse
     {
-        $this->authorizeResponsavel($request, $partida);
+        $this->authorize('controlar', $partida);
         abort_unless($evento->partida_id === $partida->id, 404);
 
         // Se for gol, decrementa
@@ -206,24 +215,6 @@ class PlacarController extends Controller
         $evento->delete();
 
         return back()->with('status', 'Evento removido.');
-    }
-
-    private function authorizeResponsavel(Request $request, Partida $partida): void
-    {
-        $userId = $request->user()->id;
-        $patota = $partida->patota;
-
-        $eResponsavel = $patota->responsavel_id === $userId
-            || $patota->criador_id === $userId;
-
-        if (! $eResponsavel) {
-            $papel = $patota->membrosAtivos()
-                ->where('users.id', $userId)
-                ->value('patota_membros.papel');
-            $eResponsavel = in_array($papel, ['administrador', 'organizador']);
-        }
-
-        abort_unless($eResponsavel, 403, 'Apenas o responsavel pode controlar a partida.');
     }
 
     private function logEvento(Partida $partida, Request $request, string $tipo): void

@@ -11,12 +11,14 @@ class ApiAuthTest extends TestCase
 {
     use RefreshDatabase;
 
+    private const SENHA = 'correta-so-neste-teste';
+
     public function test_registra_novo_usuario_e_recebe_token(): void
     {
         $r = $this->postJson('/api/v1/auth/registrar', [
             'name' => 'Teste',
             'email' => 'teste@alfafut.test',
-            'password' => 'senha1234',
+            'password' => self::SENHA,
             'apelido' => 'Tt',
         ]);
 
@@ -30,12 +32,12 @@ class ApiAuthTest extends TestCase
     {
         $user = User::factory()->create([
             'email' => 'login@alfafut.test',
-            'password' => Hash::make('senha1234'),
+            'password' => Hash::make(self::SENHA),
         ]);
 
         $this->postJson('/api/v1/auth/login', [
             'email' => 'login@alfafut.test',
-            'password' => 'senha1234',
+            'password' => self::SENHA,
         ])
             ->assertOk()
             ->assertJsonPath('usuario.id', $user->id)
@@ -46,7 +48,7 @@ class ApiAuthTest extends TestCase
     {
         User::factory()->create([
             'email' => 'erro@alfafut.test',
-            'password' => Hash::make('senha1234'),
+            'password' => Hash::make(self::SENHA),
         ]);
 
         $this->postJson('/api/v1/auth/login', [

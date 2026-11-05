@@ -13,7 +13,7 @@ class ConfirmacaoController extends Controller
 {
     public function confirmar(Request $request, Partida $partida): JsonResponse
     {
-        $this->authorizeMembro($request, $partida);
+        $this->authorize('participar', $partida);
 
         $dados = $request->validate([
             'observacao' => ['nullable', 'string', 'max:280'],
@@ -47,7 +47,7 @@ class ConfirmacaoController extends Controller
 
     public function recusar(Request $request, Partida $partida): JsonResponse
     {
-        $this->authorizeMembro($request, $partida);
+        $this->authorize('participar', $partida);
 
         PartidaConfirmacao::updateOrCreate(
             ['partida_id' => $partida->id, 'user_id' => $request->user()->id],
@@ -61,6 +61,8 @@ class ConfirmacaoController extends Controller
 
     public function cancelar(Request $request, Partida $partida): JsonResponse
     {
+        $this->authorize('participar', $partida);
+
         $confirmacao = PartidaConfirmacao::where('partida_id', $partida->id)
             ->where('user_id', $request->user()->id)
             ->firstOrFail();
@@ -80,14 +82,5 @@ class ConfirmacaoController extends Controller
 
         $proximo = $partida->listaEspera()->orderBy('posicao_lista_espera')->first();
         $proximo?->update(['em_lista_espera' => false, 'posicao_lista_espera' => null]);
-    }
-
-    private function authorizeMembro(Request $request, Partida $partida): void
-    {
-        $eMembro = $partida->patota
-            ->membrosAtivos()
-            ->where('users.id', $request->user()->id)
-            ->exists();
-        abort_unless($eMembro, 403);
     }
 }

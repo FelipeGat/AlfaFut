@@ -14,7 +14,7 @@ class PartidaController extends Controller
 {
     public function index(Request $request, Patota $patota): AnonymousResourceCollection
     {
-        $this->authorizeMembro($request, $patota);
+        $this->authorize('view', $patota);
 
         $filtro = $request->query('filtro', 'proximas');
         $query = $patota->partidas()->with(['local', 'organizador', 'confirmacoes']);
@@ -30,7 +30,7 @@ class PartidaController extends Controller
 
     public function store(Request $request, Patota $patota): JsonResponse
     {
-        $this->authorizeOrganizador($request, $patota);
+        $this->authorize('organizar', $patota);
 
         $dados = $request->validate([
             'local_id' => ['nullable', 'exists:locais,id'],
@@ -60,7 +60,7 @@ class PartidaController extends Controller
 
     public function show(Request $request, Partida $partida): PartidaResource
     {
-        $this->authorizeMembro($request, $partida->patota);
+        $this->authorize('view', $partida);
 
         return new PartidaResource(
             $partida->load(['local', 'organizador', 'confirmacoes.user', 'times.jogadores'])
@@ -69,7 +69,7 @@ class PartidaController extends Controller
 
     public function update(Request $request, Partida $partida): PartidaResource
     {
-        $this->authorizeOrganizador($request, $partida->patota);
+        $this->authorize('controlar', $partida);
 
         $dados = $request->validate([
             'local_id' => ['nullable', 'exists:locais,id'],
@@ -90,26 +90,10 @@ class PartidaController extends Controller
 
     public function destroy(Request $request, Partida $partida): JsonResponse
     {
-        $this->authorizeOrganizador($request, $partida->patota);
+        $this->authorize('controlar', $partida);
 
         $partida->update(['status' => 'cancelada']);
 
         return response()->json(['mensagem' => 'Partida cancelada.']);
-    }
-
-    private function authorizeMembro(Request $request, Patota $patota): void
-    {
-        if ($request->user()->isAdmin()) return;
-        $eMembro = $patota->membrosAtivos()->where('users.id', $request->user()->id)->exists();
-        abort_unless($eMembro, 403);
-    }
-
-    private function authorizeOrganizador(Request $request, Patota $patota): void
-    {
-        if ($request->user()->isAdmin()) return;
-        $papel = $patota->membrosAtivos()
-            ->where('users.id', $request->user()->id)
-            ->value('patota_membros.papel');
-        abort_unless(in_array($papel, ['administrador', 'organizador']), 403);
     }
 }

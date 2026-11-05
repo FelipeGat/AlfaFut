@@ -78,6 +78,18 @@ return [
     |
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Proxies confiáveis
+    |--------------------------------------------------------------------------
+    |
+    | Lista, separada por vírgula, dos servidores intermediários cujo cabeçalho
+    | X-Forwarded-For vale como origem real. Vazia: nenhum é confiável.
+    |
+    */
+
+    'proxies_confiaveis' => env('TRUSTED_PROXIES'),
+
     'locale' => env('APP_LOCALE', 'en'),
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),

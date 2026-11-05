@@ -2,17 +2,17 @@
 
 > Etapa "i" do projeto: criacao de personas (PDF Uniasselvi).
 
-## Persona 1 - Felipe Henrique (administrador)
+## Persona 1 - Marcos Andrade (administrador)
 
 | Campo | Valor |
 |-------|-------|
 | **Idade** | 34 anos |
 | **Genero** | Masculino |
-| **Ocupacao** | Desenvolvedor / fundador da Alfa Solucoes |
+| **Ocupacao** | Desenvolvedor de software |
 | **Cidade** | Joinville/SC |
 | **Escolaridade** | Superior - Gestao de Tecnologia |
 
-**Historia.** Felipe organiza ha 3 anos uma pelada com colegas de trabalho. Hoje usa grupo de WhatsApp e planilha para confirmar quem vai e dividir o aluguel do campo. Cansou da bagunca: gente que confirma e nao aparece, mensagens importantes que somem, e ninguem lembra quem ja pagou.
+**Historia.** Marcos organiza ha 3 anos uma pelada com colegas de trabalho. Hoje usa grupo de WhatsApp e planilha para confirmar quem vai e dividir o aluguel do campo. Cansou da bagunca: gente que confirma e nao aparece, mensagens importantes que somem, e ninguem lembra quem ja pagou.
 
 **Objetivos.**
 - Confirmar 10 jogadores antes de cada sabado.
@@ -81,6 +81,6 @@
 
 | Persona | Decisao tomada |
 |---------|----------------|
-| Felipe | Painel de administrador da patota com codigo de convite (sem precisar adicionar manualmente). Rateio automatico de despesas. |
+| Marcos | Painel de administrador da patota com codigo de convite (sem precisar adicionar manualmente). Rateio automatico de despesas. |
 | Ana Paula | Tudo por texto. Indicacao visual de "local acessivel". Suporte a leitor de tela e fonte ampliada. Sem audio obrigatorio. |
 | Carlos | Lista de espera automatica. Confirmacao em 1 toque. Pagamento sem complicar. |

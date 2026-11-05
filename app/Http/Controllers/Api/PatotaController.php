@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\MembroResource;
 use App\Http\Resources\PatotaResource;
 use App\Http\Resources\UsuarioResource;
 use App\Models\Patota;
@@ -26,7 +27,7 @@ class PatotaController extends Controller
                 ->get();
         } else {
             $patotas = $user
-                ->patotas()
+                ->patotasAtivas()
                 ->withCount('membrosAtivos as total_membros')
                 ->with('criador')
                 ->orderBy('nome')
@@ -66,7 +67,7 @@ class PatotaController extends Controller
 
     public function show(Request $request, Patota $patota): PatotaResource
     {
-        $this->authorizeMembro($request, $patota);
+        $this->authorize('view', $patota);
 
         return new PatotaResource(
             $patota->load('criador')->loadCount('membrosAtivos as total_membros')
@@ -75,7 +76,7 @@ class PatotaController extends Controller
 
     public function update(Request $request, Patota $patota): PatotaResource
     {
-        abort_unless($patota->criador_id === $request->user()->id, 403, 'Apenas o criador pode editar a patota.');
+        $this->authorize('update', $patota);
 
         $dados = $request->validate([
             'nome' => ['sometimes', 'string', 'max:120'],
@@ -95,7 +96,7 @@ class PatotaController extends Controller
 
     public function destroy(Request $request, Patota $patota): JsonResponse
     {
-        abort_unless($patota->criador_id === $request->user()->id, 403);
+        $this->authorize('delete', $patota);
 
         $patota->delete();
 
@@ -116,16 +117,20 @@ class PatotaController extends Controller
         );
 
         return response()->json([
-            'mensagem' => 'Voce entrou na ' . $patota->nome,
+            'mensagem' => 'Voce entrou na '.$patota->nome,
             'patota' => new PatotaResource($patota),
         ]);
     }
 
     public function membros(Request $request, Patota $patota): AnonymousResourceCollection
     {
-        $this->authorizeMembro($request, $patota);
+        $this->authorize('view', $patota);
 
-        return UsuarioResource::collection($patota->membrosAtivos()->orderBy('name')->get());
+        $membros = $patota->membrosAtivos()->orderBy('name')->get();
+
+        return $request->user()->can('organizar', $patota)
+            ? MembroResource::collection($membros)
+            : UsuarioResource::collection($membros);
     }
 
     public function sair(Request $request, Patota $patota): JsonResponse
@@ -146,18 +151,10 @@ class PatotaController extends Controller
             return response()->json(['mensagem' => 'Voce nao faz parte desta turma.'], 404);
         }
 
-        \App\Models\PatotaMembro::where('patota_id', $patota->id)
+        PatotaMembro::where('patota_id', $patota->id)
             ->where('user_id', $userId)
             ->update(['status' => 'inativo', 'saiu_em' => now()]);
 
         return response()->json(['mensagem' => 'Voce saiu da turma.']);
-    }
-
-    private function authorizeMembro(Request $request, Patota $patota): void
-    {
-        $user = $request->user();
-        if ($user->isAdmin()) return; // admin global ve tudo
-        $eMembro = $patota->membrosAtivos()->where('users.id', $user->id)->exists();
-        abort_unless($eMembro, 403, 'Voce nao faz parte desta patota.');
     }
 }

@@ -13,7 +13,7 @@ class MensagemController extends Controller
 {
     public function index(Request $request, Patota $patota): View
     {
-        $this->authorizeMembro($request, $patota);
+        $this->authorize('view', $patota);
 
         $mensagens = $patota->mensagens()
             ->with('autor', 'partida')
@@ -27,7 +27,7 @@ class MensagemController extends Controller
 
     public function store(Request $request, Patota $patota): RedirectResponse
     {
-        $this->authorizeMembro($request, $patota);
+        $this->authorize('participar', $patota);
 
         $dados = $request->validate([
             'conteudo' => ['required', 'string', 'max:1000'],
@@ -36,8 +36,8 @@ class MensagemController extends Controller
             'fixada' => ['nullable', 'boolean'],
         ]);
 
-        // Apenas admins podem fixar
-        if (! empty($dados['fixada']) && $patota->criador_id !== $request->user()->id) {
+        // Apenas quem organiza pode fixar
+        if (! empty($dados['fixada']) && $request->user()->cannot('organizar', $patota)) {
             $dados['fixada'] = false;
         }
 
@@ -54,22 +54,10 @@ class MensagemController extends Controller
     public function destroy(Request $request, Patota $patota, Mensagem $mensagem): RedirectResponse
     {
         abort_unless($mensagem->patota_id === $patota->id, 404);
-        abort_unless(
-            $mensagem->autor_id === $request->user()->id || $patota->criador_id === $request->user()->id,
-            403,
-            'Apenas o autor ou administrador pode remover esta mensagem.'
-        );
+        $this->authorize('delete', $mensagem);
 
         $mensagem->delete();
 
         return back()->with('status', 'Mensagem removida.');
-    }
-
-    private function authorizeMembro(Request $request, Patota $patota): void
-    {
-        $eMembro = $patota->membrosAtivos()
-            ->where('users.id', $request->user()->id)
-            ->exists();
-        abort_unless($eMembro, 403);
     }
 }

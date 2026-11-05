@@ -13,7 +13,7 @@ class PartidaController extends Controller
 {
     public function index(Request $request): View
     {
-        $patotaIds = $request->user()->patotas()->pluck('patotas.id');
+        $patotaIds = $request->user()->patotasAtivas()->pluck('patotas.id');
         $filtro = $request->query('filtro', 'proximas');
 
         $query = Partida::query()
@@ -29,7 +29,7 @@ class PartidaController extends Controller
 
     public function show(Request $request, Partida $partida): View
     {
-        $this->authorizeMembro($request, $partida);
+        $this->authorize('view', $partida);
         $partida->load(['patota', 'local', 'organizador', 'confirmacoes.user', 'times.jogadores']);
         $minhaConfirmacao = $partida->confirmacoes->firstWhere('user_id', $request->user()->id);
 
@@ -38,7 +38,7 @@ class PartidaController extends Controller
 
     public function confirmar(Request $request, Partida $partida): RedirectResponse
     {
-        $this->authorizeMembro($request, $partida);
+        $this->authorize('participar', $partida);
 
         $emListaEspera = $partida->isCheia();
         PartidaConfirmacao::updateOrCreate(
@@ -60,7 +60,7 @@ class PartidaController extends Controller
 
     public function recusar(Request $request, Partida $partida): RedirectResponse
     {
-        $this->authorizeMembro($request, $partida);
+        $this->authorize('participar', $partida);
 
         PartidaConfirmacao::updateOrCreate(
             ['partida_id' => $partida->id, 'user_id' => $request->user()->id],
@@ -71,18 +71,28 @@ class PartidaController extends Controller
     }
 
     // Stubs minimos para satisfazer o resource controller.
-    public function create(): View { abort(404); }
-    public function store(Request $request): RedirectResponse { abort(404); }
-    public function edit(Partida $partida): View { abort(404); }
-    public function update(Request $request, Partida $partida): RedirectResponse { abort(404); }
-    public function destroy(Partida $partida): RedirectResponse { abort(404); }
-
-    private function authorizeMembro(Request $request, Partida $partida): void
+    public function create(): View
     {
-        $eMembro = $partida->patota
-            ->membrosAtivos()
-            ->where('users.id', $request->user()->id)
-            ->exists();
-        abort_unless($eMembro, 403);
+        abort(404);
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        abort(404);
+    }
+
+    public function edit(Partida $partida): View
+    {
+        abort(404);
+    }
+
+    public function update(Request $request, Partida $partida): RedirectResponse
+    {
+        abort(404);
+    }
+
+    public function destroy(Partida $partida): RedirectResponse
+    {
+        abort(404);
     }
 }

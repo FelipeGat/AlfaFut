@@ -11,17 +11,31 @@ Authorization: Bearer {token}
 Accept: application/json
 ```
 
+Conta com e-mail nao confirmado recebe 403 em todas as rotas autenticadas, exceto `auth/eu`, `auth/logout`, `auth/reenviar-confirmacao` e `perfil`.
+
+## Limites de tentativas
+
+Excedido o limite, a resposta e 429 com `{ "message": "..." }` em portugues e cabecalho `Retry-After`.
+
+| Rota | Limite |
+|------|--------|
+| `POST /auth/login` | 5/min por e-mail + IP |
+| `POST /auth/registrar` | 30/h por IP |
+| `POST /auth/esqueci-senha` | 3/min por IP |
+| `POST /auth/reenviar-confirmacao` | 6/min por conta |
+| `POST /patotas/entrar` | 10/min por usuario |
+
 ## Autenticacao
 
 ### POST /auth/registrar
 Body:
 ```json
 {
-  "name": "Felipe Henrique",
-  "apelido": "Felipe",
-  "email": "felipe@example.com",
-  "telefone": "47999990000",
-  "password": "senha1234",
+  "name": "Jogador Exemplo",
+  "apelido": "Jogador",
+  "email": "jogador@example.com",
+  "telefone": "00900000000",
+  "password": "sua-senha",
   "posicao_preferida": "meia",
   "nivel_habilidade": "avancado"
 }
@@ -29,19 +43,23 @@ Body:
 Resposta 201:
 ```json
 {
-  "usuario": { "id": 1, "nome": "...", "email": "..." },
+  "usuario": { "id": 1, "nome": "...", "email": "...", "email_confirmado": false },
   "token": "1|abcd..."
 }
 ```
+O cadastro envia o e-mail de confirmacao. O link recebido confirma a conta.
+
+### POST /auth/reenviar-confirmacao
+Reenvia o e-mail de confirmacao. Responde 200 `{ "mensagem": "..." }`, inclusive quando a conta ja esta confirmada, sem reenviar nesse caso.
 
 ### POST /auth/login
 Body:
 ```json
-{ "email": "admin@alfafut.test", "password": "senha1234", "device_name": "app-mobile" }
+{ "email": "admin@alfafut.test", "password": "sua-senha", "device_name": "app-mobile" }
 ```
 
 ### GET /auth/eu
-Retorna o usuario autenticado.
+Retorna o usuario autenticado, com `email`, `email_confirmado`, `telefone`, `role`, `is_admin` e `preferencias_acessibilidade`.
 
 ### POST /auth/logout
 Revoga o token atual.
@@ -74,6 +92,12 @@ Body:
 | DELETE | `/patotas/{id}` | Arquiva (apenas criador) |
 | POST | `/patotas/entrar` | Entra com codigo de convite |
 | GET | `/patotas/{id}/membros` | Lista membros ativos |
+
+### Quem ve o que em um usuario
+
+Usuario aninhado (confirmacao, partida, turma e mensagem) traz so `id`, `nome`, `apelido`, `avatar_url`, `posicao_preferida` e `nivel_habilidade`.
+
+Em `/patotas/{id}/membros`, organizador e admin global recebem tambem `email`, `telefone` e `necessidades`.
 
 ## Partidas
 
@@ -118,9 +142,10 @@ Body:
 | 200 | OK |
 | 201 | Criado |
 | 401 | Nao autenticado |
-| 403 | Sem permissao (nao-membro / nao-admin) |
+| 403 | Sem permissao (nao-membro / nao-admin) ou e-mail nao confirmado |
 | 404 | Nao encontrado |
 | 422 | Erro de validacao |
+| 429 | Excesso de tentativas |
 
 ## Exemplo de fluxo completo (curl)
 
@@ -128,7 +153,7 @@ Body:
 # 1. Login
 curl -X POST http://localhost/AlfaFut/public/api/v1/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@alfafut.test","password":"senha1234"}'
+  -d '{"email":"admin@alfafut.test","password":"sua-senha"}'
 
 # 2. Listar patotas (use o token retornado)
 curl http://localhost/AlfaFut/public/api/v1/patotas \

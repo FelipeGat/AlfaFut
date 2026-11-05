@@ -28,3 +28,4 @@ Thumbs.db
 .env.*.bak
 /public/images/audit
 /public/_debug.html
+.env.homolog

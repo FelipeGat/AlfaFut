@@ -1,17 +1,16 @@
 /**
  * AlfaFut Service Worker
- * Estrategia: network-first com fallback offline cache.
- * - HTML: tenta a rede; em offline serve a pagina /offline.
- * - Assets estaticos (CSS/JS/img/font): stale-while-revalidate.
- * - APIs (POST/PATCH/DELETE): so rede (nao cacheia).
+ * So guarda o que e publico: arquivos estaticos e a pagina /offline.
+ * Pagina autenticada, dado de turma e resposta de erro nunca ficam no aparelho.
+ * - Navegacao: sempre a rede; sem rede, a pagina /offline.
+ * - Arquivos estaticos: stale-while-revalidate.
+ * - O resto (API, dados ao vivo, POST): nem passa por aqui.
  */
 
-const VERSAO = 'alfafut-v1';
+const VERSAO = 'alfafut-v2';
 const CACHE_ESTATICO = `${VERSAO}-estatico`;
-const CACHE_DINAMICO = `${VERSAO}-dinamico`;
 
 const PRE_CACHE = [
-    '/',
     '/offline',
     '/favicon.svg',
     '/images/logo/icon.svg',
@@ -19,6 +18,8 @@ const PRE_CACHE = [
     '/images/pwa/icon-512.png',
     '/manifest.webmanifest',
 ];
+
+const ESTATICOS = /^\/(build|images)\/|^\/favicon\.|^\/manifest\.webmanifest$/;
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
@@ -33,7 +34,7 @@ self.addEventListener('activate', (event) => {
         caches.keys().then((nomes) =>
             Promise.all(
                 nomes
-                    .filter((n) => n.startsWith('alfafut-') && !n.startsWith(VERSAO))
+                    .filter((n) => n.startsWith('alfafut-') && n !== CACHE_ESTATICO)
                     .map((n) => caches.delete(n))
             )
         ).then(() => self.clients.claim())
@@ -43,40 +44,32 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const req = event.request;
 
-    // So GET passa pelo SW
     if (req.method !== 'GET') return;
 
-    // Ignora chrome-extension, ws etc
     const url = new URL(req.url);
     if (url.origin !== self.location.origin) return;
 
-    // Documento HTML: network-first com fallback /offline
-    if (req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html')) {
-        event.respondWith(networkFirstHtml(req));
+    if (req.mode === 'navigate') {
+        event.respondWith(redeOuOffline(req));
         return;
     }
 
-    // Demais GETs: stale-while-revalidate
-    event.respondWith(staleWhileRevalidate(req));
+    if (ESTATICOS.test(url.pathname)) {
+        event.respondWith(staleWhileRevalidate(req));
+    }
 });
 
-async function networkFirstHtml(req) {
+async function redeOuOffline(req) {
     try {
-        const r = await fetch(req);
-        const cache = await caches.open(CACHE_DINAMICO);
-        cache.put(req, r.clone()).catch(() => null);
-        return r;
+        return await fetch(req);
     } catch (_) {
-        const cache = await caches.open(CACHE_DINAMICO);
-        const cached = await cache.match(req);
-        if (cached) return cached;
         const fallback = await caches.match('/offline');
         return fallback || new Response('Offline', { status: 503 });
     }
 }
 
 async function staleWhileRevalidate(req) {
-    const cache = await caches.open(CACHE_DINAMICO);
+    const cache = await caches.open(CACHE_ESTATICO);
     const cached = await cache.match(req);
     const fetchPromise = fetch(req)
         .then((r) => {

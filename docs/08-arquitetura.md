@@ -179,5 +179,5 @@ Token simples baseado em DB, ideal para SPA mobile. Sem complexidade de OAuth pa
 Mesma stack do `AlfaHomeApp` (consistencia entre projetos do usuario), suporte oficial a `family` e `autoDispose`, sem boilerplate de Bloc.
 
 ### Por que slug + codigo de convite?
-- Slug: URLs legiveis (`/patotas/patota-do-felipe`) - SEO + memorabilidade.
+- Slug: URLs legiveis (`/patotas/patota-do-marcos`) - SEO + memorabilidade.
 - Codigo de convite: 8 chars uppercase, facil de ditar/digitar - onboarding sem fricao.

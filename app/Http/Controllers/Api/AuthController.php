@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\UsuarioResource;
+use App\Http\Resources\MeuUsuarioResource;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -29,10 +30,12 @@ class AuthController extends Controller
             'password' => Hash::make($dados['password']),
         ]);
 
+        event(new Registered($user));
+
         $token = $user->createToken('app-mobile')->plainTextToken;
 
         return response()->json([
-            'usuario' => new UsuarioResource($user),
+            'usuario' => new MeuUsuarioResource($user),
             'token' => $token,
         ], 201);
     }
@@ -56,14 +59,23 @@ class AuthController extends Controller
         $token = $user->createToken($request->device_name ?? 'app-mobile')->plainTextToken;
 
         return response()->json([
-            'usuario' => new UsuarioResource($user),
+            'usuario' => new MeuUsuarioResource($user),
             'token' => $token,
         ]);
     }
 
-    public function me(Request $request): UsuarioResource
+    public function reenviarConfirmacao(Request $request): JsonResponse
     {
-        return new UsuarioResource($request->user());
+        if (! $request->user()->hasVerifiedEmail()) {
+            $request->user()->sendEmailVerificationNotification();
+        }
+
+        return response()->json(['mensagem' => 'Se o e-mail ainda não foi confirmado, enviamos um novo link.']);
+    }
+
+    public function me(Request $request): MeuUsuarioResource
+    {
+        return new MeuUsuarioResource($request->user());
     }
 
     public function logout(Request $request): JsonResponse

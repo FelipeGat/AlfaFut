@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copia dados de database/database.sqlite para a conexao 'mysql' padrao do Laravel.
  *
@@ -9,15 +10,16 @@
  * deixando o schema vazio e pronto pra receber as linhas.
  */
 
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-$sqlitePath = __DIR__ . '/../database/database.sqlite';
+$sqlitePath = __DIR__.'/../database/database.sqlite';
 if (! file_exists($sqlitePath)) {
     fwrite(STDERR, "SQLite nao encontrado em {$sqlitePath}\n");
     exit(1);
@@ -34,6 +36,7 @@ config(['database.connections.legacy_sqlite' => [
 // Ordem importa: tabelas pai antes das filhas.
 $ordem = [
     'users',
+    'campos',
     'patotas',
     'locais',
     'patota_membros',
@@ -55,7 +58,7 @@ $ordem = [
     'password_reset_tokens',
 ];
 
-echo "Copiando " . count($ordem) . " tabelas...\n\n";
+echo 'Copiando '.count($ordem)." tabelas...\n\n";
 
 DB::connection('mysql')->statement('SET FOREIGN_KEY_CHECKS=0');
 
@@ -63,18 +66,21 @@ $totalLinhas = 0;
 foreach ($ordem as $tabela) {
     if (! Schema::connection('legacy_sqlite')->hasTable($tabela)) {
         printf("  %-30s [pula - nao existe no SQLite]\n", $tabela);
+
         continue;
     }
     if (! Schema::connection('mysql')->hasTable($tabela)) {
         printf("  %-30s [pula - nao existe no MySQL]\n", $tabela);
+
         continue;
     }
 
     DB::connection('mysql')->table($tabela)->truncate();
 
-    $rows = DB::connection('legacy_sqlite')->table($tabela)->get()->map(fn($r) => (array) $r)->all();
+    $rows = DB::connection('legacy_sqlite')->table($tabela)->get()->map(fn ($r) => (array) $r)->all();
     if (empty($rows)) {
         printf("  %-30s 0\n", $tabela);
+
         continue;
     }
 

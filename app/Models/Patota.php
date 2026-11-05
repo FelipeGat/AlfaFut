@@ -39,7 +39,7 @@ class Patota extends Model
     {
         static::creating(function (Patota $patota) {
             if (empty($patota->slug)) {
-                $patota->slug = Str::slug($patota->nome) . '-' . Str::random(5);
+                $patota->slug = Str::slug($patota->nome).'-'.Str::random(5);
             }
             if (empty($patota->codigo_convite)) {
                 $patota->codigo_convite = strtoupper(Str::random(8));
@@ -71,6 +71,24 @@ class Patota extends Model
     public function membrosAtivos(): BelongsToMany
     {
         return $this->membros()->wherePivot('status', 'ativo');
+    }
+
+    public function temMembroAtivo(User $user): bool
+    {
+        return $this->membrosAtivos()->where('users.id', $user->id)->exists();
+    }
+
+    /** O criador sempre organiza; o responsável, enquanto for membro ativo. */
+    public function temOrganizador(User $user): bool
+    {
+        if ($this->criador_id === $user->id) {
+            return true;
+        }
+
+        $papel = $this->membrosAtivos()->where('users.id', $user->id)->value('patota_membros.papel');
+
+        return $papel !== null
+            && ($this->responsavel_id === $user->id || in_array($papel, ['administrador', 'organizador'], true));
     }
 
     public function partidas(): HasMany

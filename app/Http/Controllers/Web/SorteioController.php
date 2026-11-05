@@ -12,11 +12,7 @@ class SorteioController extends Controller
 {
     public function __invoke(Request $request, Partida $partida, SorteioTimes $sorteio): RedirectResponse
     {
-        $papel = $partida->patota->membrosAtivos()
-            ->where('users.id', $request->user()->id)
-            ->value('patota_membros.papel');
-
-        abort_unless(in_array($papel, ['administrador', 'organizador']), 403);
+        $this->authorize('controlar', $partida);
 
         if ($partida->confirmados()->count() < 2) {
             return back()->with('status', 'E preciso ao menos 2 confirmados para sortear.');

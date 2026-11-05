@@ -11,11 +11,14 @@ use App\Models\Patota;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Validation\Rule;
 
 class DespesaController extends Controller
 {
     public function index(Request $request, Patota $patota): AnonymousResourceCollection
     {
+        $this->authorize('view', $patota);
+
         return DespesaResource::collection(
             $patota->despesas()->orderByDesc('data_despesa')->get()
         );
@@ -23,8 +26,10 @@ class DespesaController extends Controller
 
     public function store(Request $request, Patota $patota): JsonResponse
     {
+        $this->authorize('organizar', $patota);
+
         $dados = $request->validate([
-            'partida_id' => ['nullable', 'exists:partidas,id'],
+            'partida_id' => ['nullable', Rule::exists('partidas', 'id')->where('patota_id', $patota->id)],
             'descricao' => ['required', 'string', 'max:160'],
             'categoria' => ['required', 'in:locacao,arbitragem,material,alimentacao,outro'],
             'valor_total' => ['required', 'numeric', 'min:0.01'],
@@ -61,6 +66,8 @@ class DespesaController extends Controller
 
     public function show(Despesa $despesa): JsonResponse
     {
+        $this->authorize('view', $despesa);
+
         return response()->json([
             'despesa' => new DespesaResource($despesa),
             'pagamentos' => $despesa->pagamentos()->with('user')->get()->map(fn ($p) => [
@@ -76,6 +83,8 @@ class DespesaController extends Controller
 
     public function update(Request $request, Despesa $despesa): DespesaResource
     {
+        $this->authorize('update', $despesa);
+
         $despesa->update($request->validate([
             'descricao' => ['sometimes', 'string', 'max:160'],
             'categoria' => ['sometimes', 'in:locacao,arbitragem,material,alimentacao,outro'],
@@ -88,6 +97,8 @@ class DespesaController extends Controller
 
     public function destroy(Despesa $despesa): JsonResponse
     {
+        $this->authorize('delete', $despesa);
+
         $despesa->delete();
 
         return response()->json(['mensagem' => 'Despesa removida.']);
@@ -95,7 +106,7 @@ class DespesaController extends Controller
 
     public function pagar(Request $request, Pagamento $pagamento): JsonResponse
     {
-        abort_unless($pagamento->user_id === $request->user()->id, 403);
+        $this->authorize('quitar', $pagamento);
 
         $dados = $request->validate([
             'valor_pago' => ['required', 'numeric', 'min:0.01'],

@@ -12,39 +12,41 @@ use App\Models\PatotaMembro;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use RuntimeException;
 
 class PatotaSeeder extends Seeder
 {
     public function run(): void
     {
-        // Admin GLOBAL com credenciais do projeto
-        $admin = User::updateOrCreate(
-            ['email' => 'felipehenriquegat@gmail.com'],
-            [
-                'name' => 'Felipe Henrique',
-                'apelido' => 'Felipe',
-                'telefone' => '(47) 99999-0000',
-                'password' => Hash::make('Home1512@'),
-                'role' => 'admin',
-                'posicao_preferida' => 'meia',
-                'nivel_habilidade' => 'avancado',
-                'email_verified_at' => now(),
-            ]
-        );
+        if (! app()->environment(['local', 'testing'])) {
+            throw new RuntimeException('O seed de demonstração só roda em ambiente local ou de teste.');
+        }
 
-        // Admin de teste (backwards compat)
-        User::updateOrCreate(
-            ['email' => 'admin@alfafut.test'],
-            [
-                'name' => 'Admin Teste',
-                'apelido' => 'AdminT',
-                'password' => Hash::make('senha1234'),
-                'role' => 'admin',
-                'posicao_preferida' => 'meia',
-                'nivel_habilidade' => 'avancado',
+        $senha = Str::password(16, symbols: false);
+
+        $conta = function (string $email, array $dados) use ($senha): User {
+            $user = User::firstOrNew(['email' => $email]);
+            $user->forceFill([
+                ...$dados,
+                'password' => Hash::make($senha),
                 'email_verified_at' => now(),
-            ]
-        );
+            ])->save();
+
+            return $user;
+        };
+
+        $admin = $conta('admin@alfafut.test', [
+            'name' => 'Admin Teste',
+            'apelido' => 'AdminT',
+            'role' => 'admin',
+            'posicao_preferida' => 'meia',
+            'nivel_habilidade' => 'avancado',
+        ]);
+
+        $conta('jogador@alfafut.test', ['name' => 'Joao Jogador', 'apelido' => 'Joao', 'tipo_usuario' => 'jogador']);
+        $conta('organizadora@alfafut.test', ['name' => 'Maria Organizadora', 'apelido' => 'Mari', 'tipo_usuario' => 'dono_pelada']);
+        $conta('campo@alfafut.test', ['name' => 'Pedro Dono do Campo', 'apelido' => 'Pedro', 'tipo_usuario' => 'dono_campo']);
 
         $jogadores = [
             ['Carlos Oliveira', 'Carlinhos', 'goleiro', 'avancado'],
@@ -65,22 +67,18 @@ class PatotaSeeder extends Seeder
 
         $usuarios = [];
         foreach ($jogadores as [$nome, $apelido, $posicao, $nivel]) {
-            $usuarios[] = User::firstOrCreate(
-                ['email' => strtolower(str_replace(' ', '.', $nome)) . '@alfafut.test'],
-                [
-                    'name' => $nome,
-                    'apelido' => $apelido,
-                    'password' => Hash::make('senha1234'),
-                    'posicao_preferida' => $posicao,
-                    'nivel_habilidade' => $nivel,
-                ]
-            );
+            $usuarios[] = $conta(strtolower(str_replace(' ', '.', $nome)).'@alfafut.test', [
+                'name' => $nome,
+                'apelido' => $apelido,
+                'posicao_preferida' => $posicao,
+                'nivel_habilidade' => $nivel,
+            ]);
         }
 
         $patota = Patota::firstOrCreate(
-            ['slug' => 'patota-do-felipe'],
+            ['slug' => 'patota-exemplo'],
             [
-                'nome' => 'Patota do Felipe',
+                'nome' => 'Patota Exemplo',
                 'descricao' => 'Pelada de quarta e sabado, todos os niveis sao bem-vindos.',
                 'cidade' => 'Joinville',
                 'estado' => 'SC',
@@ -115,7 +113,7 @@ class PatotaSeeder extends Seeder
                 'possui_estacionamento' => true,
                 'acessivel_cadeirante' => true,
                 'valor_locacao' => 180.00,
-                'contato' => '(47) 3422-0000',
+                'contato' => '(00) 0000-0000',
             ]
         );
 
@@ -172,5 +170,7 @@ class PatotaSeeder extends Seeder
                 ]
             );
         }
+
+        $this->command?->info("Senha de todas as contas de demonstração (@alfafut.test): {$senha}");
     }
 }

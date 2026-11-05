@@ -1,0 +1,72 @@
+# Reproduz a produção nesta máquina, com caixa de e-mail de desenvolvimento.
+#
+# Os segredos ficam em .env.homolog, fora do git:
+#   printf 'APP_KEY=base64:%s\nDB_PASSWORD=%s\n' "$(openssl rand -base64 32)" "$(openssl rand -hex 24)" > .env.homolog
+#   docker compose --env-file .env.homolog -f docker-compose.homolog.yml up -d --build
+#
+# Sistema em http://localhost:8100 e e-mails recebidos em http://localhost:8099.
+name: alfafut-homolog
+
+services:
+  app:
+    build: .
+    image: alfafut:homolog
+    container_name: alfafut-homolog-app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      APP_KEY: ${APP_KEY:?Defina APP_KEY no .env.homolog}
+      APP_URL: http://localhost:8100
+      DB_HOST: mysql
+      DB_DATABASE: alfafut
+      DB_USERNAME: alfafut
+      DB_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD no .env.homolog}
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+      MAIL_FROM_ADDRESS: naoresponda@alfafut.test
+      MAIL_FROM_NAME: AlfaFut
+    ports:
+      - "127.0.0.1:8100:8080"
+    volumes:
+      - storage:/var/www/html/storage
+
+  mysql:
+    image: mysql:8.4
+    container_name: alfafut-homolog-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_DATABASE: alfafut
+      MYSQL_USER: alfafut
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD no .env.homolog}
+      TZ: America/Sao_Paulo
+    volumes:
+      - mysql:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u alfafut -p$$MYSQL_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    container_name: alfafut-homolog-mailpit
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8099:8025"
+
+volumes:
+  storage:
+  mysql:
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 10.253.105.0/24

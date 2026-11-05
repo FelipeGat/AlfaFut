@@ -39,7 +39,7 @@ Acesse `http://127.0.0.1:8000` ou via XAMPP em `http://localhost/AlfaFut/public`
 
 **Usuario admin do seed:**
 - E-mail: `admin@alfafut.test`
-- Senha: `senha1234`
+- Senha: mostrada no terminal ao rodar `php artisan db:seed`
 
 ### Rodar testes automatizados
 
@@ -60,6 +60,22 @@ flutter run
 ```
 
 Para apontar para outro host: `--dart-define=ALFAFUT_API_URL=http://192.168.x.x/AlfaFut/public/api/v1`.
+
+### Imagem de producao
+
+A imagem (`Dockerfile`) roda nginx + PHP-FPM sob supervisor, sem root, e escuta na porta 8080. O banco e MySQL externo, e `storage` fica em volume. Ao subir, ela confere a configuracao (`alfafut:checar-producao`), roda as migracoes e nunca roda seed.
+
+Variaveis obrigatorias: `APP_KEY`, `APP_URL`, `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_FROM_ADDRESS`. Com HTTPS, acrescente `SESSION_SECURE_COOKIE=true` e, atras de proxy, `TRUSTED_PROXIES`.
+
+Para reproduzir a producao nesta maquina, com caixa de e-mail de desenvolvimento:
+
+```bash
+printf 'APP_KEY=base64:%s\nDB_PASSWORD=%s\n' "$(openssl rand -base64 32)" "$(openssl rand -hex 24)" > .env.homolog
+docker compose --env-file .env.homolog -f docker-compose.homolog.yml up -d --build
+docker exec -it alfafut-homolog-app php artisan alfafut:criar-admin voce@exemplo.com
+```
+
+Sistema em `http://localhost:8100` e e-mails recebidos em `http://localhost:8099`.
 
 ## Documentacao do projeto
 

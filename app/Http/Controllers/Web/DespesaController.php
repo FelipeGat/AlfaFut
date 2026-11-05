@@ -8,13 +8,14 @@ use App\Models\Pagamento;
 use App\Models\Patota;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class DespesaController extends Controller
 {
     public function index(Request $request, Patota $patota): View
     {
-        $this->authorizeMembro($request, $patota);
+        $this->authorize('view', $patota);
 
         $despesas = $patota->despesas()
             ->with('partida', 'criadaPor')
@@ -27,7 +28,7 @@ class DespesaController extends Controller
 
     public function create(Request $request, Patota $patota): View
     {
-        $this->authorizeAdmin($request, $patota);
+        $this->authorize('organizar', $patota);
 
         $partidas = $patota->partidas()->orderByDesc('data_hora')->limit(20)->get();
 
@@ -36,10 +37,10 @@ class DespesaController extends Controller
 
     public function store(Request $request, Patota $patota): RedirectResponse
     {
-        $this->authorizeAdmin($request, $patota);
+        $this->authorize('organizar', $patota);
 
         $dados = $request->validate([
-            'partida_id' => ['nullable', 'exists:partidas,id'],
+            'partida_id' => ['nullable', Rule::exists('partidas', 'id')->where('patota_id', $patota->id)],
             'descricao' => ['required', 'string', 'max:160'],
             'categoria' => ['required', 'in:locacao,arbitragem,material,alimentacao,outro'],
             'valor_total' => ['required', 'numeric', 'min:0.01'],
@@ -74,12 +75,12 @@ class DespesaController extends Controller
 
         return redirect()
             ->route('patotas.despesas.show', [$patota, $despesa])
-            ->with('status', 'Despesa cadastrada' . ($despesa->rateada ? ' e rateada entre os confirmados.' : '.'));
+            ->with('status', 'Despesa cadastrada'.($despesa->rateada ? ' e rateada entre os confirmados.' : '.'));
     }
 
     public function show(Request $request, Patota $patota, Despesa $despesa): View
     {
-        $this->authorizeMembro($request, $patota);
+        $this->authorize('view', $patota);
         abort_unless($despesa->patota_id === $patota->id, 404);
 
         $despesa->load(['partida', 'criadaPor']);
@@ -90,7 +91,7 @@ class DespesaController extends Controller
 
     public function destroy(Request $request, Patota $patota, Despesa $despesa): RedirectResponse
     {
-        $this->authorizeAdmin($request, $patota);
+        $this->authorize('organizar', $patota);
         abort_unless($despesa->patota_id === $patota->id, 404);
 
         $despesa->delete();
@@ -100,7 +101,7 @@ class DespesaController extends Controller
 
     public function pagar(Request $request, Patota $patota, Pagamento $pagamento): RedirectResponse
     {
-        abort_unless($pagamento->user_id === $request->user()->id, 403);
+        $this->authorize('quitar', $pagamento);
         abort_unless($pagamento->despesa->patota_id === $patota->id, 404);
 
         $dados = $request->validate([
@@ -111,21 +112,5 @@ class DespesaController extends Controller
         $pagamento->quitar((float) $dados['valor_pago'], $dados['forma_pagamento']);
 
         return back()->with('status', 'Pagamento registrado.');
-    }
-
-    private function authorizeMembro(Request $request, Patota $patota): void
-    {
-        $eMembro = $patota->membrosAtivos()
-            ->where('users.id', $request->user()->id)
-            ->exists();
-        abort_unless($eMembro, 403);
-    }
-
-    private function authorizeAdmin(Request $request, Patota $patota): void
-    {
-        $papel = $patota->membrosAtivos()
-            ->where('users.id', $request->user()->id)
-            ->value('patota_membros.papel');
-        abort_unless(in_array($papel, ['administrador', 'organizador']), 403);
     }
 }

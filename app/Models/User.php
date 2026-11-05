@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,7 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements HasLocalePreference, MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -62,6 +64,11 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function patotasAtivas(): BelongsToMany
+    {
+        return $this->patotas()->wherePivot('status', 'ativo');
+    }
+
     public function partidasOrganizadas(): HasMany
     {
         return $this->hasMany(Partida::class, 'organizador_id');
@@ -75,6 +82,11 @@ class User extends Authenticatable
     public function pagamentos(): HasMany
     {
         return $this->hasMany(Pagamento::class);
+    }
+
+    public function preferredLocale(): string
+    {
+        return 'pt_BR';
     }
 
     public function nomeExibicao(): string
