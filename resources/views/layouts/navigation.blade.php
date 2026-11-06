@@ -1,8 +1,8 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-200" role="navigation" aria-label="Navegacao principal">
+<nav x-data="{ open: false }" class="bg-white border-b border-gray-200" role="navigation" aria-label="Navegação principal">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
-                <a href="{{ route('dashboard') }}" class="shrink-0 flex items-center gap-2 px-2" aria-label="AlfaFut - Pagina inicial">
+                <a href="{{ route('dashboard') }}" class="shrink-0 flex items-center gap-2 px-2" aria-label="AlfaFut - Página inicial">
                     <img src="{{ asset('images/logo/icon.svg') }}" alt="" class="h-9 w-9" aria-hidden="true">
                     <span class="font-semibold text-lg">AlfaFut</span>
                 </a>
@@ -88,7 +88,7 @@
                         class="inline-flex items-center justify-center p-2 rounded-md text-gray-700"
                         :aria-expanded="open ? 'true' : 'false'"
                         aria-controls="menu-mobile"
-                        aria-label="Abrir menu de navegacao">
+                        aria-label="Abrir menu de navegação">
                     <svg class="h-6 w-6" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

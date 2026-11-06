@@ -181,7 +181,7 @@
     </style>
 </head>
 <body class="bg-gray-200 min-h-screen jornal" x-data="jornal()" x-init="iniciar()">
-    <a href="#conteudo" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-primary focus:text-on-primary focus:px-4 focus:py-2 focus:rounded">Pular para o conteudo</a>
+    <a href="#conteudo" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-primary focus:text-on-primary focus:px-4 focus:py-2 focus:rounded">Pular para o conteúdo</a>
 
     <header class="bg-primary text-on-primary" role="banner">
         <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
@@ -526,11 +526,7 @@
         </div>
     </main>
 
-    <footer class="bg-gray-900 text-gray-100 mt-10" role="contentinfo">
-        <div class="max-w-7xl mx-auto py-6 px-4 text-sm text-center">
-            AlfaFut · Atividade de Extensao Uniasselvi
-        </div>
-    </footer>
+    @include('partials.rodape', ['margem' => 'mt-10'])
 
     <script>
         function jornal() {

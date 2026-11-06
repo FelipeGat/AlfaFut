@@ -3,7 +3,7 @@
 
     <div class="text-center mb-6">
         <h1 class="font-bold text-2xl" style="color: var(--md-sys-color-primary);">Crie sua conta</h1>
-        <p class="text-sm text-gray-700 mt-1">Comece gratis e organize sua turma em minutos.</p>
+        <p class="text-sm text-gray-700 mt-1">Comece grátis e organize sua turma em minutos.</p>
     </div>
 
     <form method="POST" action="{{ route('register') }}" class="space-y-4">
@@ -11,13 +11,13 @@
 
         <div>
             <label class="block mb-2 font-medium">Eu quero me cadastrar como *</label>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" role="radiogroup" aria-label="Tipo de usuario">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" role="radiogroup" aria-label="Tipo de usuário">
                 @php
                     $tipoSelecionado = old('tipo_usuario', 'jogador');
                     $tipos = [
                         'jogador' => ['icone' => '⚽', 'titulo' => 'Jogador', 'desc' => 'Vou participar de peladas'],
                         'dono_pelada' => ['icone' => '👥', 'titulo' => 'Dono da pelada', 'desc' => 'Vou criar e organizar uma turma'],
-                        'dono_campo' => ['icone' => '🏟️', 'titulo' => 'Dono do campo', 'desc' => 'Vou cadastrar meu campo pra alugar'],
+                        'dono_campo' => ['icone' => '🏟️', 'titulo' => 'Dono do campo', 'desc' => 'Vou cadastrar meu campo para alugar'],
                     ];
                 @endphp
                 @foreach ($tipos as $valor => $info)
@@ -108,10 +108,20 @@
                    autocomplete="new-password">
         </div>
 
+        <div>
+            <label for="aceite_termos" class="flex items-start gap-2 font-normal">
+                <input id="aceite_termos" name="aceite_termos" type="checkbox" value="1" class="mt-1" required
+                       @checked(old('aceite_termos'))
+                       @error('aceite_termos') aria-invalid="true" aria-describedby="aceite_termos-erro" @enderror>
+                <span>Li e aceito os <a href="{{ route('termos') }}" target="_blank" rel="noopener" class="underline" style="color: var(--md-sys-color-primary);">termos de uso</a> e a <a href="{{ route('privacidade') }}" target="_blank" rel="noopener" class="underline" style="color: var(--md-sys-color-primary);">política de privacidade</a>. *</span>
+            </label>
+            @error('aceite_termos')<p id="aceite_termos-erro" class="text-red-700 text-sm mt-1" role="alert">{{ $message }}</p>@enderror
+        </div>
+
         <button type="submit" class="btn btn-primary w-full mt-2">Criar conta</button>
 
         <p class="text-center text-sm pt-2">
-            Ja tem uma conta?
+            Já tem uma conta?
             <a href="{{ route('login') }}" class="underline" style="color: var(--md-sys-color-primary);">Fazer login</a>
         </p>
     </form>

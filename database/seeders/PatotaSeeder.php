@@ -44,7 +44,7 @@ class PatotaSeeder extends Seeder
             'nivel_habilidade' => 'avancado',
         ]);
 
-        $conta('jogador@alfafut.test', ['name' => 'Joao Jogador', 'apelido' => 'Joao', 'tipo_usuario' => 'jogador']);
+        $conta('jogador@alfafut.test', ['name' => 'João Jogador', 'apelido' => 'João', 'tipo_usuario' => 'jogador']);
         $conta('organizadora@alfafut.test', ['name' => 'Maria Organizadora', 'apelido' => 'Mari', 'tipo_usuario' => 'dono_pelada']);
         $conta('campo@alfafut.test', ['name' => 'Pedro Dono do Campo', 'apelido' => 'Pedro', 'tipo_usuario' => 'dono_campo']);
 
@@ -62,12 +62,12 @@ class PatotaSeeder extends Seeder
             ['Kaio Martins', 'Kaio', 'goleiro', 'intermediario'],
             ['Larissa Dias', 'Lari', 'lateral', 'iniciante'],
             ['Marcelo Rocha', 'Marcelo', 'zagueiro', 'avancado'],
-            ['Natalia Cardoso', 'Nat', 'atacante', 'intermediario'],
+            ['Natália Cardoso', 'Nat', 'atacante', 'intermediario'],
         ];
 
         $usuarios = [];
         foreach ($jogadores as [$nome, $apelido, $posicao, $nivel]) {
-            $usuarios[] = $conta(strtolower(str_replace(' ', '.', $nome)).'@alfafut.test', [
+            $usuarios[] = $conta(strtolower(str_replace(' ', '.', Str::ascii($nome))).'@alfafut.test', [
                 'name' => $nome,
                 'apelido' => $apelido,
                 'posicao_preferida' => $posicao,

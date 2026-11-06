@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>AlfaFut - Sua turma organizada e acessivel</title>
-    <meta name="description" content="Solucao colaborativa para gestao de turmas de futebol com suporte de acessibilidade.">
+    <title>AlfaFut - Sua turma organizada e acessível</title>
+    <meta name="description" content="Solução colaborativa para gestão de turmas de futebol com suporte de acessibilidade.">
     <meta name="theme-color" content="#1b5e20">
 
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
@@ -20,11 +20,11 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-surface text-on-surface" x-data="{ loginAberto: {{ $errors->any() && old('email') ? 'true' : 'false' }} }">
-    <a href="#conteudo" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-primary focus:text-on-primary focus:px-4 focus:py-2 focus:rounded">Pular para o conteudo</a>
+    <a href="#conteudo" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-primary focus:text-on-primary focus:px-4 focus:py-2 focus:rounded">Pular para o conteúdo</a>
 
     <header class="bg-primary text-on-primary" role="banner">
         <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-            <a href="{{ route('home') }}" class="flex items-center gap-2 no-underline shrink-0" aria-label="AlfaFut - Pagina inicial">
+            <a href="{{ route('home') }}" class="flex items-center gap-2 no-underline shrink-0" aria-label="AlfaFut - Página inicial">
                 <img src="{{ asset('images/logo/icon.svg') }}" alt="" class="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-white p-1" aria-hidden="true">
                 <span class="font-bold text-lg sm:text-xl text-white">AlfaFut</span>
             </a>
@@ -52,7 +52,7 @@
                  x-cloak
                  x-transition
                  role="region"
-                 aria-label="Formulario de login">
+                 aria-label="Formulário de login">
                 <div class="max-w-6xl mx-auto px-4 pb-6">
                     <form method="POST" action="{{ route('login') }}"
                           class="bg-white rounded-2xl p-6 shadow-lg"
@@ -109,16 +109,16 @@
             <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-6 md:gap-8 items-center relative">
                 <div>
                     <h1 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-3 sm:mb-4">Sua turma organizada do jeito que ela merece.</h1>
-                    <p class="text-base sm:text-lg opacity-95 mb-5 sm:mb-6">Gerencie partidas, confirme presencas, divida despesas e converse com o time num espaco compartilhado e acessivel a todos.</p>
-                    <a href="{{ route('register') }}" class="btn btn-secondary">Comecar gratis</a>
+                    <p class="text-base sm:text-lg opacity-95 mb-5 sm:mb-6">Gerencie partidas, confirme presenças, divida despesas e converse com o time num espaço compartilhado e acessível a todos.</p>
+                    <a href="{{ route('register') }}" class="btn btn-secondary">Começar grátis</a>
                 </div>
                 <div class="card text-on-surface">
                     <h2 class="text-xl font-semibold mb-3">Por que AlfaFut?</h2>
                     <ul class="space-y-2 list-disc pl-6">
-                        <li>Confirmacao de presenca e lista de espera automatica.</li>
-                        <li>Sorteio justo de times respeitando posicao e nivel.</li>
-                        <li>Rateio automatico de despesas por partida.</li>
-                        <li>Mural de comunicacao com todos da turma.</li>
+                        <li>Confirmação de presença e lista de espera automática.</li>
+                        <li>Sorteio justo de times respeitando posição e nível.</li>
+                        <li>Rateio automático de despesas por partida.</li>
+                        <li>Mural de comunicação com todos da turma.</li>
                     </ul>
                 </div>
             </div>
@@ -128,29 +128,29 @@
             <div class="max-w-6xl mx-auto px-4">
                 <div class="text-center mb-10">
                     <h2 id="como-funciona-h" class="text-3xl font-bold">Veja como funciona</h2>
-                    <p class="text-gray-700 mt-2 max-w-2xl mx-auto">Prints reais do AlfaFut em uso. Tudo pensado pra ser simples e direto - na web ou no app.</p>
+                    <p class="text-gray-700 mt-2 max-w-2xl mx-auto">Prints reais do AlfaFut em uso. Tudo pensado para ser simples e direto - na web ou no app.</p>
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6">
                     <figure class="card !p-3">
                         <img src="{{ asset('images/screenshots/04-dashboard.png') }}"
-                             alt="Painel do AlfaFut com cards de resumo, lista de turmas e proximas partidas"
+                             alt="Painel do AlfaFut com cards de resumo, lista de turmas e próximas partidas"
                              class="w-full h-auto rounded-lg"
                              loading="lazy">
                         <figcaption class="mt-3 px-2">
                             <strong class="block">📊 Painel principal</strong>
-                            <span class="text-sm text-gray-700">Suas turmas, proximas partidas e o que voce ja confirmou - tudo em um lugar.</span>
+                            <span class="text-sm text-gray-700">Suas turmas, próximas partidas e o que você já confirmou - tudo em um lugar.</span>
                         </figcaption>
                     </figure>
 
                     <figure class="card !p-3">
                         <img src="{{ asset('images/screenshots/10-partida-detalhe.png') }}"
-                             alt="Tela da partida com botoes de confirmar, recusar, sortear times e lista de confirmados"
+                             alt="Tela da partida com botões de confirmar, recusar, sortear times e lista de confirmados"
                              class="w-full h-auto rounded-lg"
                              loading="lazy">
                         <figcaption class="mt-3 px-2">
                             <strong class="block">⚽ Confirmar e sortear</strong>
-                            <span class="text-sm text-gray-700">Confirmacao em 1 toque, lista de espera automatica e sorteio justo de times.</span>
+                            <span class="text-sm text-gray-700">Confirmação em 1 toque, lista de espera automática e sorteio justo de times.</span>
                         </figcaption>
                     </figure>
 
@@ -160,14 +160,14 @@
                              class="w-full h-auto rounded-lg"
                              loading="lazy">
                         <figcaption class="mt-3 px-2">
-                            <strong class="block">💰 Rateio automatico</strong>
-                            <span class="text-sm text-gray-700">Aluguel do campo dividido entre os confirmados. Cada um da baixa no proprio PIX.</span>
+                            <strong class="block">💰 Rateio automático</strong>
+                            <span class="text-sm text-gray-700">Aluguel do campo dividido entre os confirmados. Cada um da baixa no próprio PIX.</span>
                         </figcaption>
                     </figure>
 
                     <figure class="card !p-3">
                         <img src="{{ asset('images/screenshots/07-mural.png') }}"
-                             alt="Mural da turma com formulario de nova mensagem e lista de posts"
+                             alt="Mural da turma com formulário de nova mensagem e lista de posts"
                              class="w-full h-auto rounded-lg"
                              loading="lazy">
                         <figcaption class="mt-3 px-2">
@@ -185,7 +185,7 @@
 
         <section class="py-16 bg-gray-50" aria-labelledby="galeria-h">
             <div class="max-w-6xl mx-auto px-4">
-                <h2 id="galeria-h" class="text-2xl font-bold mb-2">A turma em acao</h2>
+                <h2 id="galeria-h" class="text-2xl font-bold mb-2">A turma em ação</h2>
                 <p class="text-gray-700 mb-6">Registros de partidas reais da comunidade que inspirou o projeto.</p>
                 <ul class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" role="list">
                     @for ($i = 1; $i <= 12; $i++)
@@ -202,14 +202,11 @@
 
     </main>
 
-    <footer class="bg-gray-900 text-gray-100 py-6" role="contentinfo">
-        <div class="max-w-6xl mx-auto px-4 text-sm">
-            AlfaFut &middot; Atividade de Extensao Uniasselvi - 2026 &middot; ADS / Gestao de Tecnologia.
-        </div>
-    </footer>
+    @include('partials.rodape', ['margem' => ''])
 
     <div id="banner-instalar"
          x-data="{ aberto: false }"
+         @alfafut-instalar.window="aberto = true"
          x-show="aberto"
          x-cloak
          x-transition
@@ -217,7 +214,7 @@
         <img src="{{ asset('images/logo/icon.svg') }}" alt="" class="h-12 w-12 rounded-full bg-white p-1 shrink-0">
         <div class="flex-1 min-w-0">
             <p class="font-semibold text-sm">Instalar AlfaFut</p>
-            <p class="text-xs opacity-90">Adicione na tela inicial pra usar offline.</p>
+            <p class="text-xs opacity-90">Adicione à tela inicial para abrir como aplicativo.</p>
         </div>
         <button id="btn-instalar" class="btn btn-secondary text-sm" @click="aberto = false">Instalar</button>
         <button class="text-on-primary opacity-70 hover:opacity-100" aria-label="Fechar" @click="aberto = false">✕</button>

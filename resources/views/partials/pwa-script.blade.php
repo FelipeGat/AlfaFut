@@ -10,36 +10,30 @@
         }
 
         let deferredPrompt = null;
-        const banner = document.getElementById('banner-instalar');
         const btn = document.getElementById('btn-instalar');
+        const abrirBanner = () => window.dispatchEvent(new CustomEvent('alfafut-instalar'));
 
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
+            abrirBanner();
+        });
 
-            // Mostrar banner via Alpine
-            if (banner && banner.__x) {
-                banner.__x.$data.aberto = true;
-            } else if (banner) {
-                // fallback - dispara depois do Alpine carregar
-                setTimeout(() => {
-                    if (banner.__x) banner.__x.$data.aberto = true;
-                }, 500);
-            }
+        // O navegador pode oferecer a instalação antes de o Alpine iniciar.
+        document.addEventListener('alpine:initialized', () => {
+            if (deferredPrompt) abrirBanner();
         });
 
         if (btn) {
             btn.addEventListener('click', async () => {
                 if (!deferredPrompt) return;
                 deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
+                await deferredPrompt.userChoice;
                 deferredPrompt = null;
-                console.log('Instalacao:', outcome);
             });
         }
 
         window.addEventListener('appinstalled', () => {
-            console.log('AlfaFut instalado.');
             deferredPrompt = null;
         });
     })();

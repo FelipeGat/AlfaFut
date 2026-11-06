@@ -25,6 +25,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
         Route::patch('perfil', [UsuarioController::class, 'atualizarPerfil']);
         Route::patch('perfil/acessibilidade', [UsuarioController::class, 'atualizarAcessibilidade']);
+        Route::get('perfil/meus-dados', [UsuarioController::class, 'meusDados'])->middleware('throttle:meus-dados');
 
         Route::middleware('verified')->group(function () {
             Route::post('patotas/entrar', [PatotaController::class, 'entrar'])->middleware('throttle:entrar-codigo');

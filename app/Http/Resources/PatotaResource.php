@@ -26,7 +26,7 @@ class PatotaResource extends JsonResource
                 $request->user()?->id === $this->criador_id,
                 $this->codigo_convite
             ),
-            'total_membros' => $this->whenCounted('membros'),
+            'total_membros' => $this->when(isset($this->total_membros), fn () => (int) $this->total_membros),
             'criador' => new UsuarioResource($this->whenLoaded('criador')),
             'criada_em' => $this->created_at?->toIso8601String(),
         ];

@@ -19,7 +19,7 @@
             <input id="email" name="email" type="email" class="input" required autofocus value="{{ old('email') }}">
             @error('email')<p class="text-red-700 text-sm mt-1" role="alert">{{ $message }}</p>@enderror
         </div>
-        <button type="submit" class="btn btn-primary w-full">Enviar link de recuperacao</button>
+        <button type="submit" class="btn btn-primary w-full">Enviar link de recuperação</button>
         <p class="text-center text-sm pt-2">
             <a href="{{ route('login') }}" class="underline" style="color: var(--md-sys-color-primary);">Voltar para o login</a>
         </p>

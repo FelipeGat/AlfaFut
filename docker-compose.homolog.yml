@@ -28,6 +28,8 @@ services:
       MAIL_PORT: 1025
       MAIL_FROM_ADDRESS: naoresponda@alfafut.test
       MAIL_FROM_NAME: AlfaFut
+      ALFAFUT_RESPONSAVEL_NOME: AlfaFut Homologação
+      ALFAFUT_CONTATO_PRIVACIDADE: privacidade@alfafut.test
     ports:
       - "127.0.0.1:8100:8080"
     volumes:

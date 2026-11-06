@@ -35,7 +35,7 @@ class PlacarController extends Controller
     {
         $this->authorize('view', $partida);
 
-        abort_unless($partida->finalizada(), 404, 'A partida ainda nao foi finalizada.');
+        abort_unless($partida->finalizada(), 404, 'A partida ainda não foi finalizada.');
         $partida->load(['patota', 'times.jogadores', 'eventos.jogador', 'eventos.time']);
 
         $artilheiros = $partida->gols()

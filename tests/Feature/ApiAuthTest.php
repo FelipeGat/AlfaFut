@@ -20,6 +20,7 @@ class ApiAuthTest extends TestCase
             'email' => 'teste@alfafut.test',
             'password' => self::SENHA,
             'apelido' => 'Tt',
+            'aceite_termos' => true,
         ]);
 
         $r->assertCreated()

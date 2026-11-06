@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="title">Acessibilidade</x-slot>
     <x-slot name="header">
-        <h1 class="font-bold text-2xl">Preferencias de acessibilidade</h1>
-        <p class="opacity-90 text-sm">Suas escolhas se aplicam imediatamente em toda a aplicacao.</p>
+        <h1 class="font-bold text-2xl">Preferências de acessibilidade</h1>
+        <p class="opacity-90 text-sm">Suas escolhas se aplicam imediatamente em toda a aplicação.</p>
     </x-slot>
 
     <div class="py-8 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -36,29 +36,29 @@
                 <div class="mt-4 flex items-center gap-3">
                     <input id="reduzir_movimento" name="reduzir_movimento" type="checkbox" value="1" class="h-5 w-5"
                            {{ $user->reduzir_movimento ? 'checked' : '' }}>
-                    <label for="reduzir_movimento" class="mb-0">Reduzir animacoes e transicoes (WCAG 2.3.3)</label>
+                    <label for="reduzir_movimento" class="mb-0">Reduzir animações e transições</label>
                 </div>
 
                 <div class="mt-3 flex items-center gap-3">
                     <input id="leitor_tela_otimizado" name="leitor_tela_otimizado" type="checkbox" value="1" class="h-5 w-5"
                            {{ $user->leitor_tela_otimizado ? 'checked' : '' }}>
-                    <label for="leitor_tela_otimizado" class="mb-0">Otimizar para leitor de tela (descricoes detalhadas)</label>
+                    <label for="leitor_tela_otimizado" class="mb-0">Otimizar para leitor de tela (descrições detalhadas)</label>
                 </div>
             </fieldset>
 
             <fieldset>
-                <legend class="font-semibold text-lg">Necessidades especificas</legend>
+                <legend class="font-semibold text-lg">Necessidades específicas</legend>
                 <p class="text-sm text-gray-700 mt-1">Marque o que se aplica para que o organizador possa adaptar a partida.</p>
 
                 @php
                     $necessidades = $user->necessidades_acessibilidade ?? [];
                     $opcoes = [
                         'cadeirante' => 'Cadeirante / mobilidade reduzida',
-                        'visual_baixa' => 'Baixa visao',
+                        'visual_baixa' => 'Baixa visão',
                         'visual_total' => 'Cego',
-                        'auditiva' => 'Surdo / deficiencia auditiva',
-                        'libras' => 'Comunicacao em Libras',
-                        'cognitiva' => 'Deficiencia cognitiva',
+                        'auditiva' => 'Surdo / deficiência auditiva',
+                        'libras' => 'Comunicação em Libras',
+                        'cognitiva' => 'Deficiência cognitiva',
                         'tea' => 'Transtorno do espectro autista',
                     ];
                 @endphp
@@ -74,7 +74,7 @@
             </fieldset>
 
             <div class="flex justify-end">
-                <button type="submit" class="btn btn-primary">Salvar preferencias</button>
+                <button type="submit" class="btn btn-primary">Salvar preferências</button>
             </div>
         </form>
     </div>

@@ -3,7 +3,7 @@
 
     <div class="text-center mb-6">
         <h1 class="font-bold text-2xl" style="color: var(--md-sys-color-primary);">Entrar</h1>
-        <p class="text-sm text-gray-700 mt-1">Acesse sua turma e organize as proximas peladas.</p>
+        <p class="text-sm text-gray-700 mt-1">Acesse sua turma e organize as próximas peladas.</p>
     </div>
 
     @if (session('status'))
@@ -53,7 +53,7 @@
         <button type="submit" class="btn btn-primary w-full">Entrar</button>
 
         <p class="text-center text-sm pt-2">
-            Ainda nao tem conta?
+            Ainda não tem conta?
             <a href="{{ route('register') }}" class="underline" style="color: var(--md-sys-color-primary);">Criar conta</a>
         </p>
     </form>

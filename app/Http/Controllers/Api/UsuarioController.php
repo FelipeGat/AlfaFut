@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MeuUsuarioResource;
+use App\Services\DadosDoTitular;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class UsuarioController extends Controller
 {
@@ -39,5 +41,10 @@ class UsuarioController extends Controller
         $request->user()->update($dados);
 
         return new MeuUsuarioResource($request->user()->fresh());
+    }
+
+    public function meusDados(Request $request, DadosDoTitular $dados): Response
+    {
+        return $dados->baixar($request->user());
     }
 }

@@ -52,6 +52,7 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('cadastro', fn (Request $request) => $limite(Limit::perHour(30), $request->ip()));
         RateLimiter::for('recuperacao', fn (Request $request) => $limite(Limit::perMinute(3), $request->ip()));
         RateLimiter::for('reenvio-confirmacao', fn (Request $request) => $limite(Limit::perMinute(6), $request->user()?->id ?: $request->ip()));
+        RateLimiter::for('meus-dados', fn (Request $request) => $limite(Limit::perMinute(6), $request->user()?->id ?: $request->ip()));
         RateLimiter::for('entrar-codigo', fn (Request $request) => $limite(Limit::perMinute(10), $request->user()?->id ?: $request->ip()));
     }
 
@@ -60,7 +61,7 @@ class AppServiceProvider extends ServiceProvider
         $segundos = (int) ($headers['Retry-After'] ?? 60);
         $mensagem = "Muitas tentativas. Tente de novo em {$segundos} segundos.";
 
-        if ($request->expectsJson()) {
+        if ($request->expectsJson() || $request->is('api/*')) {
             return response()->json(['message' => $mensagem], 429, $headers);
         }
 

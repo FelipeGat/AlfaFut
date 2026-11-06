@@ -35,14 +35,15 @@ class RegisteredUserController extends Controller
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'tipo_usuario' => ['required', 'in:jogador,dono_pelada,dono_campo'],
-        ]);
+            'aceite_termos' => ['accepted'],
+        ], ['aceite_termos.accepted' => 'Para criar a conta, é preciso aceitar os termos de uso e a política de privacidade.']);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'tipo_usuario' => $request->tipo_usuario,
         ]);
+        $user->concluirCadastro($request->tipo_usuario);
 
         event(new Registered($user));
 

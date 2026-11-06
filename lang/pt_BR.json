@@ -11,5 +11,8 @@
     "Hello!": "Olá!",
     "Regards,": "Até logo,",
     "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:": "Se o botão \":actionText\" não funcionar, copie e cole este endereço no navegador:",
-    "All rights reserved.": "Todos os direitos reservados."
+    "All rights reserved.": "Todos os direitos reservados.",
+    "The given data was invalid.": "Os dados enviados são inválidos.",
+    "(and :count more error)": "(e mais :count erro)",
+    "(and :count more errors)": "(e mais :count erros)"
 }

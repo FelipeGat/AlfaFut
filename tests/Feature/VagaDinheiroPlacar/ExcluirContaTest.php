@@ -172,7 +172,7 @@ class ExcluirContaTest extends TestCase
         $this->excluir($user)->assertRedirect('/');
         $this->app['auth']->forgetGuards();
 
-        $this->post('/register', ['name' => 'Pessoa Nova', 'email' => $email, 'tipo_usuario' => 'jogador', 'password' => 'SenhaForte!2026x', 'password_confirmation' => 'SenhaForte!2026x'])->assertRedirect();
+        $this->post('/register', ['name' => 'Pessoa Nova', 'email' => $email, 'tipo_usuario' => 'jogador', 'password' => 'SenhaForte!2026x', 'password_confirmation' => 'SenhaForte!2026x', 'aceite_termos' => '1'])->assertRedirect();
 
         $nova = User::where('email', $email)->first();
         $this->assertNotNull($nova);

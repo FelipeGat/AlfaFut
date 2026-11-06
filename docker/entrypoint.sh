@@ -23,4 +23,7 @@ until php artisan migrate --force; do
     sleep 2
 done
 
+# Acesso vencido já é recusado; isto só tira os registros antigos do banco.
+php artisan sanctum:prune-expired --hours=24 || true
+
 exec "$@"

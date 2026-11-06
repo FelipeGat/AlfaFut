@@ -27,7 +27,7 @@
 
             <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                 @if ($campo->endereco)
-                    <div><dt class="text-gray-600">Endereco</dt><dd>{{ $campo->endereco }}</dd></div>
+                    <div><dt class="text-gray-600">Endereço</dt><dd>{{ $campo->endereco }}</dd></div>
                 @endif
                 @if ($campo->cidade)
                     <div><dt class="text-gray-600">Cidade</dt><dd>{{ $campo->cidade }}{{ $campo->estado ? '/' . $campo->estado : '' }}</dd></div>
@@ -42,14 +42,14 @@
 
             <div class="mt-4 flex flex-wrap gap-2 text-xs">
                 @if ($campo->coberto)<span class="px-2 py-1 rounded-full bg-blue-100 text-blue-900">Coberto</span>@endif
-                @if ($campo->possui_vestiario)<span class="px-2 py-1 rounded-full bg-gray-100">Vestiario</span>@endif
+                @if ($campo->possui_vestiario)<span class="px-2 py-1 rounded-full bg-gray-100">Vestiário</span>@endif
                 @if ($campo->possui_estacionamento)<span class="px-2 py-1 rounded-full bg-gray-100">Estacionamento</span>@endif
-                @if ($campo->acessivel_cadeirante)<span class="px-2 py-1 rounded-full bg-green-100 text-green-900">Acessivel</span>@endif
+                @if ($campo->acessivel_cadeirante)<span class="px-2 py-1 rounded-full bg-green-100 text-green-900">Acessível</span>@endif
             </div>
 
             @if ($campo->descricao)
                 <div class="mt-4">
-                    <p class="text-sm text-gray-600 mb-1">Descricao</p>
+                    <p class="text-sm text-gray-600 mb-1">Descrição</p>
                     <p class="whitespace-pre-line">{{ $campo->descricao }}</p>
                 </div>
             @endif
@@ -72,7 +72,7 @@
         </div>
 
         <p>
-            <a href="{{ route('campos.catalogo') }}" class="underline text-primary">&larr; Voltar ao catalogo</a>
+            <a href="{{ route('campos.catalogo') }}" class="underline text-primary">&larr; Voltar ao catálogo</a>
         </p>
     </div>
 </x-app-layout>

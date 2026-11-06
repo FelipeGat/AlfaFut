@@ -23,12 +23,15 @@ class AuthController extends Controller
             'password' => ['required', 'string', 'min:8'],
             'posicao_preferida' => ['nullable', 'in:goleiro,zagueiro,lateral,meia,atacante'],
             'nivel_habilidade' => ['nullable', 'in:iniciante,intermediario,avancado'],
-        ]);
+            'tipo_usuario' => ['nullable', 'in:jogador,dono_pelada,dono_campo'],
+            'aceite_termos' => ['accepted'],
+        ], ['aceite_termos.accepted' => 'Para criar a conta, é preciso aceitar os termos de uso e a política de privacidade.']);
 
         $user = User::create([
             ...$dados,
             'password' => Hash::make($dados['password']),
         ]);
+        $user->concluirCadastro($dados['tipo_usuario'] ?? 'jogador');
 
         event(new Registered($user));
 
@@ -52,7 +55,7 @@ class AuthController extends Controller
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['Credenciais invalidas.'],
+                'email' => ['E-mail ou senha incorretos.'],
             ]);
         }
 
@@ -82,6 +85,6 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json(['mensagem' => 'Sessao encerrada.']);
+        return response()->json(['mensagem' => 'Sessão encerrada.']);
     }
 }

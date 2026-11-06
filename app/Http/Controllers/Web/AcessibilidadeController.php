@@ -33,6 +33,6 @@ class AcessibilidadeController extends Controller
             'necessidades_acessibilidade' => $dados['necessidades_acessibilidade'] ?? null,
         ]);
 
-        return back()->with('status', 'Preferencias de acessibilidade salvas.');
+        return back()->with('status', 'Preferências de acessibilidade salvas.');
     }
 }

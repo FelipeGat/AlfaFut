@@ -2,13 +2,13 @@
     <x-slot name="title">Nova turma</x-slot>
     <x-slot name="header">
         <h1 class="font-bold text-2xl">Criar nova turma</h1>
-        <p class="text-sm opacity-90">Passo 1: voce sera o administrador, depois compartilhe o codigo de convite.</p>
+        <p class="text-sm opacity-90">Passo 1: você será o administrador, depois compartilhe o código de convite.</p>
     </x-slot>
 
     <div class="py-8 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <form method="POST" action="{{ route('patotas.store') }}" class="card space-y-6" aria-describedby="form-help">
             @csrf
-            <p id="form-help" class="text-sm text-gray-700">Os campos marcados com asterisco (*) sao obrigatorios.</p>
+            <p id="form-help" class="text-sm text-gray-700">Os campos marcados com asterisco (*) são obrigatórios.</p>
 
             <div>
                 <label for="nome">Nome da turma *</label>
@@ -19,8 +19,8 @@
             </div>
 
             <fieldset x-data="{ sel: '{{ old('brasao') }}' }">
-                <legend class="font-medium block mb-2">Escolha o brasao da turma</legend>
-                <p class="text-sm text-gray-700 mb-3">20 clubes ficticios disponiveis. O brasao sera usado em jogos, placar e mural.</p>
+                <legend class="font-medium block mb-2">Escolha o brasão da turma</legend>
+                <p class="text-sm text-gray-700 mb-3">20 clubes fictícios disponíveis. O brasão será usado em jogos, placar e mural.</p>
                 <input type="hidden" name="brasao" :value="sel">
                 <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
                     @foreach ($clubes as $clube)
@@ -30,18 +30,18 @@
                                 style="--tw-ring-color: var(--md-sys-color-primary);"
                                 class="bg-white border rounded-lg p-2 transition-all hover:shadow-lg focus:outline-none"
                                 :aria-pressed="sel === '{{ $clube['brasao'] }}' ? 'true' : 'false'"
-                                aria-label="Escolher brasao {{ $clube['nome'] }}">
+                                aria-label="Escolher brasão {{ $clube['nome'] }}">
                             <img src="{{ asset($clube['brasao']) }}" alt="{{ $clube['nome'] }}" class="w-full h-auto" loading="lazy">
                             <span class="block text-xs mt-1 text-center text-gray-700 truncate">{{ $clube['nome'] }}</span>
                         </button>
                     @endforeach
                 </div>
-                <p class="text-xs text-gray-600 mt-2" x-show="!sel">Nenhum brasao selecionado (opcional).</p>
-                <p class="text-xs text-green-700 mt-2" x-show="sel" x-cloak>✓ Brasao selecionado.</p>
+                <p class="text-xs text-gray-600 mt-2" x-show="!sel">Nenhum brasão selecionado (opcional).</p>
+                <p class="text-xs text-green-700 mt-2" x-show="sel" x-cloak>✓ Brasão selecionado.</p>
             </fieldset>
 
             <div>
-                <label for="descricao">Descricao</label>
+                <label for="descricao">Descrição</label>
                 <textarea id="descricao" name="descricao" class="textarea" rows="3" maxlength="500">{{ old('descricao') }}</textarea>
             </div>
 
@@ -57,7 +57,7 @@
             </div>
 
             <fieldset class="border rounded-lg p-4">
-                <legend class="px-2 font-medium">Configuracao do jogo</legend>
+                <legend class="px-2 font-medium">Configuração do jogo</legend>
                 <div class="grid sm:grid-cols-2 gap-4 mt-2">
                     <div>
                         <label for="jogadores_por_time">Jogadores por time *</label>
@@ -73,7 +73,7 @@
                     </div>
                     <div class="flex items-center mt-7">
                         <input id="publica" name="publica" type="checkbox" value="1" class="h-5 w-5" {{ old('publica') ? 'checked' : '' }}>
-                        <label for="publica" class="ms-2 mb-0">Turma publica (aparece em busca)</label>
+                        <label for="publica" class="ms-2 mb-0">Turma pública (aparece em busca)</label>
                     </div>
                 </div>
             </fieldset>

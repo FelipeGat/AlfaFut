@@ -65,7 +65,7 @@ class PatotaController extends Controller
             'status' => 'ativo',
         ]);
 
-        return response()->json(new PatotaResource($patota->load('criador')), 201);
+        return response()->json(new PatotaResource($patota->load('criador')->loadCount('membrosAtivos as total_membros')), 201);
     }
 
     public function show(Request $request, Patota $patota): PatotaResource

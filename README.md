@@ -1,73 +1,31 @@
 # AlfaFut
 
-> Solucao colaborativa para gestao de patota de futebol com suporte de acessibilidade.
+Sistema para organizar a pelada: turma, partida, presença e lista de espera, sorteio de times, placar ao vivo, rateio de despesas, mural e catálogo de campos, com preferências de acessibilidade por pessoa.
 
-Atividade de Extensao da Uniasselvi - Curso de Gestao de Tecnologia / ADS.
-Carga horaria: 230 horas. Modalidade: Prestacao de servicos > Outros servicos tecnicos especializados.
-
-Desenvolvido seguindo:
-- **Modelo 3C de Colaboracao** (Comunicacao, Coordenacao, Cooperacao) - Fuks et al. (2005)
-- **Material Design 3** (Google) e **10 Heuristicas de Nielsen**
-- **WCAG 2.1** (Web Content Accessibility Guidelines)
-
-## Estrutura do projeto
-
-| Pasta | Conteudo |
-|-------|----------|
-| `AlfaFut/` | Backend web em Laravel 12 + API REST |
-| `AlfaFutApp/` | App mobile em Flutter (Android/iOS) |
+Em fase de teste. Roda no navegador, pode ser instalado como aplicativo (PWA) e tem API REST v1. O app Flutter fica no repositório `AlfaFutApp`.
 
 ## Stack
 
-- **Backend:** PHP 8.2 + Laravel 12 + Sanctum + SQLite (dev)
-- **Frontend web:** Blade + Tailwind 3 + Material Design 3 + Alpine.js
-- **App mobile:** Flutter 3.41 + Riverpod + go_router + dio
-- **Acessibilidade:** WCAG 2.1 AA (alto contraste AAA opcional)
+- PHP 8.3 e Laravel 12, com Sanctum
+- Blade, Tailwind 3, Alpine 3 e Vite 7
+- MySQL 8.4 em produção e SQLite nos testes
+- Imagem Docker com nginx e PHP-FPM
 
-## Como rodar
+## Testes
 
-### Backend
-
-```bash
-cd C:\xampp\htdocs\AlfaFut
-composer install
-php artisan migrate:fresh --seed
-php artisan serve --port=8000
-```
-
-Acesse `http://127.0.0.1:8000` ou via XAMPP em `http://localhost/AlfaFut/public`.
-
-**Usuario admin do seed:**
-- E-mail: `admin@alfafut.test`
-- Senha: mostrada no terminal ao rodar `php artisan db:seed`
-
-### Rodar testes automatizados
+Sem PHP na máquina, com Docker:
 
 ```bash
-php artisan test --filter='ApiAuthTest|ApiPatotaTest|ApiPartidaTest|ApiDespesaTest|SorteioTimesTest'
+docker run --rm -u $(id -u):$(id -g) -v "$PWD":/app -w /app php:8.3-cli-alpine vendor/bin/phpunit
 ```
 
-Cobertura atual: 18 feature tests + 2 unit tests (47 assertions).
+## Rodar como em produção
 
-Mais 14 jogadores ficticios sao criados (mesma senha).
+A imagem (`Dockerfile`) roda nginx + PHP-FPM sob supervisor, sem root, e escuta na porta 8080. O banco é MySQL externo, e `storage` fica em volume. Ao subir, ela confere a configuração (`alfafut:checar-producao`), roda as migrações e nunca roda seed.
 
-### App Flutter
+Variáveis obrigatórias: `APP_KEY`, `APP_URL`, `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_FROM_ADDRESS`, `ALFAFUT_RESPONSAVEL_NOME` e `ALFAFUT_CONTATO_PRIVACIDADE`. Com HTTPS, acrescente `SESSION_SECURE_COOKIE=true` e, atrás de proxy, `TRUSTED_PROXIES`. `ALFAFUT_RESPONSAVEL_DOCUMENTO` é opcional e aparece na política de privacidade.
 
-```bash
-cd C:\xampp\htdocs\AlfaFutApp
-flutter pub get
-flutter run
-```
-
-Para apontar para outro host: `--dart-define=ALFAFUT_API_URL=http://192.168.x.x/AlfaFut/public/api/v1`.
-
-### Imagem de producao
-
-A imagem (`Dockerfile`) roda nginx + PHP-FPM sob supervisor, sem root, e escuta na porta 8080. O banco e MySQL externo, e `storage` fica em volume. Ao subir, ela confere a configuracao (`alfafut:checar-producao`), roda as migracoes e nunca roda seed.
-
-Variaveis obrigatorias: `APP_KEY`, `APP_URL`, `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_FROM_ADDRESS`. Com HTTPS, acrescente `SESSION_SECURE_COOKIE=true` e, atras de proxy, `TRUSTED_PROXIES`.
-
-Para reproduzir a producao nesta maquina, com caixa de e-mail de desenvolvimento:
+Para reproduzir nesta máquina, com caixa de e-mail de desenvolvimento:
 
 ```bash
 printf 'APP_KEY=base64:%s\nDB_PASSWORD=%s\n' "$(openssl rand -base64 32)" "$(openssl rand -hex 24)" > .env.homolog
@@ -77,44 +35,17 @@ docker exec -it alfafut-homolog-app php artisan alfafut:criar-admin voce@exemplo
 
 Sistema em `http://localhost:8100` e e-mails recebidos em `http://localhost:8099`.
 
-## Documentacao do projeto
+## Dados de demonstração
 
-Toda a documentacao da atividade de extensao esta em `docs/`:
+`php artisan db:seed` cria contas e turmas fictícias, com senha gerada na hora e mostrada no terminal. O seed é recusado em produção.
 
-- [`docs/01-personas.md`](docs/01-personas.md) - Personas (Etapa i)
-- [`docs/02-requisitos.md`](docs/02-requisitos.md) - Requisitos funcionais e nao funcionais (Etapas j, m)
-- [`docs/03-modelo-3c.md`](docs/03-modelo-3c.md) - Mapeamento das funcionalidades pelo Modelo 3C (Etapa c)
-- [`docs/04-acessibilidade-wcag.md`](docs/04-acessibilidade-wcag.md) - Conformidade WCAG 2.1 (Etapa g)
-- [`docs/05-usabilidade-heuristicas.md`](docs/05-usabilidade-heuristicas.md) - Heuristicas de Nielsen (Etapa f)
-- [`docs/06-prototipo-baixa-fidelidade.md`](docs/06-prototipo-baixa-fidelidade.md) - Apendice D (Etapa k)
-- [`docs/07-prototipo-alta-fidelidade.md`](docs/07-prototipo-alta-fidelidade.md) - Apendice E (Etapa l)
-- [`docs/08-arquitetura.md`](docs/08-arquitetura.md) - Diagramas e arquitetura (Etapa n)
-- [`docs/09-api.md`](docs/09-api.md) - Documentacao da API REST
-- [`docs/10-cronograma.md`](docs/10-cronograma.md) - Cronograma de execucao das 230h
-- [`docs/11-eventos.md`](docs/11-eventos.md) - Evidencias fotograficas de campo (Etapa a)
+## Documentação
 
-## Status das etapas (PDF Uniasselvi)
+- [`docs/briefing.md`](docs/briefing.md) e [`docs/constitution.md`](docs/constitution.md): visão e princípios do projeto
+- [`docs/specs/`](docs/specs): especificação, plano e tarefas de cada frente
+- [`docs/09-api.md`](docs/09-api.md): API REST
+- `docs/01` a `docs/11`: documentos de pesquisa e de projeto da versão original
 
-| Etapa | Descricao | Status | Documento |
-|-------|-----------|--------|-----------|
-| a | Contato inicial | Parcial | docs/11 (fotos recebidas) |
-| b | Pesquisa em materiais | Concluida | docs/03 a docs/05 |
-| c | Modelo 3C | Concluida | docs/03-modelo-3c.md |
-| d | Personas | Concluida | docs/01-personas.md |
-| e | Prototipacao - estudo | Concluida | docs/06, docs/07 |
-| f | Usabilidade / UX | Concluida | docs/05 |
-| g | WCAG | Concluida | docs/04 |
-| h | Levantamento info | Pendente | a fazer em campo |
-| i | Personas detalhadas | Concluida | docs/01-personas.md |
-| j | Requisitos | Concluida | docs/02-requisitos.md |
-| k | Prototipo baixa fidelidade | Concluida | docs/06-prototipo-baixa-fidelidade.md |
-| l | Prototipo alta fidelidade | Concluida | docs/07-prototipo-alta-fidelidade.md |
-| m | Especificacao requisitos | Concluida | docs/02-requisitos.md |
-| n | Especificacao / UML | Concluida | docs/08-arquitetura.md |
-| o | Implementacao | **Concluida** | codigo (web + flutter completos, 3 pilares 3C) |
-| p | Verificacao / validacao | Parcial | 18 feature tests + sorteio unit tests; falta validacao em campo |
-| q | Relatorio / Paper | Pendente | depois das validacoes |
-
-## Licenca
+## Licença
 
 MIT.

@@ -34,6 +34,8 @@ class ChecarProducaoTest extends TestCase
             'sqlite' => [['database.default' => 'sqlite'], 'SQLite'],
             'e-mail no log' => [['mail.default' => 'log'], 'MAIL_MAILER'],
             'remetente padrão' => [['mail.from.address' => 'hello@example.com'], 'MAIL_FROM_ADDRESS'],
+            'sem responsável pelos dados' => [['alfafut.responsavel.nome' => null], 'ALFAFUT_RESPONSAVEL_NOME'],
+            'sem contato de privacidade' => [['alfafut.responsavel.contato_privacidade' => null], 'ALFAFUT_CONTATO_PRIVACIDADE'],
         ];
     }
 
@@ -46,6 +48,8 @@ class ChecarProducaoTest extends TestCase
             'database.default' => 'mysql',
             'mail.default' => 'smtp',
             'mail.from.address' => 'nao-responda@alfafut.test',
+            'alfafut.responsavel.nome' => 'Responsável de exemplo',
+            'alfafut.responsavel.contato_privacidade' => 'privacidade@alfafut.test',
         ]);
     }
 }

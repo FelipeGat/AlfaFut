@@ -24,6 +24,7 @@ class RegistrationTest extends TestCase
             'tipo_usuario' => 'jogador',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'aceite_termos' => '1',
         ]);
 
         $this->assertAuthenticated();

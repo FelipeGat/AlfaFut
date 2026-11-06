@@ -77,7 +77,7 @@
                         <input id="valor_mensalidade" name="valor_mensalidade" type="number" class="input" step="0.01" min="0" value="{{ old('valor_mensalidade', $patota->valor_mensalidade) }}" inputmode="decimal">
                     </div>
                     <div class="flex items-center mt-7">
-                        <input id="publica" name="publica" type="checkbox" value="1" class="h-5 w-5" {{ old('publica', $patota->publica) ? 'checked' : '' }}>
+                        <input id="publica" name="publica" type="checkbox" value="1" class="h-5 w-5" {{ old('publica', $patota->pública) ? 'checked' : '' }}>
                         <label for="publica" class="ms-2 mb-0">Turma pública</label>
                     </div>
                 </div>
@@ -93,7 +93,7 @@
             @csrf
             @method('DELETE')
             <h2 class="text-red-700">Zona perigosa</h2>
-            <p class="text-sm text-gray-700 mt-2">Arquivar a turma oculta ela e as partidas. Por enquanto, não há como restaurar pelo site.</p>
+            <p class="text-sm text-gray-700 mt-2">Arquivar a turma oculta ela e as partidas. Depois, quem criou pode restaurá-la na lista de turmas.</p>
             <button type="submit" class="btn btn-danger mt-4">Arquivar turma</button>
         </form>
     </div>

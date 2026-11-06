@@ -3,7 +3,7 @@
 
     <div class="text-center mb-6">
         <h1 class="font-bold text-2xl" style="color: var(--md-sys-color-primary);">Confirmar senha</h1>
-        <p class="text-sm text-gray-700 mt-2">Esta e uma area protegida. Confirme sua senha para continuar.</p>
+        <p class="text-sm text-gray-700 mt-2">Esta é uma área protegida. Confirme sua senha para continuar.</p>
     </div>
 
     <form method="POST" action="{{ route('password.confirm') }}" class="space-y-4">

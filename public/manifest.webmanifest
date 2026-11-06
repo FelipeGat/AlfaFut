@@ -1,7 +1,7 @@
 {
   "name": "AlfaFut - Sua turma organizada",
   "short_name": "AlfaFut",
-  "description": "Solucao colaborativa para gestao de turma de futebol com placar ao vivo, rateio de despesas e mural.",
+  "description": "Organize a sua turma de futebol: presença, times, placar ao vivo, rateio de despesas e mural.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

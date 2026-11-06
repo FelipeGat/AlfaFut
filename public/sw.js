@@ -1,13 +1,13 @@
 /**
  * AlfaFut Service Worker
- * So guarda o que e publico: arquivos estaticos e a pagina /offline.
- * Pagina autenticada, dado de turma e resposta de erro nunca ficam no aparelho.
- * - Navegacao: sempre a rede; sem rede, a pagina /offline.
+ * Só guarda o que é público: arquivos estáticos e a página /offline.
+ * Página autenticada, dado de turma e resposta de erro nunca ficam no aparelho.
+ * - Navegação: sempre a rede; sem rede, a página /offline.
  * - Arquivos estaticos: stale-while-revalidate.
  * - O resto (API, dados ao vivo, POST): nem passa por aqui.
  */
 
-const VERSAO = 'alfafut-v2';
+const VERSAO = 'alfafut-v3';
 const CACHE_ESTATICO = `${VERSAO}-estatico`;
 
 const PRE_CACHE = [

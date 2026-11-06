@@ -17,8 +17,8 @@
         @if ($campos->isEmpty())
             <div class="card text-center">
                 <div class="text-5xl mb-3">🏟️</div>
-                <p class="text-lg text-gray-700">Voce ainda nao cadastrou nenhum campo.</p>
-                <p class="text-sm text-gray-600 mt-2">Cadastre seu campo para que organizadores de pelada possam encontrar voce.</p>
+                <p class="text-lg text-gray-700">Você ainda não cadastrou nenhum campo.</p>
+                <p class="text-sm text-gray-600 mt-2">Cadastre seu campo para que organizadores de pelada possam encontrar você.</p>
                 <a href="{{ route('meus-campos.create') }}" class="btn btn-primary mt-4">Cadastrar meu primeiro campo</a>
             </div>
         @else
@@ -50,7 +50,7 @@
                                 <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-900">coberto</span>
                             @endif
                             @if ($campo->acessivel_cadeirante)
-                                <span class="px-2 py-1 rounded-full bg-green-100 text-green-900">acessivel</span>
+                                <span class="px-2 py-1 rounded-full bg-green-100 text-green-900">acessível</span>
                             @endif
                         </div>
                         <div class="mt-4 flex gap-2">

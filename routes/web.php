@@ -21,6 +21,8 @@ Route::get('/', function () {
 
 Route::get('/como-usar', ComoUsarController::class)->name('como-usar');
 Route::view('/offline', 'offline')->name('offline');
+Route::view('/privacidade', 'legal.privacidade')->name('privacidade');
+Route::view('/termos', 'legal.termos')->name('termos');
 
 Route::middleware(['auth', 'verified', 'cache.headers:no_store;private'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
@@ -100,6 +102,7 @@ Route::middleware(['auth', 'cache.headers:no_store;private'])->group(function ()
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/perfil/meus-dados', [ProfileController::class, 'meusDados'])->middleware('throttle:meus-dados')->name('profile.dados');
 });
 
 require __DIR__.'/auth.php';

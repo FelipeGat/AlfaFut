@@ -1,7 +1,7 @@
 <x-app-layout>
-    <x-slot name="title">Catalogo de campos</x-slot>
+    <x-slot name="title">Catálogo de campos</x-slot>
     <x-slot name="header">
-        <h1 class="font-bold text-xl sm:text-2xl">Campos disponiveis</h1>
+        <h1 class="font-bold text-xl sm:text-2xl">Campos disponíveis</h1>
     </x-slot>
 
     <div class="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -53,7 +53,7 @@
                                 <span class="px-2 py-1 rounded-full bg-gray-100">{{ \App\Models\Campo::tiposPiso()[$campo->tipo_piso] ?? $campo->tipo_piso }}</span>
                             @endif
                             @if ($campo->coberto)<span class="px-2 py-1 rounded-full bg-blue-100 text-blue-900">coberto</span>@endif
-                            @if ($campo->acessivel_cadeirante)<span class="px-2 py-1 rounded-full bg-green-100 text-green-900">acessivel</span>@endif
+                            @if ($campo->acessivel_cadeirante)<span class="px-2 py-1 rounded-full bg-green-100 text-green-900">acessível</span>@endif
                         </div>
                     </li>
                 @endforeach

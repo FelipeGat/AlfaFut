@@ -7,7 +7,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="description" content="AlfaFut - Solucao colaborativa para gestao de turmas de futebol com suporte de acessibilidade.">
+    <meta name="description" content="AlfaFut - Solução colaborativa para gestão de turmas de futebol com suporte de acessibilidade.">
     <meta name="theme-color" content="#1b5e20">
 
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
@@ -30,7 +30,7 @@
 <body class="font-sans antialiased bg-surface text-on-surface">
     {{-- WCAG 2.4.1 Bypass Blocks: skip link --}}
     <a href="#conteudo-principal" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-primary focus:text-on-primary focus:px-4 focus:py-2 focus:rounded">
-        Pular para o conteudo principal
+        Pular para o conteúdo principal
     </a>
 
     <div class="min-h-screen flex flex-col">
@@ -64,17 +64,13 @@
             {{ $slot }}
         </main>
 
-        <footer class="bg-gray-900 text-gray-100 mt-12" role="contentinfo">
-            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-xs sm:text-sm">
-                <p>AlfaFut &middot; Atividade de Extensão Uniasselvi</p>
-                <p class="mt-1 opacity-80">Modelo 3C, Material Design e WCAG 2.1.</p>
-            </div>
-        </footer>
+        @include('partials.rodape')
     </div>
 
     {{-- Banner "Instalar app" (aparece quando o navegador suporta) --}}
     <div id="banner-instalar"
          x-data="{ aberto: false }"
+         @alfafut-instalar.window="aberto = true"
          x-show="aberto"
          x-cloak
          x-transition
@@ -84,7 +80,7 @@
         <img src="{{ asset('images/logo/icon.svg') }}" alt="" class="h-12 w-12 rounded-full bg-white p-1 shrink-0">
         <div class="flex-1 min-w-0">
             <p class="font-semibold text-sm">Instalar AlfaFut</p>
-            <p class="text-xs opacity-90">Adicione na tela inicial pra usar offline.</p>
+            <p class="text-xs opacity-90">Adicione à tela inicial para abrir como aplicativo.</p>
         </div>
         <button id="btn-instalar" class="btn btn-secondary text-sm" @click="aberto = false">Instalar</button>
         <button class="text-on-primary opacity-70 hover:opacity-100" aria-label="Fechar" @click="aberto = false">✕</button>

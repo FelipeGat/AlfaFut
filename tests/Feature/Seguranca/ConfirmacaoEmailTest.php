@@ -23,6 +23,7 @@ class ConfirmacaoEmailTest extends TestCase
             'tipo_usuario' => 'jogador',
             'password' => 'senha-bem-grande',
             'password_confirmation' => 'senha-bem-grande',
+            'aceite_termos' => '1',
         ]);
 
         $user = User::where('email', 'nova@alfafut.test')->firstOrFail();
@@ -44,6 +45,7 @@ class ConfirmacaoEmailTest extends TestCase
             'name' => 'Pessoa Nova',
             'email' => 'nova@alfafut.test',
             'password' => 'senha-bem-grande',
+            'aceite_termos' => true,
         ])->assertCreated()->assertJsonPath('usuario.email_confirmado', false);
 
         $user = User::where('email', 'nova@alfafut.test')->firstOrFail();

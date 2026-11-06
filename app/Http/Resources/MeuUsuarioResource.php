@@ -17,6 +17,7 @@ class MeuUsuarioResource extends UsuarioResource
             'email_confirmado' => $this->hasVerifiedEmail(),
             'telefone' => $this->telefone,
             'role' => $this->role ?? 'user',
+            'tipo_usuario' => $this->tipo_usuario,
             'is_admin' => $this->isAdmin(),
             'preferencias_acessibilidade' => [
                 'alto_contraste' => (bool) $this->alto_contraste,

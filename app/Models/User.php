@@ -26,8 +26,6 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         'posicao_preferida',
         'nivel_habilidade',
         'password',
-        'role',
-        'tipo_usuario',
         'alto_contraste',
         'tamanho_fonte',
         'reduzir_movimento',
@@ -45,6 +43,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         return [
             'email_verified_at' => 'datetime',
             'excluida_em' => 'datetime',
+            'termos_aceitos_em' => 'datetime',
             'data_nascimento' => 'date',
             'password' => 'hashed',
             'alto_contraste' => 'boolean',
@@ -58,6 +57,16 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
     protected function nivelHabilidade(): Attribute
     {
         return Attribute::make(set: fn ($valor) => $valor ?? 'intermediario');
+    }
+
+    /** Só o cadastro define o perfil de uso e o aceite; por isso ficam fora do $fillable. */
+    public function concluirCadastro(string $tipoUsuario): void
+    {
+        $this->forceFill([
+            'tipo_usuario' => $tipoUsuario,
+            'termos_aceitos_em' => now(),
+            'termos_versao' => config('alfafut.versao_termos'),
+        ])->save();
     }
 
     public function patotasCriadas(): HasMany

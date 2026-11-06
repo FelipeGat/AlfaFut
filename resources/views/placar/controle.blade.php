@@ -70,7 +70,7 @@
         </section>
         @endif
 
-        <!-- Botoes principais -->
+        <!-- Botões principais -->
         <section class="card">
             <h2 class="text-lg font-semibold mb-4">Controle do tempo</h2>
             <div class="grid grid-cols-2 gap-3">

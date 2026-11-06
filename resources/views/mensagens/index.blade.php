@@ -12,7 +12,7 @@
             <form method="POST" action="{{ route('patotas.mensagens.store', $patota) }}" class="mt-3 space-y-3">
                 @csrf
                 <div>
-                    <label for="conteudo" class="sr-only">Conteudo da mensagem</label>
+                    <label for="conteudo" class="sr-only">Conteúdo da mensagem</label>
                     <textarea id="conteudo"
                               name="conteudo"
                               class="textarea"

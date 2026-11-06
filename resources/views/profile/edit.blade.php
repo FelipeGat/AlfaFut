@@ -19,7 +19,7 @@
         @endif
         @if (session('status') === 'verification-link-sent')
             <div role="status" aria-live="polite" class="bg-blue-50 border-l-4 border-blue-700 text-blue-900 p-4 rounded">
-                Um novo link de verificacao foi enviado para seu e-mail.
+                Um novo link de verificação foi enviado para seu e-mail.
             </div>
         @endif
 
@@ -85,11 +85,8 @@
 
                     @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                         <div class="mt-2 p-3 rounded bg-yellow-50 border-l-4 border-yellow-500 text-yellow-900 text-sm">
-                            Seu e-mail ainda nao foi verificado.
-                            <form method="POST" action="{{ route('verification.send') }}" class="inline">
-                                @csrf
-                                <button type="submit" class="underline font-medium">Reenviar link de verificacao</button>
-                            </form>
+                            Seu e-mail ainda não foi confirmado.
+                            <button type="submit" form="reenviar-confirmacao" class="underline font-medium">Reenviar link de confirmação</button>
                         </div>
                     @endif
                 </div>
@@ -98,13 +95,17 @@
                     <button type="submit" class="btn btn-primary">Salvar dados</button>
                 </div>
             </form>
+
+            <form id="reenviar-confirmacao" method="POST" action="{{ route('verification.send') }}" class="hidden">
+                @csrf
+            </form>
         </section>
 
         {{-- Card 2: Senha --}}
         <section class="card" aria-labelledby="senha-h">
             <header class="mb-4">
                 <h2 id="senha-h" class="text-lg font-semibold">Alterar senha</h2>
-                <p class="text-sm text-gray-700">Escolha uma senha forte e unica para esta conta.</p>
+                <p class="text-sm text-gray-700">Escolha uma senha forte e única para esta conta.</p>
             </header>
 
             <form method="POST" action="{{ route('password.update') }}" class="space-y-4">
@@ -137,7 +138,17 @@
             </form>
         </section>
 
-        {{-- Card 3: Zona perigosa --}}
+        {{-- Card 3: Seus dados --}}
+        <section class="card" aria-labelledby="dados-h">
+            <header class="mb-4">
+                <h2 id="dados-h" class="text-lg font-semibold">Seus dados</h2>
+                <p class="text-sm text-gray-700">Baixe uma cópia do que o AlfaFut guarda sobre você: cadastro, acessibilidade, turmas, presenças, parcelas e mensagens. Veja como tratamos seus dados na <a href="{{ route('privacidade') }}" class="underline">política de privacidade</a>.</p>
+            </header>
+
+            <a href="{{ route('profile.dados') }}" class="btn btn-secondary">Baixar meus dados</a>
+        </section>
+
+        {{-- Card 4: Zona perigosa --}}
         <section class="card border-2 border-red-200" aria-labelledby="perigo-h" x-data="{ confirmando: false }">
             <header class="mb-4">
                 <h2 id="perigo-h" class="text-lg font-semibold text-red-700">Zona perigosa</h2>

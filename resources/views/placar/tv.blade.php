@@ -101,7 +101,7 @@
                     <span class="badge-status bg-gray-600">FINALIZADA</span>
                 </template>
                 <template x-if="!dados.em_andamento && !dados.pausada && !dados.finalizada">
-                    <span class="badge-status bg-blue-600">AGUARDANDO INICIO</span>
+                    <span class="badge-status bg-blue-600">AGUARDANDO INÍCIO</span>
                 </template>
             </div>
         </header>
@@ -130,7 +130,7 @@
             <div class="placar-grid w-full max-w-6xl">
                 <div class="text-center anim-fade-in">
                     <template x-if="dados.times[0]?.brasao">
-                        <img :src="'/' + dados.times[0].brasao" :alt="'Brasao ' + dados.times[0].nome"
+                        <img :src="'/' + dados.times[0].brasao" :alt="'Brasão ' + dados.times[0].nome"
                              class="mx-auto" style="height: clamp(60px, 14vw, 140px); width: auto; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));">
                     </template>
                     <div class="time-nome mt-3" x-text="dados.times[0]?.nome ?? 'Time A'"></div>
@@ -146,7 +146,7 @@
 
                 <div class="text-center anim-fade-in">
                     <template x-if="dados.times[1]?.brasao">
-                        <img :src="'/' + dados.times[1].brasao" :alt="'Brasao ' + dados.times[1].nome"
+                        <img :src="'/' + dados.times[1].brasao" :alt="'Brasão ' + dados.times[1].nome"
                              class="mx-auto" style="height: clamp(60px, 14vw, 140px); width: auto; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));">
                     </template>
                     <div class="time-nome mt-3" x-text="dados.times[1]?.nome ?? 'Time B'"></div>
@@ -159,7 +159,7 @@
         </main>
 
         <footer class="px-4 sm:px-8 pb-6">
-            <h2 class="text-center text-sm uppercase tracking-widest opacity-70 mb-3">Ultimos eventos</h2>
+            <h2 class="text-center text-sm uppercase tracking-widest opacity-70 mb-3">Últimos eventos</h2>
             <div class="max-w-3xl mx-auto space-y-2">
                 <template x-for="(ev, idx) in dados.ultimos_eventos" :key="ev.criado_em + idx">
                     <div class="evento-item anim-slide-down">
@@ -234,7 +234,7 @@
                     return {gol: '⚽', gol_contra: '😬', inicio: '▶️', pausa: '⏸️', retomada: '▶️', fim: '🏁'}[tipo] ?? '·';
                 },
                 rotuloEvento(tipo) {
-                    return {inicio: 'Inicio da partida', pausa: 'Pausa', retomada: 'Retomada', fim: 'Fim da partida', gol: 'Gol', gol_contra: 'Gol contra'}[tipo] ?? tipo;
+                    return {inicio: 'Início da partida', pausa: 'Pausa', retomada: 'Retomada', fim: 'Fim da partida', gol: 'Gol', gol_contra: 'Gol contra'}[tipo] ?? tipo;
                 },
             };
         }

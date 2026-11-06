@@ -13,7 +13,7 @@
 
                 <div class="flex items-center justify-end gap-2 pt-2 border-t mt-4">
                     <a href="{{ route('meus-campos.index') }}" class="btn btn-secondary">Cancelar</a>
-                    <button type="submit" class="btn btn-primary">Salvar alteracoes</button>
+                    <button type="submit" class="btn btn-primary">Salvar alterações</button>
                 </div>
             </form>
         </div>

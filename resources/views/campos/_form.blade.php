@@ -10,9 +10,9 @@
     </div>
 
     <div class="md:col-span-2">
-        <label for="endereco">Endereco</label>
+        <label for="endereco">Endereço</label>
         <input id="endereco" name="endereco" type="text" class="input" maxlength="200"
-               value="{{ old('endereco', $c?->endereco) }}" placeholder="Rua, numero, bairro">
+               value="{{ old('endereco', $c?->endereco) }}" placeholder="Rua, número, bairro">
     </div>
 
     <div>
@@ -62,9 +62,9 @@
     </div>
 
     <div class="md:col-span-2">
-        <label for="descricao">Descricao</label>
+        <label for="descricao">Descrição</label>
         <textarea id="descricao" name="descricao" rows="3" class="input"
-                  placeholder="Detalhes sobre o campo, regras, horarios...">{{ old('descricao', $c?->descricao) }}</textarea>
+                  placeholder="Detalhes sobre o campo, regras, horários...">{{ old('descricao', $c?->descricao) }}</textarea>
     </div>
 
     <fieldset class="md:col-span-2 border rounded p-3">
@@ -74,13 +74,13 @@
                 <input type="checkbox" name="coberto" value="1" {{ old('coberto', $c?->coberto) ? 'checked' : '' }}> Coberto
             </label>
             <label class="flex items-center gap-2">
-                <input type="checkbox" name="possui_vestiario" value="1" {{ old('possui_vestiario', $c?->possui_vestiario) ? 'checked' : '' }}> Vestiario
+                <input type="checkbox" name="possui_vestiario" value="1" {{ old('possui_vestiario', $c?->possui_vestiario) ? 'checked' : '' }}> Vestiário
             </label>
             <label class="flex items-center gap-2">
                 <input type="checkbox" name="possui_estacionamento" value="1" {{ old('possui_estacionamento', $c?->possui_estacionamento) ? 'checked' : '' }}> Estacionamento
             </label>
             <label class="flex items-center gap-2">
-                <input type="checkbox" name="acessivel_cadeirante" value="1" {{ old('acessivel_cadeirante', $c?->acessivel_cadeirante) ? 'checked' : '' }}> Acessivel a cadeirantes
+                <input type="checkbox" name="acessivel_cadeirante" value="1" {{ old('acessivel_cadeirante', $c?->acessivel_cadeirante) ? 'checked' : '' }}> Acessível a cadeirantes
             </label>
         </div>
     </fieldset>
@@ -88,7 +88,7 @@
     @if ($c)
         <label class="flex items-center gap-2 md:col-span-2">
             <input type="checkbox" name="ativo" value="1" {{ old('ativo', $c->ativo) ? 'checked' : '' }}>
-            Campo ativo (aparece no catalogo publico)
+            Campo ativo (aparece no catálogo público)
         </label>
     @endif
 </div>

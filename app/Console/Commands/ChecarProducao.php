@@ -19,6 +19,8 @@ class ChecarProducao extends Command
             config('database.default') === 'sqlite' ? 'O banco de produção não pode ser SQLite: defina DB_CONNECTION=mysql.' : null,
             in_array(config('mail.default'), ['log', 'array'], true) ? 'Defina um envio real de e-mail em MAIL_MAILER: com log, os links ficariam no registro do servidor.' : null,
             config('mail.from.address') === 'hello@example.com' ? 'Defina MAIL_FROM_ADDRESS.' : null,
+            blank(config('alfafut.responsavel.nome')) ? 'Defina ALFAFUT_RESPONSAVEL_NOME: a política de privacidade precisa dizer quem responde pelos dados.' : null,
+            blank(config('alfafut.responsavel.contato_privacidade')) ? 'Defina ALFAFUT_CONTATO_PRIVACIDADE: a política de privacidade precisa de um contato.' : null,
         ]);
 
         foreach ($problemas as $problema) {

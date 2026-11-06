@@ -21,31 +21,27 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans antialiased bg-surface text-on-surface">
-    <a href="#conteudo" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-primary focus:text-on-primary focus:px-4 focus:py-2 focus:rounded">Pular para o conteudo</a>
+    <a href="#conteudo" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-primary focus:text-on-primary focus:px-4 focus:py-2 focus:rounded">Pular para o conteúdo</a>
 
     <header class="bg-primary text-on-primary" role="banner">
         <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
-            <a href="{{ route('home') }}" class="flex items-center gap-2 no-underline shrink-0" aria-label="AlfaFut - Pagina inicial">
+            <a href="{{ route('home') }}" class="flex items-center gap-2 no-underline shrink-0" aria-label="AlfaFut - Página inicial">
                 <img src="{{ asset('images/logo/icon.svg') }}" alt="" class="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-white p-1" aria-hidden="true">
                 <span class="font-bold text-lg sm:text-xl text-white">AlfaFut</span>
             </a>
             <nav aria-label="Acesso" class="flex items-center gap-2 shrink-0">
-                <a href="{{ route('home') }}" class="px-3 sm:px-4 py-2 rounded-full border-2 border-white text-white font-medium text-sm sm:text-base">Inicio</a>
+                <a href="{{ route('home') }}" class="px-3 sm:px-4 py-2 rounded-full border-2 border-white text-white font-medium text-sm sm:text-base">Início</a>
             </nav>
         </div>
     </header>
 
     <main id="conteudo" role="main" class="flex flex-col items-center px-4 py-10 sm:py-16" tabindex="-1">
-        <div class="w-full max-w-md card">
+        <div class="w-full {{ $attributes->get('largura', 'max-w-md') }} card">
             {{ $slot }}
         </div>
     </main>
 
-    <footer class="bg-gray-900 text-gray-100 mt-12" role="contentinfo">
-        <div class="max-w-7xl mx-auto py-6 px-4 text-sm text-center">
-            AlfaFut &middot; Atividade de Extensao Uniasselvi
-        </div>
-    </footer>
+    @include('partials.rodape')
 
     @include('partials.pwa-script')
 </body>
